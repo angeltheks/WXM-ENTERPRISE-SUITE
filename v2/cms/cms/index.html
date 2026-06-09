@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>WXM Control Center</title>
+    <meta name="description" content="Panel local para administrar WXM ONE RADIO CMC.">
+    <link rel="stylesheet" href="assets/css/cms.css?v=20260605-react-atlas">
+</head>
+<body>
+<div class="cms-shell">
+    <aside class="cms-sidebar">
+        <div class="brand-block">
+            <div class="brand-mark">WX</div>
+            <div>
+                <strong>WXM Control</strong>
+                <span>CMC local</span>
+            </div>
+        </div>
+
+        <nav class="cms-nav" aria-label="Navegacion del CMS">
+            <div class="nav-group">
+                <span class="nav-group-title">Centro de mando</span>
+                <button class="nav-pill active" data-section="overview">Dashboard</button>
+                <button class="nav-pill" data-section="analytics">Analytics</button>
+            </div>
+            <div class="nav-group">
+                <span class="nav-group-title">Emisora</span>
+                <button class="nav-pill" data-section="station">Identidad</button>
+                <button class="nav-pill" data-section="schedule">Programacion</button>
+                <button class="nav-pill" data-section="presenters">Locutores</button>
+                <button class="nav-pill" data-section="stations">Canales</button>
+            </div>
+            <div class="nav-group">
+                <span class="nav-group-title">Contenido</span>
+                <button class="nav-pill" data-section="banners">Banners</button>
+                <button class="nav-pill" data-section="highlights">Destacados</button>
+                <button class="nav-pill" data-section="content">Noticias / Replays</button>
+            </div>
+            <div class="nav-group">
+                <span class="nav-group-title">Crecimiento</span>
+                <button class="nav-pill" data-section="features">Funciones app</button>
+                <button class="nav-pill" data-section="interaction">Interaccion</button>
+                <button class="nav-pill" data-section="sponsors">Sponsors</button>
+            </div>
+            <div class="nav-group">
+                <span class="nav-group-title">Tecnico</span>
+                <button class="nav-pill" data-section="system">Sistema / Config</button>
+            </div>
+        </nav>
+
+        <div class="sidebar-note">
+            <span>Estado</span>
+            <strong id="sidebarStatus">Cargando...</strong>
+        </div>
+    </aside>
+
+    <main class="cms-main">
+        <header class="cms-header">
+            <div>
+                <span class="eyebrow">WXM ONE RADIO</span>
+                <h1>Control Center</h1>
+                <p>Administra el CMC local ahora y prepara el salto al CMS remoto por HTTPS.</p>
+            </div>
+            <div class="header-actions">
+                <button class="ghost-btn" id="togglePreviewBtn" aria-pressed="false">Ocultar preview</button>
+                <button class="ghost-btn" id="reloadBtn">Recargar CMC</button>
+                <button class="primary-btn" id="saveDraftBtn">Guardar borrador</button>
+            </div>
+        </header>
+
+        <section class="cms-grid">
+            <div class="workspace">
+                <section class="cms-section active" data-panel="overview">
+                    <div class="section-heading">
+                        <span class="eyebrow">Resumen operativo</span>
+                        <h2>Panel de control local</h2>
+                    </div>
+                    <div class="metric-grid">
+                        <article class="metric-card">
+                            <span>Revision</span>
+                            <strong id="metricRevision">--</strong>
+                        </article>
+                        <article class="metric-card">
+                            <span>Stream</span>
+                            <strong id="metricStream">--</strong>
+                        </article>
+                        <article class="metric-card">
+                            <span>Fallbacks</span>
+                            <strong id="metricFallbacks">0</strong>
+                        </article>
+                        <article class="metric-card">
+                            <span>Funciones activas</span>
+                            <strong id="metricFeatures">0</strong>
+                        </article>
+                    </div>
+                    <article class="readiness-card" id="readinessCard">
+                        <div>
+                            <span class="eyebrow">Publicacion</span>
+                            <h3 id="readinessTitle">Revisando contrato...</h3>
+                            <p id="readinessSummary">El CMS validara el JSON antes de permitir publicarlo.</p>
+                        </div>
+                        <ul id="readinessIssues"></ul>
+                    </article>
+                    <div class="control-room-grid">
+                        <article class="control-card">
+                            <span>Publicacion</span>
+                            <strong>Contrato CMS</strong>
+                            <p>Exporta el JSON de la app, revisa el gate y prepara hosting HTTPS.</p>
+                            <button class="small-btn" data-jump="system" data-system-tab-jump="publish">Abrir publicacion</button>
+                        </article>
+                        <article class="control-card">
+                            <span>Operacion tecnica</span>
+                            <strong>Stream y endpoints</strong>
+                            <p>Gestiona senal principal, metadata, fallbacks y emergencia.</p>
+                            <button class="small-btn" data-jump="system" data-system-tab-jump="operations">Configurar operacion</button>
+                        </article>
+                        <article class="control-card">
+                            <span>Contenido</span>
+                            <strong>Portada editorial</strong>
+                            <p>Administra banners, destacados, noticias, podcasts y replays.</p>
+                            <button class="small-btn" data-jump="banners">Editar contenido</button>
+                        </article>
+                        <article class="control-card">
+                            <span>Emisora</span>
+                            <strong>Parrilla y talento</strong>
+                            <p>Organiza programas, locutores, canales secundarios y marca.</p>
+                            <button class="small-btn" data-jump="schedule">Abrir programacion</button>
+                        </article>
+                        <article class="control-card">
+                            <span>Audiencia</span>
+                            <strong>Analytics operativo</strong>
+                            <p>Revisa oyentes, paises, players, referidores y eventos anonimos.</p>
+                            <button class="small-btn" data-jump="analytics">Ver analytics</button>
+                        </article>
+                        <article class="control-card">
+                            <span>Comunidad</span>
+                            <strong>Interaccion y negocio</strong>
+                            <p>Controla encuestas, peticiones, funciones activas y sponsors.</p>
+                            <button class="small-btn" data-jump="interaction">Abrir comunidad</button>
+                        </article>
+                    </div>
+                    <div class="operator-card">
+                        <div>
+                            <h3>Flujo recomendado</h3>
+                            <p>Edita el CMC, revisa la vista previa, exporta el JSON y publicalo en HTTPS cuando tengamos hosting.</p>
+                        </div>
+                        <button class="secondary-btn" data-jump="system" data-system-tab-jump="publish">Ir a configuracion</button>
+                    </div>
+                </section>
+
+                <section class="cms-section" data-panel="analytics">
+                    <div class="section-heading">
+                        <span class="eyebrow">Audiencia</span>
+                        <h2>Analytics operativo</h2>
+                        <p>Vista local preparada para datos reales de app, web, players externos y logs del stream. Los numeros actuales son muestra segura hasta conectar backend.</p>
+                    </div>
+
+                    <div class="analytics-toolbar">
+                        <div>
+                            <strong id="analyticsPeriod">Ultimos 7 dias</strong>
+                            <span id="analyticsSource">Fuente: muestra local</span>
+                            <span class="analytics-date-range" id="analyticsDateRange">Apr 30, 2026 - May 30, 2026</span>
+                        </div>
+                        <div class="toolbar-actions">
+                            <button class="small-btn" data-jump="system" data-system-tab-jump="advanced">Configurar analytics</button>
+                            <button class="small-btn" id="refreshRemoteAnalyticsBtn" type="button">Actualizar remoto</button>
+                            <button class="small-btn" id="exportAnalyticsBtn">Exportar analytics</button>
+                        </div>
+                    </div>
+
+                    <div class="analytics-kpis">
+                        <article class="analytics-kpi">
+                            <span>Live listeners</span>
+                            <strong id="analyticsLiveListeners">0</strong>
+                            <small>En vivo</small>
+                        </article>
+                        <article class="analytics-kpi">
+                            <span>Peak audience</span>
+                            <strong id="analyticsPeakAudience">0</strong>
+                            <small id="analyticsPeakAt">--</small>
+                        </article>
+                        <article class="analytics-kpi">
+                            <span>Avg. hours a day</span>
+                            <strong id="analyticsAvgHours">0h</strong>
+                            <small>30 dias</small>
+                        </article>
+                        <article class="analytics-kpi">
+                            <span>Avg. listening time</span>
+                            <strong id="analyticsAvgTime">0m</strong>
+                            <small>7 dias</small>
+                        </article>
+                        <article class="analytics-kpi">
+                            <span>Usuarios desde app</span>
+                            <strong id="analyticsAppUsers">0</strong>
+                            <small>WXM Android</small>
+                        </article>
+                    </div>
+
+                    <div class="analytics-hub">
+                        <div class="analytics-tabbar" role="tablist" aria-label="Secciones de analytics">
+                            <button class="analytics-tab active" type="button" role="tab" aria-selected="true" data-analytics-tab="dashboard">Dashboard</button>
+                            <button class="analytics-tab" type="button" role="tab" aria-selected="false" data-analytics-tab="quick">Quick stats</button>
+                            <button class="analytics-tab" type="button" role="tab" aria-selected="false" data-analytics-tab="countries">Paises</button>
+                            <button class="analytics-tab" type="button" role="tab" aria-selected="false" data-analytics-tab="players">Players</button>
+                            <button class="analytics-tab" type="button" role="tab" aria-selected="false" data-analytics-tab="referrers">Referidores</button>
+                            <button class="analytics-tab" type="button" role="tab" aria-selected="false" data-analytics-tab="events">Eventos app</button>
+                        </div>
+
+                        <section class="analytics-tab-panel active" data-analytics-panel="dashboard">
+                            <div class="analytics-dashboard-grid">
+                                <article class="analytics-card">
+                                    <div class="analytics-card-head">
+                                        <h3>Total listening hours trends</h3>
+                                        <span>1 semana</span>
+                                    </div>
+                                    <svg class="analytics-chart" id="listeningHoursChart" viewBox="0 0 640 220" role="img" aria-label="Tendencia de horas escuchadas"></svg>
+                                </article>
+
+                                <article class="analytics-card total-hours-card">
+                                    <h3>Total listening hours</h3>
+                                    <strong id="analyticsTotalHours">0</strong>
+                                    <span>horas</span>
+                                    <p>Dato agregado por sesiones anonimas. No debe exponer informacion personal.</p>
+                                </article>
+
+                                <article class="analytics-card wide">
+                                    <div class="analytics-card-head">
+                                        <h3>Audience realtime</h3>
+                                        <span>cada 5 min</span>
+                                    </div>
+                                    <svg class="analytics-chart analytics-chart-large" id="audienceRealtimeChart" viewBox="0 0 920 240" role="img" aria-label="Audiencia en tiempo real"></svg>
+                                </article>
+
+                                <article class="analytics-card wide live-connections-card">
+                                    <div class="analytics-card-head">
+                                        <h3>Live Connections</h3>
+                                        <span id="dashboardAnalyticsMapStatus">Live</span>
+                                    </div>
+                                    <div class="geo-panel dashboard-geo-panel">
+                                        <div class="geo-map dashboard-geo-map" id="dashboardAnalyticsMap" aria-label="Mapa de conexiones en vivo"></div>
+                                        <div class="live-connections-side">
+                                            <h4>Live connections</h4>
+                                            <div id="dashboardLiveConnectionsList" class="compact-list live-connections-list"></div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="analytics-card">
+                                    <div class="analytics-card-head">
+                                        <h3>Top 5 paises</h3>
+                                        <span>Live</span>
+                                    </div>
+                                    <div class="donut-panel" id="countriesDonut"></div>
+                                </article>
+
+                                <article class="analytics-card">
+                                    <div class="analytics-card-head">
+                                        <h3>Top 5 players</h3>
+                                        <span>Access</span>
+                                    </div>
+                                    <div class="donut-panel" id="playersDonut"></div>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section class="analytics-tab-panel" data-analytics-panel="quick">
+                            <div class="analytics-quick-grid">
+                                <article class="analytics-card">
+                                    <div class="analytics-card-head">
+                                        <h3>Listening hours</h3>
+                                        <span>Total <strong id="quickListeningTotal">0</strong></span>
+                                    </div>
+                                    <svg class="analytics-chart" id="quickListeningChart" viewBox="0 0 640 220" role="img" aria-label="Horas escuchadas"></svg>
+                                </article>
+                                <article class="analytics-card">
+                                    <div class="analytics-card-head">
+                                        <h3>Unique listeners</h3>
+                                        <span>Total <strong id="quickUniqueTotal">0</strong></span>
+                                    </div>
+                                    <svg class="analytics-chart" id="quickUniqueChart" viewBox="0 0 640 220" role="img" aria-label="Oyentes unicos"></svg>
+                                </article>
+                                <article class="analytics-card">
+                                    <div class="analytics-card-head">
+                                        <h3>Access count</h3>
+                                        <span>Total <strong id="quickAccessTotal">0</strong></span>
+                                    </div>
+                                    <svg class="analytics-chart" id="quickAccessChart" viewBox="0 0 640 220" role="img" aria-label="Conteo de accesos"></svg>
+                                </article>
+                                <article class="analytics-card wide">
+                                    <div class="analytics-card-head">
+                                        <h3>Quick stats</h3>
+                                        <span>Periodo seleccionado</span>
+                                    </div>
+                                    <div id="quickStatsTable" class="analytics-table"></div>
+                                </article>
+                                <article class="analytics-card analytics-ops-card">
+                                    <h3>Lectura operacional</h3>
+                                    <p>Esta vista resume usuarios unicos, horas escuchadas y accesos para compararlos por ayer, semana, mes y periodo filtrado.</p>
+                                    <div class="analytics-pill-grid">
+                                        <span>Privacidad agregada</span>
+                                        <span>Sin datos personales</span>
+                                        <span>Preparado para export</span>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section class="analytics-tab-panel" data-analytics-panel="countries">
+                            <article class="analytics-card wide">
+                                <div class="analytics-card-head">
+                                    <h3>Live connections</h3>
+                                    <span id="analyticsMapStatus">Mapa agregado por pais</span>
+                                </div>
+                                <div class="geo-panel">
+                                    <div class="geo-map" id="analyticsMap" aria-label="Mapa de conexiones por pais"></div>
+                                    <div>
+                                        <h4>Conexiones recientes</h4>
+                                        <div id="liveConnectionsList" class="compact-list"></div>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="analytics-card">
+                                <div class="analytics-card-head">
+                                    <h3>Top paises</h3>
+                                    <span>Live</span>
+                                </div>
+                                <div id="topCountriesList" class="rank-list"></div>
+                            </article>
+                            <article class="analytics-card wide">
+                                <div class="analytics-card-head">
+                                    <h3>Audience per country</h3>
+                                    <span>Listening hours · Access · Unique listeners</span>
+                                </div>
+                                <div id="countriesAnalyticsTable" class="analytics-table detailed"></div>
+                            </article>
+                        </section>
+
+                        <section class="analytics-tab-panel" data-analytics-panel="players">
+                            <article class="analytics-card">
+                                <div class="analytics-card-head">
+                                    <h3>Top players</h3>
+                                    <span>App, web y externos</span>
+                                </div>
+                                <div id="topPlayersList" class="rank-list"></div>
+                            </article>
+                            <article class="analytics-card wide">
+                                <div class="analytics-card-head">
+                                    <h3>Audience per player</h3>
+                                    <span>Listening hours · Distinct listeners · Access</span>
+                                </div>
+                                <svg class="analytics-chart" id="playersAudienceChart" viewBox="0 0 920 240" role="img" aria-label="Audiencia por player"></svg>
+                                <div id="playersAnalyticsTable" class="analytics-table detailed"></div>
+                            </article>
+                            <article class="analytics-card analytics-ops-card">
+                                <h3>Usuarios desde nuestra app</h3>
+                                <p>El player WXM Android debe reportar `sourceClient=wxm_android_app` para separar audiencia propia de web, TuneIn, Alexa u otros players.</p>
+                                <div class="analytics-pill-grid">
+                                    <span>WXM Android</span>
+                                    <span>Web app</span>
+                                    <span>External player</span>
+                                </div>
+                            </article>
+                        </section>
+
+                        <section class="analytics-tab-panel" data-analytics-panel="referrers">
+                            <article class="analytics-card">
+                                <div class="analytics-card-head">
+                                    <h3>Referidores</h3>
+                                    <span>Origen de audiencia</span>
+                                </div>
+                                <div id="topReferrersList" class="rank-list"></div>
+                            </article>
+                            <article class="analytics-card wide">
+                                <div class="analytics-card-head">
+                                    <h3>Audience per referrer</h3>
+                                    <span>Listening hours · Distinct listeners · Access</span>
+                                </div>
+                                <svg class="analytics-chart" id="referrersAudienceChart" viewBox="0 0 920 240" role="img" aria-label="Audiencia por referidor"></svg>
+                                <div id="referrersAnalyticsTable" class="analytics-table detailed"></div>
+                            </article>
+                            <article class="analytics-card analytics-ops-card">
+                                <h3>Atribucion limpia</h3>
+                                <p>Esta capa ayuda a diferenciar trafico directo, app oficial, web oficial, TuneIn, Alexa, redes sociales y campanas.</p>
+                                <div class="analytics-pill-grid">
+                                    <span>Direct</span>
+                                    <span>App oficial</span>
+                                    <span>Social/referral</span>
+                                </div>
+                            </article>
+                        </section>
+
+                        <section class="analytics-tab-panel" data-analytics-panel="events">
+                            <div class="analytics-split-grid">
+                                <article class="analytics-card analytics-ops-card">
+                                    <h3>Eventos anonimos recomendados</h3>
+                                    <p>playback_start, playback_pause, buffering_start, buffering_end, metadata_update, stream_error, fallback_activated y session_end.</p>
+                                    <div class="analytics-pill-grid">
+                                        <span>Playback</span>
+                                        <span>Buffering</span>
+                                        <span>Errores</span>
+                                        <span>Fallbacks</span>
+                                    </div>
+                                </article>
+                                <article class="analytics-card analytics-ops-card">
+                                    <h3>Campos minimos</h3>
+                                    <p>sourceClient, platform, appVersion, stationId, streamRole, player, referrer, country agregada y duracion de sesion.</p>
+                                    <div class="analytics-pill-grid">
+                                        <span>GDPR friendly</span>
+                                        <span>Agregado</span>
+                                        <span>Exportable</span>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="cms-section" data-panel="station">
+                    <div class="section-heading">
+                        <span class="eyebrow">Marca</span>
+                        <h2>Identidad de la emisora</h2>
+                    </div>
+                    <div class="form-grid two">
+                        <label class="field">
+                            <span>Nombre</span>
+                            <input id="stationName" type="text" maxlength="60">
+                        </label>
+                        <label class="field">
+                            <span>Dominio</span>
+                            <input id="stationDomain" type="text" maxlength="80">
+                        </label>
+                        <label class="field">
+                            <span>Slogan</span>
+                            <input id="stationSlogan" type="text" maxlength="100">
+                        </label>
+                        <label class="field">
+                            <span>Subtitulo</span>
+                            <input id="stationSubtitle" type="text" maxlength="80">
+                        </label>
+                        <label class="field wide">
+                            <span>Logo app</span>
+                            <input id="stationLogo" type="text" maxlength="900000" placeholder="assets/img/... o https://...">
+                            <small class="image-hint">Recomendado: 1024x1024 PNG/WEBP, maximo 700 KB para produccion.</small>
+                            <input id="stationLogoFile" class="image-file-input" type="file" accept="image/png,image/jpeg,image/webp">
+                            <div id="stationLogoPreview" class="image-preview" aria-live="polite"></div>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="cms-section" data-panel="features">
+                    <div class="section-heading">
+                        <span class="eyebrow">Control remoto</span>
+                        <h2>Funciones activas en la app</h2>
+                    </div>
+                    <div class="feature-grid" id="featureGrid"></div>
+                </section>
+
+                <section class="cms-section" data-panel="schedule">
+                    <div class="section-heading">
+                        <span class="eyebrow">Parrilla</span>
+                        <h2>Programacion</h2>
+                    </div>
+                    <div class="list-header">
+                        <p>Estos programas alimentan Inicio y la pestana Programas.</p>
+                        <button class="small-btn" id="addScheduleBtn">Agregar programa</button>
+                    </div>
+                    <div class="stack-list" id="scheduleList"></div>
+                </section>
+
+                <section class="cms-section" data-panel="banners">
+                    <div class="section-heading">
+                        <span class="eyebrow">Home</span>
+                        <h2>Banners editoriales</h2>
+                    </div>
+                    <div class="list-header">
+                        <p>Eventos, entrevistas, avisos especiales y mensajes de portada. Permite imagen.</p>
+                        <button class="small-btn" id="addBannerBtn">Agregar banner</button>
+                    </div>
+                    <div class="stack-list" id="bannerList"></div>
+                </section>
+
+                <section class="cms-section" data-panel="presenters">
+                    <div class="section-heading">
+                        <span class="eyebrow">Talento</span>
+                        <h2>Locutores y DJs</h2>
+                    </div>
+                    <div class="list-header">
+                        <p>Perfiles visibles en la app. Permite foto o arte de marca.</p>
+                        <button class="small-btn" id="addPresenterBtn">Agregar locutor</button>
+                    </div>
+                    <div class="stack-list" id="presenterList"></div>
+                </section>
+
+                <section class="cms-section" data-panel="highlights">
+                    <div class="section-heading">
+                        <span class="eyebrow">Contenido</span>
+                        <h2>Destacados editoriales</h2>
+                    </div>
+                    <div class="list-header">
+                        <p>Promos, eventos, entrevistas y mensajes editoriales.</p>
+                        <button class="small-btn" id="addHighlightBtn">Agregar destacado</button>
+                    </div>
+                    <div class="stack-list" id="highlightList"></div>
+                </section>
+
+                <section class="cms-section" data-panel="content">
+                    <div class="section-heading">
+                        <span class="eyebrow">Editorial</span>
+                        <h2>Noticias, podcasts y replays</h2>
+                    </div>
+                    <div class="module-split">
+                        <div>
+                            <div class="list-header">
+                                <h3>Noticias / articulos</h3>
+                                <button class="small-btn" id="addArticleBtn">Agregar noticia</button>
+                            </div>
+                            <div class="stack-list" id="articleList"></div>
+                        </div>
+                        <div>
+                            <div class="list-header">
+                                <h3>Podcasts / replays</h3>
+                                <button class="small-btn" id="addPodcastBtn">Agregar podcast</button>
+                            </div>
+                            <div class="stack-list" id="podcastList"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="cms-section" data-panel="stations">
+                    <div class="section-heading">
+                        <span class="eyebrow">Audio</span>
+                        <h2>Radios secundarias</h2>
+                    </div>
+                    <div class="list-header">
+                        <p>Canales adicionales tipo WXM Urban, WXM Club o WXM Chill. Permite imagen y stream.</p>
+                        <button class="small-btn" id="addStationBtn">Agregar canal</button>
+                    </div>
+                    <div class="stack-list" id="stationList"></div>
+                </section>
+
+                <section class="cms-section" data-panel="interaction">
+                    <div class="section-heading">
+                        <span class="eyebrow">Comunidad</span>
+                        <h2>Encuestas y votaciones</h2>
+                    </div>
+                    <div class="list-header">
+                        <p>Preguntas para la comunidad. Permite imagen y opciones editables.</p>
+                        <button class="small-btn" id="addPollBtn">Agregar encuesta</button>
+                    </div>
+                    <div class="stack-list" id="pollList"></div>
+                </section>
+
+                <section class="cms-section" data-panel="sponsors">
+                    <div class="section-heading">
+                        <span class="eyebrow">Monetizacion</span>
+                        <h2>Promociones y sponsors</h2>
+                    </div>
+                    <div class="list-header">
+                        <p>Banners de aliados, eventos pagados o promociones oficiales. Permite imagen.</p>
+                        <button class="small-btn" id="addSponsorBtn">Agregar sponsor</button>
+                    </div>
+                    <div class="stack-list" id="sponsorList"></div>
+                </section>
+
+                <section class="cms-section" data-panel="system">
+                    <div class="section-heading">
+                        <span class="eyebrow">Operacion</span>
+                        <h2>Configuracion operativa</h2>
+                        <p>Vista simplificada para operar la radio sin perder controles avanzados. Lo tecnico queda agrupado y protegido para cuando haga falta.</p>
+                    </div>
+                    <div class="system-hub">
+                        <div class="system-tabbar" role="tablist" aria-label="Configuracion del sistema">
+                            <button class="system-tab active" type="button" role="tab" aria-selected="true" data-system-tab="operations">Operacion</button>
+                            <button class="system-tab" type="button" role="tab" aria-selected="false" data-system-tab="app">App</button>
+                            <button class="system-tab" type="button" role="tab" aria-selected="false" data-system-tab="publish">Publicacion</button>
+                            <button class="system-tab advanced-tab" type="button" role="tab" aria-selected="false" data-system-tab="advanced" hidden>Avanzado</button>
+                        </div>
+                        <div class="system-toolbar" aria-label="Controles de sistema">
+                            <button class="advanced-toggle" type="button" id="toggleAdvancedBtn" aria-pressed="false">Mostrar avanzado</button>
+                        </div>
+
+                        <section class="system-tab-panel active" data-system-panel="operations">
+                            <div class="system-panel-heading">
+                                <h3>Operacion diaria</h3>
+                                <p>Lo que un operador necesita para mantener la senal al aire: stream, metadata, fallbacks y modo emergencia.</p>
+                            </div>
+                            <div class="system-stack">
+                                <article class="system-card">
+                                    <div class="system-card-head">
+                                        <div>
+                                            <span class="eyebrow">Senal</span>
+                                            <h3>Stream y recuperacion</h3>
+                                        </div>
+                                        <small>HTTPS obligatorio</small>
+                                    </div>
+                                    <div class="form-grid two">
+                                        <label class="field wide">
+                                            <span>Stream principal HTTPS</span>
+                                            <input id="streamPrimary" type="url" inputmode="url">
+                                            <small>URL oficial de la radio en vivo. Debe responder estable desde datos moviles.</small>
+                                        </label>
+                                        <label class="field wide">
+                                            <span>API de metadata HTTPS</span>
+                                            <input id="streamInfoApi" type="url" inputmode="url">
+                                            <small>Alimenta cancion, artista, historial, notificacion y pantalla bloqueada.</small>
+                                        </label>
+                                        <label class="field">
+                                            <span>Reconexion ms</span>
+                                            <input id="streamReconnect" type="number" min="2000" max="30000" step="500">
+                                        </label>
+                                        <label class="field">
+                                            <span>Max reintentos</span>
+                                            <input id="streamRetries" type="number" min="1" max="10">
+                                        </label>
+                                    </div>
+                                    <details class="inline-help">
+                                        <summary>Como configurarlo</summary>
+                                        <p>Usa un stream HTTPS principal y al menos un fallback distinto. Mantener 5000 ms de reconexion es un punto seguro para radio 24/7.</p>
+                                    </details>
+                                </article>
+
+                                <article class="system-card">
+                                    <div class="list-header compact">
+                                        <div>
+                                            <span class="eyebrow">Respaldo</span>
+                                            <h3>Fallback streams</h3>
+                                        </div>
+                                        <button class="small-btn" id="addFallbackBtn">Agregar fallback</button>
+                                    </div>
+                                    <div class="stack-list" id="fallbackList"></div>
+                                </article>
+
+                                <article class="system-card">
+                                    <div class="system-card-head">
+                                        <div>
+                                            <span class="eyebrow">Incidencias</span>
+                                            <h3>Modo emergencia</h3>
+                                        </div>
+                                        <small>Usar solo cuando sea necesario</small>
+                                    </div>
+                                    <div class="form-grid two">
+                                        <label class="field">
+                                            <span>Modo emergencia</span>
+                                            <select id="emergencyEnabled">
+                                                <option value="false">Apagado</option>
+                                                <option value="true">Encendido</option>
+                                            </select>
+                                        </label>
+                                        <label class="field">
+                                            <span>Severidad</span>
+                                            <select id="emergencySeverity">
+                                                <option value="info">Info</option>
+                                                <option value="warning">Warning</option>
+                                                <option value="critical">Critical</option>
+                                            </select>
+                                        </label>
+                                        <label class="field">
+                                            <span>Titulo emergencia</span>
+                                            <input id="emergencyTitle" type="text" maxlength="80">
+                                        </label>
+                                        <label class="field">
+                                            <span>Stream emergencia HTTPS</span>
+                                            <input id="emergencyStream" type="url">
+                                        </label>
+                                        <label class="field wide">
+                                            <span>Mensaje emergencia</span>
+                                            <textarea id="emergencyMessage" maxlength="180"></textarea>
+                                        </label>
+                                    </div>
+                                    <details class="inline-help">
+                                        <summary>Cuando usarlo</summary>
+                                        <p>Activalo para mantenimiento, caida del proveedor o comunicados importantes. Si agregas stream de emergencia, debe ser HTTPS.</p>
+                                    </details>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section class="system-tab-panel" data-system-panel="app">
+                            <div class="system-panel-heading">
+                                <h3>Apariencia y experiencia de app</h3>
+                                <p>Controles visibles para marca, portada, tema, acento y recomendacion de audio. Son seguros para operador editorial.</p>
+                            </div>
+                            <div class="system-stack">
+                                <article class="system-card">
+                                    <div class="system-card-head">
+                                        <div>
+                                            <span class="eyebrow">Marca</span>
+                                            <h3>Visual, tema y audio</h3>
+                                        </div>
+                                        <small>Se publica en la app</small>
+                                    </div>
+                                    <div class="form-grid two">
+                                        <label class="field">
+                                            <span>Tema por defecto</span>
+                                            <select id="visualTheme">
+                                                <option value="dark">Dark</option>
+                                                <option value="light">Light</option>
+                                            </select>
+                                        </label>
+                                        <label class="field">
+                                            <span>Color acento</span>
+                                            <input id="visualAccent" type="text" maxlength="7">
+                                            <small>Formato hexadecimal, ejemplo #f72570.</small>
+                                        </label>
+                                        <label class="field wide">
+                                            <span>Imagen hero</span>
+                                            <input id="visualHero" type="text" maxlength="900000" placeholder="assets/img/... o https://...">
+                                            <small class="image-hint">Recomendado: 1920x1080 o 1600x900 WEBP/JPG, maximo 900 KB para produccion.</small>
+                                            <input id="visualHeroFile" class="image-file-input" type="file" accept="image/png,image/jpeg,image/webp">
+                                            <div id="visualHeroPreview" class="image-preview" aria-live="polite"></div>
+                                        </label>
+                                        <label class="field">
+                                            <span>Perfil audio recomendado</span>
+                                            <input id="audioProfile" type="text" maxlength="40">
+                                            <small>Valores sugeridos: standard, club, voice, night, wide.</small>
+                                        </label>
+                                        <label class="field">
+                                            <span>Modo bajo consumo</span>
+                                            <select id="audioLowData">
+                                                <option value="false">Apagado</option>
+                                                <option value="true">Encendido</option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section class="system-tab-panel" data-system-panel="publish">
+                            <div class="system-panel-heading">
+                                <h3>Publicacion CMS / CMC</h3>
+                                <p>Publica solo el contrato que lee la app. El CMC bruto y herramientas tecnicas quedan en Avanzado.</p>
+                            </div>
+                            <div class="publish-card">
+                                <div>
+                                    <h3>JSON listo para hosting</h3>
+                                    <p>Descarga el contrato compatible con la app como `wxm-cms.json` y subelo a un hosting HTTPS.</p>
+                                    <p class="publish-gate" id="publishGateStatus">Validando contrato de publicacion...</p>
+                                </div>
+                                <div class="publish-actions">
+                                    <button class="primary-btn" id="downloadAppJsonBtn">Descargar JSON app</button>
+                                    <button class="ghost-btn" id="copyAppJsonBtn">Copiar JSON app</button>
+                                </div>
+                            </div>
+                            <label class="field">
+                                <span>Endpoint CMS futuro HTTPS</span>
+                                <input id="remoteEndpoint" type="url" placeholder="https://tu-dominio.com/wxm-cms.json">
+                                <small>URL publica donde la app leera cambios remotos sin recompilar APK.</small>
+                            </label>
+                            <button class="secondary-btn" id="saveEndpointBtn">Guardar endpoint para prueba local</button>
+                            <p class="json-label">Contrato que consume la app (`wxm-cms.json`)</p>
+                            <pre class="json-output" id="appJsonOutput" aria-label="CMS app JSON"></pre>
+                        </section>
+
+                        <section class="system-tab-panel" data-system-panel="advanced">
+                            <div class="system-panel-heading with-action">
+                                <div>
+                                    <h3>Avanzado y desarrollador</h3>
+                                    <p>Herramientas tecnicas para analytics remoto, Google Maps, assets, CMC bruto y manual operativo. No hacen falta para operar la radio todos los dias.</p>
+                                </div>
+                                <button class="secondary-btn compact" type="button" id="leaveAdvancedBtn">Salir de avanzado</button>
+                            </div>
+                            <div class="advanced-warning">
+                                <strong>Modo avanzado</strong>
+                                <p>Cambia estos valores solo cuando exista hosting, backend o una prueba tecnica concreta. Las claves locales no se exportan al JSON publico.</p>
+                            </div>
+
+                            <div class="system-stack">
+                                <article class="system-card">
+                                    <div class="system-card-head">
+                                        <div>
+                                            <span class="eyebrow">Audiencia</span>
+                                            <h3>Analytics y mapa</h3>
+                                        </div>
+                                        <small>Backend opcional</small>
+                                    </div>
+                                    <div class="form-grid two analytics-config-grid">
+                                        <label class="field">
+                                            <span>Modo analytics</span>
+                                            <select id="analyticsMode">
+                                                <option value="local-sample">Muestra local</option>
+                                                <option value="remote">Backend remoto</option>
+                                                <option value="disabled">Apagado</option>
+                                            </select>
+                                        </label>
+                                        <label class="field">
+                                            <span>Retencion agregada dias</span>
+                                            <input id="analyticsRetention" type="number" min="7" max="730">
+                                        </label>
+                                        <label class="field wide">
+                                            <span>Endpoint ingesta HTTPS</span>
+                                            <input id="analyticsIngestEndpoint" type="url" inputmode="url" placeholder="https://api.tu-dominio.com/api/analytics/ingest">
+                                        </label>
+                                        <label class="field wide">
+                                            <span>Endpoint dashboard HTTPS</span>
+                                            <input id="analyticsDashboardEndpoint" type="url" inputmode="url" placeholder="https://api.tu-dominio.com/api/analytics/dashboard">
+                                        </label>
+                                        <label class="field">
+                                            <span>Mapa de audiencia</span>
+                                            <select id="analyticsMapProvider">
+                                                <option value="local">Mapa interno seguro</option>
+                                                <option value="google">Google Maps API</option>
+                                            </select>
+                                        </label>
+                                        <label class="field">
+                                            <span>Google Maps API key local</span>
+                                            <input id="analyticsGoogleMapsKey" type="password" autocomplete="off" placeholder="Solo para el panel CMS">
+                                        </label>
+                                    </div>
+                                </article>
+
+                                <article class="system-card">
+                                    <div class="system-card-head">
+                                        <div>
+                                            <span class="eyebrow">Media</span>
+                                            <h3>Assets de produccion</h3>
+                                        </div>
+                                        <small>Convierte base64 a URLs</small>
+                                    </div>
+                                    <div class="asset-pipeline-card">
+                                        <div>
+                                            <h3>Subida y paquete media</h3>
+                                            <p>Sube o empaqueta las imagenes locales embebidas para convertirlas en URLs del CMS antes de publicar.</p>
+                                            <p class="publish-gate warn" id="assetPipelineStatus">Sin imagenes locales pendientes.</p>
+                                        </div>
+                                        <div class="form-grid two">
+                                            <label class="field wide">
+                                                <span>Endpoint upload assets</span>
+                                                <input id="assetUploadEndpoint" type="url" placeholder="https://tu-dominio.com/api/assets/upload">
+                                                <small>API privada que recibe imagenes y devuelve URLs publicas HTTPS.</small>
+                                            </label>
+                                        </div>
+                                        <div class="publish-actions">
+                                            <button class="secondary-btn" id="saveAssetEndpointBtn">Guardar endpoint assets</button>
+                                            <button class="primary-btn" id="uploadEmbeddedAssetsBtn">Subir imagenes locales</button>
+                                            <button class="ghost-btn" id="downloadAssetPackageBtn">Descargar paquete media</button>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="system-card">
+                                    <div class="system-card-head">
+                                        <div>
+                                            <span class="eyebrow">Respaldo</span>
+                                            <h3>CMC bruto editable</h3>
+                                        </div>
+                                        <small>Uso interno</small>
+                                    </div>
+                                    <div class="publish-actions">
+                                        <button class="secondary-btn" id="downloadJsonBtn">Descargar CMC bruto</button>
+                                        <button class="ghost-btn" id="copyJsonBtn">Copiar CMC bruto</button>
+                                    </div>
+                                    <p class="json-label">CMC bruto editable (`wxm-cmc.json`)</p>
+                                    <pre class="json-output" id="jsonOutput" aria-label="CMC JSON"></pre>
+                                </article>
+                            </div>
+
+                            <div class="system-panel-heading subtle">
+                                <h3>Manual operativo / FAQ</h3>
+                                <p>Guia rapida para saber que es cada configuracion, para que sirve, que resultado da y como configurarla sin romper produccion.</p>
+                            </div>
+                            <div class="manual-grid">
+                                <details class="manual-card" open>
+                                    <summary>Stream principal HTTPS</summary>
+                                    <p><strong>Que es:</strong> la URL oficial de audio en vivo que reproduce la app.</p>
+                                    <p><strong>Resultado:</strong> al publicar el CMS, la app usa esa senal como fuente principal.</p>
+                                    <ol>
+                                        <li>Pega una URL `https://` de Icecast, Shoutcast, HLS o endpoint compatible.</li>
+                                        <li>Guarda borrador y revisa Validacion.</li>
+                                        <li>Configura al menos un fallback antes de produccion.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>API de metadata HTTPS</summary>
+                                    <p><strong>Que es:</strong> endpoint que entrega cancion, artista, portada o datos de emision.</p>
+                                    <p><strong>Resultado:</strong> mejora historial, lockscreen, notificacion y tarjetas de la app.</p>
+                                    <ol>
+                                        <li>Usa solo HTTPS.</li>
+                                        <li>Evita secretos en la URL publica.</li>
+                                        <li>Comprueba que responde estable desde red movil.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Fallback streams</summary>
+                                    <p><strong>Que es:</strong> lista de senales secundarias usadas si la fuente principal falla.</p>
+                                    <p><strong>Resultado:</strong> menos cortes cuando hay caida temporal del proveedor principal.</p>
+                                    <ol>
+                                        <li>Agrega URLs HTTPS ordenadas por prioridad.</li>
+                                        <li>No uses la misma URL repetida.</li>
+                                        <li>Prueba cada fallback antes de publicar.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Reconexion y reintentos</summary>
+                                    <p><strong>Que es:</strong> politica basica de recuperacion cuando el stream se corta.</p>
+                                    <p><strong>Resultado:</strong> la app intenta volver sin dejar loops infinitos.</p>
+                                    <ol>
+                                        <li>Usa 5000 ms como punto seguro para radio 24/7.</li>
+                                        <li>Sube el valor si hay red inestable.</li>
+                                        <li>No configures reintentos excesivos porque consume bateria.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Analytics endpoints</summary>
+                                    <p><strong>Que es:</strong> URLs del backend que recibe eventos anonimos y devuelve dashboard.</p>
+                                    <p><strong>Resultado:</strong> audiencia real por app, web, pais, player, referrer y errores.</p>
+                                    <ol>
+                                        <li>Activa `Backend remoto` solo cuando exista API HTTPS.</li>
+                                        <li>Configura ingesta y dashboard en el submenu Analytics.</li>
+                                        <li>No envies datos personales; usa agregados y IDs anonimos.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Google Maps API</summary>
+                                    <p><strong>Que es:</strong> opcion visual para mapa de oyentes conectado al dashboard CMS.</p>
+                                    <p><strong>Resultado:</strong> el panel muestra paises y conexiones con mapa interactivo.</p>
+                                    <ol>
+                                        <li>Crea una Browser API Key restringida por dominio.</li>
+                                        <li>Pegala solo en este panel local.</li>
+                                        <li>La key no se exporta al JSON publico de la app.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Endpoint CMS futuro HTTPS</summary>
+                                    <p><strong>Que es:</strong> URL donde quedara publicado `wxm-cms.json` en hosting.</p>
+                                    <p><strong>Resultado:</strong> la app podra leer cambios remotos sin recompilar APK.</p>
+                                    <ol>
+                                        <li>Sube `wxm-cms.json` a hosting HTTPS.</li>
+                                        <li>Pega la URL publica aqui para pruebas.</li>
+                                        <li>Usa cache y versionado cuando pase a produccion.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Endpoint upload assets</summary>
+                                    <p><strong>Que es:</strong> API privada que recibe imagenes del CMS y devuelve URLs publicas.</p>
+                                    <p><strong>Resultado:</strong> las imagenes dejan de ir embebidas y cargan como assets optimizados.</p>
+                                    <ol>
+                                        <li>Levanta el `cms-remote-starter` o backend equivalente.</li>
+                                        <li>Configura autenticacion y `WXM_CMS_PUBLIC_BASE_URL`.</li>
+                                        <li>Sube imagenes locales y publica el contrato resultante.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Modo emergencia</summary>
+                                    <p><strong>Que es:</strong> interruptor editorial para incidencias, mantenimiento o stream alterno.</p>
+                                    <p><strong>Resultado:</strong> la app puede mostrar aviso y usar senal temporal segura.</p>
+                                    <ol>
+                                        <li>Activalo solo si hay incidencia real.</li>
+                                        <li>Escribe un mensaje breve y claro.</li>
+                                        <li>Si cambias stream, usa HTTPS y prueba antes.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>Visual y audio</summary>
+                                    <p><strong>Que es:</strong> tema, color, hero y perfil recomendado para la experiencia de usuario.</p>
+                                    <p><strong>Resultado:</strong> la app adapta portada, apariencia y sugerencia de audio desde CMS.</p>
+                                    <ol>
+                                        <li>Usa imagen hero 1920x1080 o 1600x900.</li>
+                                        <li>Define un color hexadecimal valido.</li>
+                                        <li>El perfil de audio debe coincidir con opciones de la app: standard, club, voice, night, wide.</li>
+                                    </ol>
+                                </details>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="preview-panel">
+                <div class="phone-frame">
+                    <div class="phone-status">
+                        <span>9:41</span>
+                        <span>5G 100%</span>
+                    </div>
+                    <div class="phone-screen">
+                        <div class="preview-top">
+                            <img id="previewLogo" src="../assets/img/brand/wxm-emblem-square.png" alt="WXM">
+                            <button>Compartir</button>
+                        </div>
+                        <span class="preview-live">EN VIVO</span>
+                        <h2 id="previewName">WXM ONE RADIO</h2>
+                        <p id="previewSlogan">La radio que conecta al mundo</p>
+                        <div class="preview-card">
+                            <span>Ahora en WXM</span>
+                            <strong id="previewProgram">Prime Time WXM</strong>
+                            <small id="previewHost">Invitados especiales</small>
+                            <button class="preview-play">Play</button>
+                        </div>
+                        <div class="preview-list" id="previewHighlights"></div>
+                    </div>
+                </div>
+                <div class="validation-card">
+                    <h3>Validacion</h3>
+                    <ul id="validationList"></ul>
+                </div>
+            </aside>
+        </section>
+    </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="assets/vendor/react.production.min.js?v=20260605-react-atlas"></script>
+<script src="assets/vendor/react-dom.production.min.js?v=20260605-react-atlas"></script>
+<script src="assets/vendor/d3.min.js?v=20260605-react-atlas"></script>
+<script src="assets/vendor/topojson-client.min.js?v=20260605-react-atlas"></script>
+<script src="assets/react/WxmWorldAtlasMap.runtime.js?v=20260605-react-atlas"></script>
+<script type="module" src="assets/js/cms.js?v=20260605-react-atlas"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "appId": "com.wxmoneradio.player",
+  "appName": "WXM ONE RADIO",
+  "webDir": "v2",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

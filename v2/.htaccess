@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════
+# WXM ONE RADIO — .htaccess Seguro
+# Compatible con Apache / Hostinger
+# ═══════════════════════════════════════════════════════════════
+
+# ── Seguridad: bloquear acceso a archivos sensibles ─────────────
+<FilesMatch "(^\.|\.(DS_Store|env|log|bak|sql|sh|py|xml|md|txt))$">
+    Require all denied
+</FilesMatch>
+
+# Bloquear el directorio scratch/ completamente
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^scratch/ - [F,L]
+</IfModule>
+
+# ── Cabeceras HTTP de Seguridad ─────────────────────────────────
+<IfModule mod_headers.c>
+
+    # Content-Security-Policy
+    # Notas:
+    #  - script-src 'strict-dynamic' con nonce es lo ideal; aquí usamos
+    #    'self' + módulos porque no tenemos nonce generado por PHP en index.html
+    #  - img-src permite Spotify CDN, iTunes y el servidor propio
+    #  - media-src permite el stream de audio
+    #  - connect-src permite la API de metadatos, iTunes y el proxy propio
+    #  - frame-ancestors permite embeber solo desde el sitio propio y wxmoneradio.com
+    Header always set Content-Security-Policy "\
+default-src 'none'; \
+script-src 'self'; \
+style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; \
+font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; \
+img-src 'self' data: \
+    https://i.scdn.co \
+    https://mosaic.scdn.co \
+    https://is1-ssl.mzstatic.com \
+    https://is2-ssl.mzstatic.com \
+    https://is3-ssl.mzstatic.com \
+    https://is4-ssl.mzstatic.com \
+    https://is5-ssl.mzstatic.com \
+    https://jm8n.net \
+    https://wxmoneradio.com; \
+media-src 'self' https://jm8n.net:8024; \
+connect-src 'self' \
+    https://jm8n.net \
+    https://jm8n.net:8024 \
+    https://itunes.apple.com; \
+object-src 'none'; \
+base-uri 'self'; \
+form-action 'none'; \
+frame-ancestors 'self' https://wxmoneradio.com; \
+upgrade-insecure-requests;"
+
+    # Evita que el navegador adivine el tipo MIME
+    Header always set X-Content-Type-Options "nosniff"
+
+    # No filtrar el referrer a terceros
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Deshabilitar funciones del navegador no necesarias
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+    # Forzar HTTPS (activar solo si el sitio ya está en HTTPS)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Clickjacking: frame-ancestors define los orígenes permitidos para embed.
+
+    # Cache: HTML siempre fresco, assets versionados pueden cachearse
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+    <FilesMatch "\.(js|css)$">
+        Header set Cache-Control "public, max-age=3600"
+    </FilesMatch>
+    <FilesMatch "\.(png|jpg|jpeg|webp|gif|svg|ico)$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+
+</IfModule>
+
+# ── MIME types correctos ───────────────────────────────────────
+<IfModule mod_mime.c>
+    AddType application/javascript .js .mjs
+    AddType text/css .css
+</IfModule>
+
+# ── Compresión Gzip ────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>

@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WXM CMS Remote Admin</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050507;
+      --panel: rgba(15, 15, 21, .92);
+      --panel-2: rgba(25, 24, 33, .86);
+      --line: rgba(255, 255, 255, .11);
+      --line-hot: rgba(255, 0, 122, .42);
+      --text: #ffffff;
+      --muted: #aaa8ba;
+      --pink: #ff007a;
+      --pink-2: #ff2d95;
+      --green: #3df59a;
+      --red: #ff4d6d;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 28px;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255, 0, 122, .28), transparent 30%),
+        radial-gradient(circle at 88% 12%, rgba(255, 45, 149, .18), transparent 32%),
+        linear-gradient(135deg, #050507 0%, #08080d 54%, #111016 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 82%);
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mark {
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      border: 1px solid var(--line-hot);
+      border-radius: 16px;
+      background: radial-gradient(circle at center, rgba(255, 0, 122, .34), rgba(255, 0, 122, .08) 44%, rgba(255,255,255,.04));
+      box-shadow: 0 0 28px rgba(255, 0, 122, .28);
+      font-weight: 1000;
+      letter-spacing: -.06em;
+    }
+
+    h1, h2, p { margin: 0; }
+    h1 { font-size: clamp(30px, 4vw, 54px); letter-spacing: -.04em; line-height: .95; }
+    .brand p { margin-top: 7px; color: var(--muted); font-size: 14px; }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.045);
+      color: var(--muted);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .status-pill::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 14px currentColor;
+    }
+    .status-pill.is-ok::before { background: var(--green); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(18,18,25,.94), rgba(9,9,13,.96));
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .38);
+      padding: 22px;
+    }
+
+    .login-card {
+      position: sticky;
+      top: 20px;
+    }
+
+    .eyebrow {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--pink-2);
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    label {
+      display: block;
+      margin: 18px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.055);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      padding: 14px 16px;
+    }
+
+    textarea {
+      min-height: 250px;
+      resize: vertical;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #dedbea;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--line-hot);
+      box-shadow: 0 0 0 4px rgba(255, 0, 122, .12);
+    }
+
+    button, .link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      border: 0;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--pink), #9f075a);
+      color: white;
+      font: inherit;
+      font-weight: 950;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 12px 16px;
+    }
+
+    button.secondary, .link-button.secondary {
+      background: rgba(255,255,255,.075);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      filter: grayscale(.8);
+      opacity: .62;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .actions .wide { grid-column: 1 / -1; }
+
+    .message {
+      min-height: 24px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .message.is-error { color: var(--red); }
+    .message.is-ok { color: var(--green); }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      min-height: 116px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel-2);
+      padding: 16px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 30px;
+      letter-spacing: -.04em;
+    }
+
+    .metric small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .panel-head h2 { font-size: 22px; letter-spacing: -.03em; }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .mini-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mini-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+      color: var(--muted);
+    }
+
+    .mini-list strong { color: var(--text); }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 940px) {
+      body { padding: 18px; }
+      header { align-items: flex-start; flex-direction: column; }
+      .grid, .split { grid-template-columns: 1fr; }
+      .login-card { position: static; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .metrics, .actions { grid-template-columns: 1fr; }
+      .card { padding: 18px; border-radius: 18px; }
+      .mark { width: 50px; height: 50px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="mark" aria-hidden="true">WXM</div>
+        <div>
+          <h1>CMS Remote Admin</h1>
+          <p>Panel seguro para operar el JSON publicado, analytics y estado del servidor WXM.</p>
+        </div>
+      </div>
+      <div id="sessionPill" class="status-pill">Verificando sesion</div>
+    </header>
+
+    <div class="grid">
+      <section class="card login-card">
+        <span class="eyebrow">Acceso privado</span>
+        <h2>Control remoto</h2>
+        <p class="message">Usa la contrasena configurada en el hosting. La sesion se guarda en cookie HttpOnly.</p>
+
+        <form id="loginForm">
+          <label for="password">Contrasena admin</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="WXM_CMS_ADMIN_PASSWORD" required>
+          <div class="actions">
+            <button class="wide" type="submit">Iniciar sesion</button>
+          </div>
+        </form>
+
+        <div id="adminActions" class="actions hidden">
+          <button type="button" id="refreshCms">Refrescar CMS</button>
+          <button type="button" id="refreshAnalytics">Analytics</button>
+          <a class="link-button secondary" href="/wxm-cms.json" target="_blank" rel="noreferrer">JSON publico</a>
+          <a class="link-button secondary" href="/health" target="_blank" rel="noreferrer">Health</a>
+          <button type="button" id="logout" class="secondary wide">Cerrar sesion</button>
+        </div>
+
+        <p id="message" class="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <main>
+        <section class="metrics" aria-label="Metricas principales">
+          <div class="metric"><span>Estado</span><strong id="metricStatus">--</strong><small id="metricSource">Sin datos</small></div>
+          <div class="metric"><span>Revision CMS</span><strong id="metricRevision">--</strong><small id="metricHash">No publicada</small></div>
+          <div class="metric"><span>Oyentes live</span><strong id="metricLive">--</strong><small id="metricPeak">Peak --</small></div>
+          <div class="metric"><span>Eventos</span><strong id="metricEvents">--</strong><small id="metricApp">App --</small></div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head">
+            <h2>Resumen operativo</h2>
+            <span class="eyebrow" id="updatedAt">Sin sincronizar</span>
+          </div>
+          <div class="split">
+            <div>
+              <label>Top paises</label>
+              <ul id="countriesList" class="mini-list"></ul>
+            </div>
+            <div>
+              <label>Top players / origenes</label>
+              <ul id="playersList" class="mini-list"></ul>
+            </div>
+          </div>
+
+          <label for="jsonPreview">Vista segura del contrato CMS</label>
+          <textarea id="jsonPreview" readonly spellcheck="false" placeholder="Inicia sesion para cargar /api/cms/current"></textarea>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const els = {
+      form: document.getElementById("loginForm"),
+      password: document.getElementById("password"),
+      adminActions: document.getElementById("adminActions"),
+      sessionPill: document.getElementById("sessionPill"),
+      message: document.getElementById("message"),
+      refreshCms: document.getElementById("refreshCms"),
+      refreshAnalytics: document.getElementById("refreshAnalytics"),
+      logout: document.getElementById("logout"),
+      metricStatus: document.getElementById("metricStatus"),
+      metricSource: document.getElementById("metricSource"),
+      metricRevision: document.getElementById("metricRevision"),
+      metricHash: document.getElementById("metricHash"),
+      metricLive: document.getElementById("metricLive"),
+      metricPeak: document.getElementById("metricPeak"),
+      metricEvents: document.getElementById("metricEvents"),
+      metricApp: document.getElementById("metricApp"),
+      countriesList: document.getElementById("countriesList"),
+      playersList: document.getElementById("playersList"),
+      updatedAt: document.getElementById("updatedAt"),
+      jsonPreview: document.getElementById("jsonPreview")
+    };
+
+    const state = { authed: false };
+
+    function setMessage(text, type = "") {
+      els.message.textContent = text || "";
+      els.message.className = `message ${type ? `is-${type}` : ""}`;
+    }
+
+    function setAuthed(value) {
+      state.authed = Boolean(value);
+      els.form.classList.toggle("hidden", state.authed);
+      els.adminActions.classList.toggle("hidden", !state.authed);
+      els.sessionPill.textContent = state.authed ? "Sesion admin activa" : "Sesion no iniciada";
+      els.sessionPill.classList.toggle("is-ok", state.authed);
+      els.metricStatus.textContent = state.authed ? "OK" : "--";
+      els.metricSource.textContent = state.authed ? "API protegida lista" : "Esperando login";
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, {
+        credentials: "include",
+        headers: options.body ? { "Content-Type": "application/json" } : undefined,
+        ...options
+      });
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+      if (!response.ok) {
+        const reason = typeof payload === "object" ? payload.error || payload.message : payload;
+        throw new Error(reason || `http_${response.status}`);
+      }
+      return payload;
+    }
+
+    function renderList(target, rows, emptyText) {
+      target.replaceChildren();
+      const source = Array.isArray(rows) ? rows.slice(0, 5) : [];
+      if (!source.length) {
+        const li = document.createElement("li");
+        li.textContent = emptyText;
+        target.append(li);
+        return;
+      }
+      source.forEach(row => {
+        const li = document.createElement("li");
+        const label = document.createElement("strong");
+        const value = document.createElement("span");
+        label.textContent = row.country || row.name || row.player || row.referrer || "Sin nombre";
+        value.textContent = String(row.live || row.uniqueListeners || row.access || row.sessions || row.count || 0);
+        li.append(label, value);
+        target.append(li);
+      });
+    }
+
+    function renderCms(payload) {
+      const revision = payload?.revision || payload?.station?.revision || payload?.content?.revision || "sin-revision";
+      const hash = payload?.hash || payload?.checksum || payload?.station?.slug || "sin-hash";
+      els.metricRevision.textContent = String(revision).slice(0, 18);
+      els.metricHash.textContent = String(hash).slice(0, 28);
+      els.jsonPreview.value = JSON.stringify(payload, null, 2);
+      els.updatedAt.textContent = `CMS ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function renderAnalytics(payload) {
+      const analytics = payload?.analytics || payload || {};
+      const live = Number(analytics?.liveListeners || analytics?.live || analytics?.summary?.liveListeners || 0);
+      const peak = Number(analytics?.peakAudience || analytics?.summary?.peakAudience || 0);
+      const events = Number(payload?.eventCount || analytics?.eventCount || analytics?.summary?.events || 0);
+      const appUsers = Number(analytics?.appUsers || analytics?.summary?.appUsers || 0);
+      els.metricLive.textContent = live.toLocaleString("es-ES");
+      els.metricPeak.textContent = `Peak ${peak.toLocaleString("es-ES")}`;
+      els.metricEvents.textContent = events.toLocaleString("es-ES");
+      els.metricApp.textContent = `App ${appUsers.toLocaleString("es-ES")}`;
+      renderList(els.countriesList, analytics.countries, "Sin paises agregados");
+      renderList(els.playersList, analytics.players || analytics.referrers, "Sin players agregados");
+      els.updatedAt.textContent = `Analytics ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    async function loadCms() {
+      try {
+        setMessage("Cargando contrato CMS protegido...");
+        const payload = await api("/api/cms/current");
+        renderCms(payload);
+        setMessage("Contrato CMS cargado.", "ok");
+      } catch (error) {
+        els.jsonPreview.value = "";
+        setMessage(`CMS no disponible: ${error.message}`, "error");
+      }
+    }
+
+    async function loadAnalytics() {
+      try {
+        setMessage("Cargando analytics protegido...");
+        const payload = await api("/api/analytics/summary");
+        renderAnalytics(payload);
+        setMessage("Analytics cargado.", "ok");
+      } catch (error) {
+        setMessage(`Analytics no disponible: ${error.message}`, "error");
+      }
+    }
+
+    async function checkStatus() {
+      try {
+        const payload = await api("/api/auth/status");
+        setAuthed(Boolean(payload.authenticated));
+        if (payload.authenticated) {
+          setMessage("Sesion recuperada.", "ok");
+          await Promise.allSettled([loadCms(), loadAnalytics()]);
+        } else {
+          setMessage("Inicia sesion para administrar el CMS remoto.");
+        }
+      } catch (error) {
+        setAuthed(false);
+        setMessage(`No se pudo verificar sesion: ${error.message}`, "error");
+      }
+    }
+
+    els.form.addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        setMessage("Validando credenciales...");
+        await api("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ password: els.password.value })
+        });
+        els.password.value = "";
+        setAuthed(true);
+        setMessage("Sesion iniciada.", "ok");
+        await Promise.allSettled([loadCms(), loadAnalytics()]);
+      } catch (error) {
+        setAuthed(false);
+        setMessage(`Login fallido: ${error.message}`, "error");
+      }
+    });
+
+    els.refreshCms.addEventListener("click", loadCms);
+    els.refreshAnalytics.addEventListener("click", loadAnalytics);
+    els.logout.addEventListener("click", async () => {
+      try { await api("/api/auth/logout", { method: "POST" }); } catch (_) {}
+      setAuthed(false);
+      setMessage("Sesion cerrada.");
+    });
+
+    checkStatus();
+  </script>
+</body>
+</html>

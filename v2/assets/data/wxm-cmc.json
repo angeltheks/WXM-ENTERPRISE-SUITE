@@ -1,0 +1,331 @@
+{
+  "revision": "2026-05-20-cmc-media-modules-v2",
+  "source": "local",
+  "station": {
+    "name": "WXM ONE RADIO",
+    "domain": "wxmoneradio.com",
+    "slogan": "La radio que conecta al mundo",
+    "subtitle": "Music & Culture",
+    "logo": "assets/img/brand/wxm-emblem-square.png"
+  },
+  "stream": {
+    "primaryUrl": "https://jm8n.net:8024/stream",
+    "fallbackUrls": [],
+    "infoApi": "https://jm8n.net/cp/get_info.php?p=8024",
+    "reconnectIntervalMs": 5000,
+    "maxRetries": 5
+  },
+  "features": {
+    "banners": true,
+    "miniPlayer": true,
+    "languageSelector": true,
+    "editorialHighlights": true,
+    "programs": true,
+    "presenters": true,
+    "requests": true,
+    "history": true,
+    "favorites": true,
+    "sleepTimer": true,
+    "fallbackStreams": true,
+    "audioProfiles": false,
+    "secondaryStations": true,
+    "podcasts": true,
+    "mixes": false,
+    "news": true,
+    "videos": false,
+    "songQuiz": false,
+    "replays": false,
+    "polls": true,
+    "sponsors": true,
+    "emergencyMode": true,
+    "visualConfig": true,
+    "audioExperience": true,
+    "analyticsDashboard": true
+  },
+  "emergency": {
+    "enabled": false,
+    "severity": "info",
+    "title": "WXM en vivo",
+    "message": "La senal opera normalmente.",
+    "streamUrl": ""
+  },
+  "visual": {
+    "themeDefault": "dark",
+    "heroImage": "assets/img/brand/hero-world-wide.png",
+    "accentColor": "#e91e63"
+  },
+  "audioExperience": {
+    "enabled": true,
+    "recommendedProfile": "standard",
+    "lowDataMode": false,
+    "networkWarning": true
+  },
+  "analytics": {
+    "enabled": true,
+    "mode": "local-sample",
+    "periodLabel": "Ultimos 7 dias",
+    "periodRange": {
+      "start": "Apr 30, 2026",
+      "end": "May 30, 2026"
+    },
+    "ingestEndpoint": "",
+    "dashboardEndpoint": "",
+    "retentionDays": 90,
+    "kpis": {
+      "liveListeners": 9,
+      "peakAudience": 9,
+      "peakAt": "04:05",
+      "avgHoursDay": 0,
+      "avgListeningTimeMin": 0,
+      "totalListeningHours": 0,
+      "appUsers": 5
+    },
+    "listeningHoursTrend": [
+      { "label": "May 12", "value": 0 },
+      { "label": "May 13", "value": 0 },
+      { "label": "May 14", "value": 0 },
+      { "label": "May 15", "value": 0 },
+      { "label": "May 16", "value": 0 },
+      { "label": "May 17", "value": 0 },
+      { "label": "May 18", "value": 0 }
+    ],
+    "audienceRealtime": [
+      { "label": "03:30", "value": 6 },
+      { "label": "03:35", "value": 7 },
+      { "label": "03:40", "value": 7 },
+      { "label": "03:45", "value": 7 },
+      { "label": "03:50", "value": 8 },
+      { "label": "03:55", "value": 8 },
+      { "label": "04:00", "value": 9 },
+      { "label": "04:05", "value": 9 },
+      { "label": "04:10", "value": 9 },
+      { "label": "04:15", "value": 8 }
+    ],
+    "quickSeries": {
+      "listeningHours": [
+        { "label": "May 03", "value": 0 },
+        { "label": "May 06", "value": 0 },
+        { "label": "May 09", "value": 0 },
+        { "label": "May 12", "value": 0 },
+        { "label": "May 15", "value": 0 },
+        { "label": "May 18", "value": 0 },
+        { "label": "May 21", "value": 0 },
+        { "label": "May 24", "value": 0 },
+        { "label": "May 27", "value": 0 },
+        { "label": "May 30", "value": 0 }
+      ],
+      "uniqueListeners": [
+        { "label": "May 03", "value": 1 },
+        { "label": "May 06", "value": 2 },
+        { "label": "May 09", "value": 2 },
+        { "label": "May 12", "value": 3 },
+        { "label": "May 15", "value": 3 },
+        { "label": "May 18", "value": 4 },
+        { "label": "May 21", "value": 4 },
+        { "label": "May 24", "value": 5 },
+        { "label": "May 27", "value": 5 },
+        { "label": "May 30", "value": 6 }
+      ],
+      "accessCount": [
+        { "label": "May 03", "value": 2 },
+        { "label": "May 06", "value": 3 },
+        { "label": "May 09", "value": 3 },
+        { "label": "May 12", "value": 4 },
+        { "label": "May 15", "value": 5 },
+        { "label": "May 18", "value": 5 },
+        { "label": "May 21", "value": 6 },
+        { "label": "May 24", "value": 7 },
+        { "label": "May 27", "value": 7 },
+        { "label": "May 30", "value": 8 }
+      ]
+    },
+    "countries": [
+      { "country": "Canada", "code": "CA", "listeningHours": 0, "access": 3, "uniqueListeners": 3, "distinctIps": 3, "live": 3 },
+      { "country": "United States", "code": "US", "listeningHours": 0, "access": 2, "uniqueListeners": 2, "distinctIps": 2, "live": 2 },
+      { "country": "Spain", "code": "ES", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 },
+      { "country": "Finland", "code": "FI", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 },
+      { "country": "Hungary", "code": "HU", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 },
+      { "country": "Dominican Republic", "code": "DO", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 }
+    ],
+    "players": [
+      { "name": "WXM Android App", "key": "wxm_android_app", "listeningHours": 0, "access": 5, "uniqueListeners": 5, "distinctIps": 5 },
+      { "name": "Web Browser", "key": "wxm_web_app", "listeningHours": 0, "access": 2, "uniqueListeners": 2, "distinctIps": 2 },
+      { "name": "External Player", "key": "external_player", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1 }
+    ],
+    "referrers": [
+      { "name": "WXM Android App", "source": "wxm_android_app", "listeningHours": 0, "access": 5, "uniqueListeners": 5, "distinctIps": 5 },
+      { "name": "Direct", "source": "direct", "listeningHours": 0, "access": 2, "uniqueListeners": 2, "distinctIps": 2 },
+      { "name": "wxmoneradio.com", "source": "official_site", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1 }
+    ],
+    "liveConnections": [
+      { "country": "Hungary", "ageSeconds": 9 },
+      { "country": "Canada", "ageSeconds": 53 },
+      { "country": "Canada", "ageSeconds": 56 },
+      { "country": "United States", "ageSeconds": 77 },
+      { "country": "Dominican Republic", "ageSeconds": 82 }
+    ],
+    "quickStats": {
+      "uniqueListeners": { "yesterday": 0, "week": 0, "month": 0, "selected": 0 },
+      "listeningHours": { "yesterday": 0, "week": 0, "month": 0, "selected": 0 },
+      "accessCount": { "yesterday": 0, "week": 0, "month": 0, "selected": 0 }
+    }
+  },
+  "content": {
+    "banners": [
+      {
+        "title": "Broadcasting worldwide 24/7",
+        "meta": "WXM Future Network",
+        "body": "Musica, cultura y comunidad desde el Caribe para el mundo.",
+        "image": "assets/img/brand/hero-world-wide.png",
+        "ctaLabel": "Escuchar ahora",
+        "ctaUrl": "",
+        "placement": "home"
+      }
+    ],
+    "schedule": [
+      {
+        "time": "06:00",
+        "title": "WXM Morning",
+        "host": "Equipo WXM",
+        "tag": "Noticias, energia y hits",
+        "genre": "Magazine musical",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "description": "Arranque del dia con noticias ligeras, cultura pop y hits globales.",
+        "socialUrl": "",
+        "playlistUrl": ""
+      },
+      {
+        "time": "10:00",
+        "title": "Global Mix",
+        "host": "WXM DJs",
+        "tag": "Pop, urbano y dance",
+        "genre": "Music mix",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "description": "Seleccion global de pop, urbano, dance y sonidos latinos.",
+        "socialUrl": "",
+        "playlistUrl": ""
+      },
+      {
+        "time": "14:00",
+        "title": "La Conexion",
+        "host": "Cabina WXM",
+        "tag": "Cultura, llamadas y comunidad",
+        "genre": "Comunidad",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "description": "Espacio abierto para mensajes, dedicatorias y conexion con oyentes.",
+        "socialUrl": "",
+        "playlistUrl": ""
+      },
+      {
+        "time": "18:00",
+        "title": "Prime Time WXM",
+        "host": "Invitados especiales",
+        "tag": "Estrenos, entrevistas y tendencia",
+        "genre": "Prime time",
+        "image": "assets/img/brand/hero-world-mobile.png",
+        "description": "La franja fuerte con estrenos, tendencias, entrevistas y momentos especiales.",
+        "socialUrl": "",
+        "playlistUrl": ""
+      },
+      {
+        "time": "22:00",
+        "title": "Night Sessions",
+        "host": "WXM Selectors",
+        "tag": "Late night, chill y electronica",
+        "genre": "Late night",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "description": "Sonido nocturno con seleccion chill, electronica suave y mood global.",
+        "socialUrl": "",
+        "playlistUrl": ""
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Especial urbano global",
+        "meta": "Hoy 18:00",
+        "icon": "fa-bolt",
+        "body": "Una hora con los lanzamientos que estan moviendo la semana.",
+        "image": "assets/img/brand/hero-world-mobile.png",
+        "ctaLabel": "Ver especial",
+        "ctaUrl": ""
+      },
+      {
+        "title": "Entrevistas WXM",
+        "meta": "Proximamente",
+        "icon": "fa-microphone",
+        "body": "Conversaciones cortas con artistas, productores y voces culturales.",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "ctaLabel": "Explorar",
+        "ctaUrl": ""
+      },
+      {
+        "title": "Mapa de oyentes",
+        "meta": "En desarrollo",
+        "icon": "fa-earth-americas",
+        "body": "La comunidad WXM conectada por ciudades y paises.",
+        "image": "assets/img/brand/hero-world-wide.png",
+        "ctaLabel": "Muy pronto",
+        "ctaUrl": ""
+      }
+    ],
+    "presenters": [
+      {
+        "name": "Equipo WXM",
+        "role": "Cabina central",
+        "program": "Prime Time WXM",
+        "bio": "Voces de la comunidad WXM con foco en musica, cultura y conexion global.",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "instagram": "",
+        "website": ""
+      }
+    ],
+    "articles": [
+      {
+        "title": "La nueva etapa de WXM",
+        "category": "Cultura",
+        "excerpt": "Una emisora digital con identidad global, audio en vivo y contenido editorial administrable.",
+        "image": "assets/img/brand/hero-world-wide.png",
+        "url": "",
+        "publishedAt": "2026-05-20"
+      }
+    ],
+    "podcasts": [
+      {
+        "title": "Lo mejor de WXM",
+        "show": "Replays",
+        "episodes": 0,
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "url": "",
+        "description": "Espacio preparado para entrevistas, especiales y programas grabados."
+      }
+    ],
+    "stations": [
+      {
+        "name": "WXM Main",
+        "description": "Senal principal en vivo 24/7.",
+        "streamUrl": "https://jm8n.net:8024/stream",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "enabled": true
+      }
+    ],
+    "polls": [
+      {
+        "question": "Que quieres escuchar mas en WXM?",
+        "meta": "Encuesta activa",
+        "image": "assets/img/brand/wxm-emblem-square.png",
+        "options": ["Urbano", "Pop", "Dance", "Entrevistas"]
+      }
+    ],
+    "sponsors": [
+      {
+        "title": "Aliado WXM",
+        "brand": "WXM Partners",
+        "body": "Espacio preparado para patrocinadores, eventos y promociones oficiales.",
+        "image": "assets/img/brand/hero-world-mobile.png",
+        "url": "",
+        "startsAt": "2026-05-20",
+        "endsAt": ""
+      }
+    ]
+  }
+}

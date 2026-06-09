@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WXM ONE RADIO | La Radio que Conecta al Mundo</title>
+    <meta name="description" content="WXM ONE RADIO - Música, cultura, entrevistas y radio online 24/7.">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wxm-app-shell">
+    <header class="app-topbar">
+        <div class="brand-identity">
+            <h1 class="brand-name">WXM ONE RADIO</h1>
+            <div class="brand-meta-line">
+                <div class="live-dot-wrapper">
+                    <span class="live-dot"></span>
+                    <span class="live-label" data-i18n="common.liveUpper">EN VIVO</span>
+                </div>
+                <span class="brand-slogan" data-i18n="brand.slogan">La radio que conecta al mundo</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="themeBtn" title="Cambiar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="icon-btn" id="shareBtn" title="Compartir">
+                <i class="fas fa-share-nodes"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <section class="app-view active" id="view-home" data-view="home">
+            <div class="hero-live-card">
+                <div class="hero-copy">
+                    <span class="section-kicker" data-i18n="home.nowKicker">Ahora en WXM</span>
+                    <h2 id="homeTrackTitle">Cargando en vivo...</h2>
+                    <p id="homeTrackArtist">WXM Radio</p>
+                    <div class="hero-signal-row" aria-label="Broadcasting worldwide 24/7">
+                        <span>Broadcasting worldwide</span>
+                        <strong>24/7</strong>
+                    </div>
+                </div>
+                <button class="hero-play-btn" id="homePlayBtn" title="Reproducir">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item stat-live">
+                    <div class="stat-wave">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <div class="stat-text">
+                        <span class="stat-number" id="liveListeners">...</span>
+                        <span class="stat-label" data-i18n="home.listeningNow">escuchando ahora</span>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <i class="fas fa-signal stat-icon"></i>
+                    <div class="stat-text">
+                        <span class="stat-number" id="totalConnections">...</span>
+                        <span class="stat-label" data-i18n="home.connectionsToday">conexiones hoy</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-row">
+                <h3 data-i18n="programs.title">Programación</h3>
+                <button class="text-action" data-jump-view="programs" data-i18n="common.viewAll">Ver todo</button>
+            </div>
+            <div class="now-next-grid" id="homeSchedule"></div>
+
+            <div class="quick-actions">
+                <button class="quick-action" id="quickRequestBtn">
+                    <i class="fas fa-microphone-lines"></i>
+                    <span data-i18n="actions.requestSong">Pedir canción</span>
+                </button>
+                <button class="quick-action" id="quickSleepBtn">
+                    <i class="fas fa-moon"></i>
+                    <span>Sleep timer</span>
+                </button>
+                <button class="quick-action" id="quickWhatsappBtn">
+                    <i class="fab fa-whatsapp"></i>
+                    <span data-i18n="actions.studio">Cabina</span>
+                </button>
+            </div>
+
+            <div class="section-row">
+                <h3 data-i18n="home.highlights">Destacados</h3>
+                <button class="text-action" data-jump-view="explore" data-i18n="nav.explore">Explorar</button>
+            </div>
+            <div class="editorial-stack" id="homeHighlights"></div>
+            <div class="cms-rails-stack" id="homeCmsRails"></div>
+        </section>
+
+        <section class="app-view" id="view-live" data-view="live">
+            <div class="live-dashboard">
+                <div class="live-dashboard-header">
+                    <span class="section-kicker" data-i18n="live.kicker">Radio en vivo</span>
+                    <h2 data-i18n="live.title">Ahora suena</h2>
+                    <p data-i18n="live.subtitle">Canción actual, historial reciente y acciones rápidas sin salir del directo.</p>
+                </div>
+
+                <article class="live-now-panel" data-player-surface>
+                    <div class="live-now-art">
+                        <img id="artwork" src="assets/img/brand/wxm-emblem-square.png" alt="Artwork">
+                    </div>
+                    <div class="live-now-copy">
+                        <span class="section-kicker" data-i18n="live.nowPlaying">Sonando ahora</span>
+                        <h2 class="track-title" id="trackTitle">Cargando...</h2>
+                        <p class="track-artist" id="trackArtist">WXM Radio</p>
+                        <div class="wxm-marquee-bar live-inline-marquee">
+                            <div class="wxm-marquee-inner">
+                                <div class="wxm-marquee-track" id="marqueeTrack">
+                                    <span class="wxm-marquee-text">LA RADIO QUE CONECTA AL MUNDO &nbsp;•&nbsp; SONANDO: CARGANDO... &nbsp;•&nbsp;</span>
+                                    <span class="wxm-marquee-text">LA RADIO QUE CONECTA AL MUNDO &nbsp;•&nbsp; SONANDO: CARGANDO... &nbsp;•&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="marquee-edge left"></div>
+                            <div class="marquee-edge right"></div>
+                        </div>
+                    </div>
+                </article>
+
+                <div class="live-control-panel">
+                    <button class="ctrl-btn ctrl-secondary" id="stopBtn" title="Detener">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                    <button class="ctrl-btn ctrl-play live-main-play" id="playBtn" title="Reproducir">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="ctrl-btn ctrl-secondary" id="syncBtn" title="Sincronizar">
+                        <i class="fas fa-arrows-rotate"></i>
+                    </button>
+                    <div class="volume-section live-volume">
+                        <i class="fas fa-volume-low vol-icon"></i>
+                        <input type="range" class="vol-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.7">
+                        <i class="fas fa-volume-high vol-icon" id="muteBtn"></i>
+                    </div>
+                </div>
+
+                <div class="player-tools">
+                    <button class="tool-chip" id="favoriteTrackBtn">
+                        <i class="far fa-heart"></i>
+                        <span data-i18n="actions.save">Guardar</span>
+                    </button>
+                    <button class="tool-chip" id="sleepTimerBtn">
+                        <i class="fas fa-clock"></i>
+                        <span>Sleep</span>
+                    </button>
+                    <button class="tool-chip" id="requestSongBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        <span data-i18n="actions.request">Pedir</span>
+                    </button>
+                </div>
+
+                <section class="live-history-card" id="liveHistory">
+                    <div class="section-row compact">
+                        <h3 data-i18n="live.musicHistory">Historial musical</h3>
+                        <button class="text-action" id="openHistoryBtn" type="button" data-i18n="live.weekView">Semana</button>
+                    </div>
+                    <div id="weeklyPlaylistContainer"></div>
+                </section>
+            </div>
+        </section>
+
+        <section class="app-view" id="view-programs" data-view="programs">
+            <div class="screen-heading">
+                <span class="section-kicker" data-i18n="programs.kicker">Parrilla WXM</span>
+                <h2 data-i18n="programs.title">Programas</h2>
+            </div>
+            <div class="schedule-list" id="programsList"></div>
+        </section>
+
+        <section class="app-view" id="view-explore" data-view="explore">
+            <div class="screen-heading">
+                <span class="section-kicker" data-i18n="explore.kicker">Cultura y música</span>
+                <h2 data-i18n="nav.explore">Explorar</h2>
+            </div>
+            <div class="editorial-stack large" id="exploreList"></div>
+            <div class="cms-rails-stack" id="exploreRails"></div>
+        </section>
+
+        <section class="app-view" id="view-me" data-view="me">
+            <div class="screen-heading">
+                <span class="section-kicker" data-i18n="me.kicker">Tu radio</span>
+                <h2 data-i18n="nav.me">Mi WXM</h2>
+            </div>
+            <div class="profile-card">
+                <div>
+                    <strong data-i18n="me.localFavorites">Favoritos locales</strong>
+                    <span id="favoritesCount">0 canciones guardadas</span>
+                </div>
+                <button class="icon-btn" id="clearFavoritesBtn" title="Limpiar favoritos">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="favorites-list" id="favoritesList"></div>
+            <div class="settings-list">
+                <button class="settings-item" id="audioSettingsBtn">
+                    <i class="fas fa-sliders"></i>
+                    <span data-i18n="settings.audio">Audio inmersivo</span>
+                    <small id="audioProfileLabel">Estándar</small>
+                </button>
+                <button class="settings-item" id="languageSettingsBtn">
+                    <i class="fas fa-language"></i>
+                    <span data-i18n="settings.language">Idioma</span>
+                    <small id="languageLabel">Sistema</small>
+                </button>
+                <button class="settings-item" id="serviceStatusBtn">
+                    <i class="fas fa-circle-info"></i>
+                    <span data-i18n="settings.serviceStatus">Estado del servicio</span>
+                    <small id="serviceStatusLabel">Listo</small>
+                </button>
+                <button class="settings-item" id="contactBtn">
+                    <i class="fas fa-envelope"></i>
+                    <span data-i18n="settings.contact">Contactar cabina</span>
+                </button>
+                <button class="settings-item" id="privacyBtn">
+                    <i class="fas fa-shield-halved"></i>
+                    <span data-i18n="settings.privacy">Privacidad y seguridad</span>
+                </button>
+                <div class="developer-settings-group" id="developerSettingsGroup" hidden>
+                    <button class="settings-item" id="cmsStatusBtn">
+                        <i class="fas fa-cloud-arrow-down"></i>
+                        <span data-i18n="settings.cms">CMS / CMC</span>
+                        <small id="cmsStatusLabel">Local</small>
+                    </button>
+                    <button class="settings-item" id="engineStatusBtn">
+                        <i class="fas fa-microchip"></i>
+                        <span data-i18n="settings.engine">Motor NEXTGEN</span>
+                        <small id="nativeEngineLabel">Android listo</small>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="global-mini-player" id="miniPlayer" role="group" aria-label="Reproductor WXM">
+        <img id="miniArtwork" src="assets/img/brand/wxm-emblem-square.png" alt="">
+        <div class="mini-player-copy">
+            <span class="mini-player-state" id="miniPlayerState" data-i18n="common.live">En vivo</span>
+            <strong id="miniTrackTitle">Cargando...</strong>
+            <small id="miniTrackArtist">WXM Radio</small>
+        </div>
+        <button class="mini-play-btn" id="miniPlayBtn" type="button" title="Reproducir">
+            <i class="fas fa-play" id="miniPlayIcon"></i>
+        </button>
+    </div>
+
+    <nav class="bottom-nav" aria-label="Navegación principal">
+        <button class="nav-item active" data-target-view="home">
+            <i class="fas fa-house"></i>
+            <span data-i18n="nav.home">Inicio</span>
+        </button>
+        <button class="nav-item" data-target-view="live">
+            <i class="fas fa-circle-play"></i>
+            <span data-i18n="nav.live">En vivo</span>
+        </button>
+        <button class="nav-item" data-target-view="programs">
+            <i class="fas fa-calendar-days"></i>
+            <span data-i18n="nav.programs">Programas</span>
+        </button>
+        <button class="nav-item" data-target-view="explore">
+            <i class="fas fa-compass"></i>
+            <span data-i18n="nav.explore">Explorar</span>
+        </button>
+        <button class="nav-item" data-target-view="me">
+            <i class="fas fa-user"></i>
+            <span data-i18n="nav.me">Mi WXM</span>
+        </button>
+    </nav>
+</div>
+
+<div class="history-sheet" id="historySheet" aria-hidden="true">
+    <div class="history-sheet-panel">
+        <div class="sheet-grabber"></div>
+        <div class="history-sheet-header">
+            <div>
+                <span class="section-kicker" data-i18n="nav.live">En vivo</span>
+                <strong data-i18n="live.musicHistory">Historial reciente</strong>
+            </div>
+            <button class="close-modal" id="closeHistoryBtn" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="historySheetContent"></div>
+    </div>
+</div>
+
+<div class="app-modal" id="appModal" aria-hidden="true">
+    <div class="app-modal-panel">
+        <div class="app-modal-header">
+            <strong id="appModalTitle">WXM</strong>
+            <button class="close-modal" id="appModalClose" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="app-modalBody" id="appModalBody"></div>
+    </div>
+</div>
+
+<script type="module" src="assets/js/ui-controller.js"></script>
+</body>
+</html>

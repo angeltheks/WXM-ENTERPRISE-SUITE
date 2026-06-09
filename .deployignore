@@ -1,0 +1,28 @@
+.DS_Store
+**/.DS_Store
+
+# Secretos y configuración privada
+.env
+*.env
+spotify-secrets.php
+*.pem
+*.key
+*.crt
+
+# Artefactos heredados y herramientas locales
+Reproductor.xml
+extracted_code.html
+extract_script.py
+PROMPT_BLINDAJE_SEGURIDAD.md
+v2/scratch/
+
+# Backups, temporales y volcados
+*.bak
+*.old
+*.orig
+*.tmp
+*.log
+*.sql
+*.zip
+*.tar
+*.tar.gz

@@ -1,0 +1,45 @@
+### OS / Editor
+.DS_Store
+**/.DS_Store
+.idea/
+**/.idea/
+
+### Logs / temporary files
+*.log
+*.tmp
+*.bak
+*.old
+
+### Secrets / local environment
+.env
+.env.*
+**/.env
+**/.env.*
+!*.env.example
+!**/.env.example
+spotify-secrets.php
+
+### Android / Gradle
+**/local.properties
+**/.gradle/
+**/build/
+*.apk
+*.aab
+*.ap_
+*.jks
+*.keystore
+
+### Node / CMS
+node_modules/
+package-lock.json
+cms-remote-starter/data/
+cms-remote-starter/public/uploads/
+
+### Generated or legacy extraction artifacts
+extract_script.py
+extracted_code.html
+Reproductor.xml
+
+### Legacy platform output folders
+android/
+ios/

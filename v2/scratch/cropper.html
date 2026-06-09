@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="results"></div>
+    <script>
+        const img = new Image();
+        img.src = '../assets/img/official-banner.png';
+        img.onload = () => {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const results = document.getElementById('results');
+
+            // 1. Recortar Logo (x:30, y:120, w:340, h:240)
+            canvas.width = 340;
+            canvas.height = 240;
+            ctx.drawImage(img, 30, 120, 340, 240, 0, 0, 340, 240);
+            const logoBase64 = canvas.toDataURL('image/png');
+            
+            // 2. Recortar Mapa (x:510, y:30, w:420, h:360)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = 420;
+            canvas.height = 360;
+            ctx.drawImage(img, 510, 30, 420, 360, 0, 0, 420, 360);
+            const mapBase64 = canvas.toDataURL('image/png');
+
+            results.textContent = '';
+
+            const logoData = document.createElement('div');
+            logoData.id = 'logo-data';
+            logoData.textContent = logoBase64;
+
+            const mapData = document.createElement('div');
+            mapData.id = 'map-data';
+            mapData.textContent = mapBase64;
+
+            results.appendChild(logoData);
+            results.appendChild(mapData);
+        };
+    </script>
+</body>
+</html>

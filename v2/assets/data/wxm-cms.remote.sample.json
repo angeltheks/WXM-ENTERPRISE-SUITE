@@ -1,0 +1,250 @@
+{
+  "revision": "2026-05-30-cms-remote-contract-v2",
+  "source": "remote-cms-sample",
+  "station": {
+    "name": "WXM ONE RADIO",
+    "domain": "wxmoneradio.com",
+    "slogan": "La radio que conecta al mundo",
+    "subtitle": "Music & Culture",
+    "logo": "assets/img/brand/wxm-emblem-square.png"
+  },
+  "stream": {
+    "primaryUrl": "https://jm8n.net:8024/stream",
+    "fallbackUrls": [],
+    "infoApi": "https://jm8n.net/cp/get_info.php?p=8024",
+    "reconnectIntervalMs": 5000,
+    "maxRetries": 5
+  },
+  "features": {
+    "miniPlayer": true,
+    "languageSelector": true,
+    "editorialHighlights": true,
+    "programs": true,
+    "requests": true,
+    "banners": true,
+    "secondaryStations": true,
+    "podcasts": true,
+    "mixes": false,
+    "news": true,
+    "videos": false,
+    "songQuiz": false,
+    "replays": false,
+    "presenters": true,
+    "polls": true,
+    "sponsors": true,
+    "audioExperience": true,
+    "emergencyMode": false
+  },
+  "visual": {
+    "themeDefault": "dark",
+    "allowLightTheme": true,
+    "heroImage": "assets/img/brand/hero-world-wide.png",
+    "logoImage": "assets/img/brand/logo-wxm-3d.png"
+  },
+  "audioExperience": {
+    "enabled": true,
+    "recommendedProfile": "standard",
+    "defaultProfile": "standard",
+    "allowUserProfiles": true,
+    "showAdvancedProfiles": true,
+    "lowDataMode": false,
+    "networkWarning": true
+  },
+  "analytics": {
+    "enabled": true,
+    "mode": "remote",
+    "ingestEndpoint": "https://tu-dominio.com/api/analytics/ingest",
+    "dashboardEndpoint": "https://tu-dominio.com/api/analytics/summary",
+    "retentionDays": 90,
+    "requiredDimensions": [
+      "sourceClient",
+      "platform",
+      "appVersion",
+      "stationId",
+      "streamRole",
+      "player",
+      "referrer"
+    ],
+    "sourceClients": [
+      "wxm_android_app",
+      "wxm_web_app",
+      "cms_preview",
+      "external_player",
+      "tunein",
+      "alexa",
+      "unknown"
+    ]
+  },
+  "emergency": {
+    "enabled": false,
+    "severity": "info",
+    "title": "WXM en vivo",
+    "message": "La senal opera normalmente.",
+    "streamUrl": ""
+  },
+  "homeRails": [
+    "banners",
+    "secondaryStations",
+    "podcasts",
+    "news",
+    "presenters",
+    "sponsors"
+  ],
+  "exploreRails": [
+    "banners",
+    "secondaryStations",
+    "podcasts",
+    "mixes",
+    "news",
+    "presenters",
+    "polls",
+    "songQuiz",
+    "videos",
+    "replays",
+    "sponsors"
+  ],
+  "rails": {
+    "banners": {
+      "feature": "banners",
+      "titleKey": "cms.rails.banners",
+      "actionKey": "common.viewMore",
+      "layout": "hero-banner",
+      "items": [
+        {
+          "title": "Especial urbano global",
+          "subtitle": "Eventos, entrevistas y estrenos WXM desde el Caribe para el mundo.",
+          "image": "assets/img/brand/hero-world-wide.png",
+          "badge": "WXM 24/7",
+          "meta": "Hoy 18:00",
+          "body": "Una franja editorial para destacar eventos, estrenos, invitados y especiales de la emisora. Cuando el CMS real este activo, este espacio podra publicar imagen, descripcion, fecha, enlace y llamada a la accion sin actualizar la app."
+        }
+      ]
+    },
+    "secondaryStations": {
+      "feature": "secondaryStations",
+      "titleKey": "cms.rails.radios",
+      "actionKey": "common.viewMore",
+      "layout": "station-grid",
+      "items": [
+        {
+          "title": "WXM Main",
+          "subtitle": "Live 24/7",
+          "image": "assets/img/brand/wxm-emblem-square.png",
+          "badge": "Live",
+          "url": "https://jm8n.net:8024/stream",
+          "body": "Canal principal de WXM ONE RADIO con transmision continua. Esta ficha puede crecer con descripcion, generos, horarios destacados y enlaces oficiales."
+        },
+        {
+          "title": "WXM Urban",
+          "subtitle": "Coming soon",
+          "image": "assets/img/brand/hero-world-mobile.png",
+          "badge": "Soon",
+          "body": "Canal secundario preparado para una futura programacion urbana, con portada, descripcion y estado controlados desde el CMS."
+        }
+      ]
+    },
+    "podcasts": {
+      "feature": "podcasts",
+      "titleKey": "cms.rails.podcasts",
+      "actionKey": "common.viewMore",
+      "layout": "media-row",
+      "items": [
+        {
+          "title": "WXM Interviews",
+          "subtitle": "Conversaciones con artistas, productores y voces culturales.",
+          "image": "assets/img/logo-premium.png",
+          "badge": "Podcast",
+          "body": "Podcast de ejemplo para validar como se vera una serie dentro de la app. A futuro puede incluir episodios, duracion, fecha, audio on demand y descarga si los derechos lo permiten."
+        }
+      ]
+    },
+    "mixes": {
+      "feature": "mixes",
+      "titleKey": "cms.rails.mixes",
+      "actionKey": "common.viewMore",
+      "layout": "media-row",
+      "items": []
+    },
+    "news": {
+      "feature": "news",
+      "titleKey": "cms.rails.news",
+      "actionKey": "common.viewMore",
+      "layout": "article-row",
+      "items": [
+        {
+          "title": "WXM prepara nuevos especiales en vivo",
+          "subtitle": "La app queda lista para publicar noticias musicales desde CMS remoto.",
+          "image": "assets/img/brand/hero-world-wide.png",
+          "badge": "Noticias",
+          "body": "Esta es una noticia de ejemplo para probar la vista completa. El equipo de WXM podra publicar titulares, portada, resumen, cuerpo de la noticia y enlaces desde el CMS remoto cuando este disponible."
+        }
+      ]
+    },
+    "presenters": {
+      "feature": "presenters",
+      "titleKey": "cms.rails.presenters",
+      "actionKey": "common.viewMore",
+      "layout": "presenter-row",
+      "items": [
+        {
+          "title": "WXM Selectors",
+          "subtitle": "Curadores de musica, cultura y tendencias.",
+          "image": "assets/img/brand/wxm-emblem-square.png",
+          "badge": "Cabina",
+          "body": "Ficha de locutor o selector preparada para foto, biografia, redes, horarios y playlist del programa."
+        }
+      ]
+    },
+    "polls": {
+      "feature": "polls",
+      "titleKey": "cms.rails.polls",
+      "actionKey": "common.viewMore",
+      "layout": "poll-row",
+      "items": [
+        {
+          "title": "Que bloque quieres escuchar hoy?",
+          "subtitle": "Urbano global, Top 40, entrevistas o cultura.",
+          "image": "assets/img/brand/wxm-emblem-square.png",
+          "badge": "Encuesta",
+          "body": "Encuesta de ejemplo. En una fase con backend de comunidad, el usuario podra votar y la cabina recibira resultados moderados en tiempo real."
+        }
+      ]
+    },
+    "songQuiz": {
+      "feature": "songQuiz",
+      "titleKey": "cms.rails.songQuiz",
+      "actionKey": "common.viewMore",
+      "layout": "media-row",
+      "items": []
+    },
+    "videos": {
+      "feature": "videos",
+      "titleKey": "cms.rails.videos",
+      "actionKey": "common.viewMore",
+      "layout": "video-row",
+      "items": []
+    },
+    "replays": {
+      "feature": "replays",
+      "titleKey": "cms.rails.replays",
+      "actionKey": "common.viewMore",
+      "layout": "media-row",
+      "items": []
+    },
+    "sponsors": {
+      "feature": "sponsors",
+      "titleKey": "cms.rails.sponsors",
+      "actionKey": "common.viewMore",
+      "layout": "sponsor-row",
+      "items": [
+        {
+          "title": "Aliados WXM",
+          "subtitle": "Espacio preparado para patrocinadores, eventos y promociones.",
+          "image": "assets/img/official-banner.png",
+          "badge": "Sponsor",
+          "body": "Modulo comercial preparado para aliados, marcas, eventos y promociones. Debe mantenerse controlado desde CMS para activar o retirar campanas sin recompilar."
+        }
+      ]
+    }
+  }
+}

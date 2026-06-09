@@ -1,0 +1,23 @@
+{
+  "name": "wxm-one-radio-player",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WXM ONE RADIO player packaged for web, Android and iOS with Capacitor.",
+  "scripts": {
+    "serve": "python3 -m http.server 8080 --directory v2",
+    "check:js": "node --check v2/assets/js/config.js && node --check v2/assets/js/metadata-service.js && node --check v2/assets/js/audio-engine.js && node --check v2/assets/js/ui-controller.js && node --check v2/assets/js/modules/playlist/playlist-engine.js && node --check v2/assets/js/modules/playlist/playlist-storage.js && node --check v2/assets/js/modules/playlist/playlist-ui.js",
+    "cap:sync": "npx cap sync",
+    "cap:add:android": "npx cap add android",
+    "cap:add:ios": "npx cap add ios",
+    "android": "npx cap open android",
+    "ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}

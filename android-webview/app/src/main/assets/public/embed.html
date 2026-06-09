@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WXM ONE RADIO | Embed</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="embed-page">
+    <div class="wxm-player-container">
+        <header class="player-header">
+            <div class="brand-identity">
+                <div class="live-dot-wrapper">
+                    <span class="live-dot"></span>
+                    <span class="live-label">EN VIVO</span>
+                </div>
+                <h1 class="brand-name">WXM ONE RADIO</h1>
+                <p class="brand-slogan">La Radio que Conecta al Mundo</p>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="themeBtn" title="Cambiar Tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="icon-btn" id="shareBtn" title="Compartir">
+                    <i class="fas fa-share-nodes"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item stat-live">
+                <div class="stat-wave">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="stat-text">
+                    <span class="stat-number" id="liveListeners">...</span>
+                    <span class="stat-label">escuchando ahora</span>
+                </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <i class="fas fa-signal stat-icon"></i>
+                <div class="stat-text">
+                    <span class="stat-number" id="totalConnections">...</span>
+                    <span class="stat-label">conexiones hoy</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="wxm-marquee-bar">
+            <div class="wxm-marquee-inner">
+                <div class="wxm-marquee-track" id="marqueeTrack">
+                    <span class="wxm-marquee-text">LA RADIO QUE CONECTA AL MUNDO &nbsp;•&nbsp; SONANDO: CARGANDO... &nbsp;•&nbsp;</span>
+                    <span class="wxm-marquee-text">LA RADIO QUE CONECTA AL MUNDO &nbsp;•&nbsp; SONANDO: CARGANDO... &nbsp;•&nbsp;</span>
+                </div>
+            </div>
+            <div class="marquee-edge left"></div>
+            <div class="marquee-edge right"></div>
+        </div>
+
+        <div class="artwork-section">
+            <div class="artwork-glow"></div>
+            <div class="artwork-frame" id="artworkFrame">
+                <img id="artwork" src="assets/img/brand/wxm-emblem-square.png" alt="Artwork" class="artwork-img">
+                <div class="artwork-overlay">
+                    <img src="assets/img/brand/wxm-emblem-square.png" alt="WXM ONE RADIO" class="overlay-logo-img">
+                </div>
+            </div>
+        </div>
+
+        <div class="track-info">
+            <h2 class="track-title" id="trackTitle">Cargando...</h2>
+            <p class="track-artist" id="trackArtist">WXM Radio</p>
+        </div>
+
+        <canvas id="visualizer"></canvas>
+
+        <div class="controls-section">
+            <div class="controls">
+                <button class="ctrl-btn ctrl-secondary" id="stopBtn" title="Detener">
+                    <i class="fas fa-stop"></i>
+                </button>
+                <button class="ctrl-btn ctrl-play" id="playBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="ctrl-btn ctrl-secondary" id="syncBtn" title="Sincronizar">
+                    <i class="fas fa-arrows-rotate"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="volume-section">
+            <i class="fas fa-volume-low vol-icon"></i>
+            <input type="range" class="vol-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.7">
+            <i class="fas fa-volume-high vol-icon" id="muteBtn"></i>
+        </div>
+
+        <div id="weeklyPlaylistContainer"></div>
+    </div>
+    <script type="module" src="assets/js/ui-controller.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "wxm-cms-remote-starter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WXM ONE RADIO remote CMS starter: public wxm-cms.json, protected publish API and anonymous analytics ingest.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "PORT=8787 node server.js",
+    "check": "node --check server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
