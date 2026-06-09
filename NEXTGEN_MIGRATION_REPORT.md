@@ -1403,3 +1403,54 @@ Pendiente:
 Rollback:
 
 - Reemplazar los archivos anteriores desde la copia original o desactivar el runtime `WxmWorldAtlasMap`; el CMS volvera al fallback SVG interno si React/D3/TopoJSON no cargan.
+
+## Post-Git Operational Baseline - 2026-06-10
+
+Motivo:
+
+- El proyecto ya estaba lo bastante avanzado para versionarlo como suite oficial y dejar un punto estable antes de continuar con cambios de mayor alcance.
+- Era necesario separar `main` estable de una rama de trabajo `dev`, agregar reglas de release y automatizar verificaciones minimas.
+
+Archivos creados:
+
+- `README.md`
+- `RELEASE_CHECKLIST.md`
+- `.github/workflows/ci.yml`
+
+Archivos modificados:
+
+- `MCP.md`
+- `NEXTGEN_MIGRATION_REPORT.md`
+
+Git:
+
+- Remoto oficial: `https://github.com/angeltheks/WXM-ENTERPRISE-SUITE`.
+- Baseline inicial en `main`: `86fdee0`.
+- Tag estable: `v0.1.0-baseline`.
+- Rama de trabajo: `dev`.
+
+Arquitectura operativa agregada:
+
+- El README raiz documenta rutas activas, estructura del suite, comandos de CMS, app web, admin remoto y build Android.
+- El checklist de release define validaciones antes de generar APK o promover cambios.
+- GitHub Actions valida higiene del repo, sintaxis JavaScript critica y build Android debug.
+
+Reglas de continuidad:
+
+- Continuar el desarrollo diario en `dev`.
+- Promover a `main` solo cuando compile y pase checklist.
+- No subir APKs, builds, `.gradle`, `node_modules`, `.env`, `local.properties`, uploads ni bases de datos runtime.
+- Publicar binarios mediante GitHub Releases o artefactos de CI, no como archivos trackeados.
+
+Rollback:
+
+- Para volver al baseline estable:
+  - `git switch main`
+  - `git reset --hard v0.1.0-baseline`
+- Si solo falla la capa post-Git, revertir el commit que agrega `README.md`, `RELEASE_CHECKLIST.md`, `.github/workflows/ci.yml` y esta seccion documental.
+
+Pendiente:
+
+- Subir `dev` y el tag `v0.1.0-baseline` al remoto.
+- Confirmar que el CI remoto corre correctamente en GitHub.
+- Crear milestones/issues por fase para ordenar el cierre de CMS remoto, analytics persistente, Android media service y futura migracion Compose.

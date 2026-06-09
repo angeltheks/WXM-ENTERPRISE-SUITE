@@ -845,3 +845,42 @@ Pendiente recomendado:
 - Persistir analytics en base de datos gestionada en hosting.
 - Agregar export CSV/JSON protegido desde el admin remoto.
 - Si el operador requiere precision cartografica de territorios pequenos, usar dataset GeoJSON caribeno de mayor resolucion solo para esa subregion.
+
+## Git Baseline Y Flujo Post-Git - 2026-06-10
+
+Objetivo:
+
+- Convertir `Reprov2_NEXTGEN` en la fuente oficial versionada sin perder la posibilidad de volver a un baseline estable.
+- Evitar que APKs, builds, caches, credenciales o datos locales entren al repositorio.
+- Preparar una disciplina de trabajo por ramas antes de seguir con mas fases.
+
+Implementado:
+
+- Repositorio remoto oficial: `angeltheks/WXM-ENTERPRISE-SUITE`.
+- `main` queda como baseline estable inicial con commit `86fdee0`.
+- Tag de recuperacion: `v0.1.0-baseline`.
+- Rama de trabajo: `dev`.
+- Documentacion raiz agregada:
+  - `README.md`
+  - `RELEASE_CHECKLIST.md`
+- CI agregado en `.github/workflows/ci.yml` con:
+  - validacion de archivos prohibidos trackeados;
+  - guardia basica contra secretos comunes;
+  - revision de sintaxis JavaScript critica;
+  - build Android debug con Gradle.
+
+Reglas:
+
+- Trabajar en `/Users/mac/AndroidProjects/Reprov2_NEXTGEN` como proyecto activo.
+- Mantener `/Users/mac/AndroidProjects/Reprov2` como proyecto original historico, salvo decision explicita.
+- Los APKs no se suben al repo como archivos trackeados; deben publicarse por releases o artefactos de CI.
+- No trackear `build/`, `.gradle/`, `.idea/`, `node_modules/`, `.env`, `local.properties`, uploads locales ni bases de datos runtime.
+- `main` debe recibir cambios solo cuando `dev` compile y pase checklist.
+- El CMS local y el CMS Remote Admin son parte del suite; la app Android, el frontend WebView y el CMS deben avanzar coordinados.
+
+Pendiente recomendado:
+
+- Abrir PR de `dev` hacia `main` cuando el CI remoto pase.
+- Agregar release workflow firmado cuando exista keystore de produccion.
+- Definir issues/milestones por fase para CMS remoto completo, analytics persistente y migracion futura a Jetpack Compose.
+- Depurar en una fase futura las copias legacy como `v2/cms/cms/`, sin hacerlo mientras sirvan como respaldo de continuidad.
