@@ -16,6 +16,52 @@ WXM ONE RADIO debe evolucionar de reproductor web a una app de radio completa: e
 - El proxy Spotify vive en servidor HTTPS; la app movil no ejecuta PHP.
 - La reproduccion Android debe vivir en servicio nativo para segundo plano, pantalla bloqueada y controles de sistema.
 
+## Gobernanza Oficial Del Proyecto
+
+Desde 2026-06-10 existe una sola fuente de verdad:
+
+```text
+/Users/mac/AndroidProjects/Reprov2_NEXTGEN
+```
+
+Repositorio oficial:
+
+```text
+angeltheks/WXM-ENTERPRISE-SUITE
+```
+
+Carpetas historicas, no activas:
+
+```text
+/Users/mac/AndroidProjects/Reprov2
+/Users/mac/Desktop/Reprov2
+```
+
+Reglas permanentes:
+
+- No desarrollar en carpetas historicas.
+- Si se necesita un archivo legacy, comparar versiones, verificar diferencias y migrar solo lo necesario al repo oficial.
+- Trabajar en `dev` o `feature/*`; nunca directo en `main`.
+- Mantener el proyecto como monorepo enterprise.
+- No crear sistemas paralelos si existe un modulo equivalente.
+- Refactorizar antes de duplicar.
+- Documentar cambios de arquitectura en `docs/`, `MCP.md` y `WXM_PROJECT_CONTEXT.md`.
+- No mover fisicamente `android-webview/`, `v2/` ni `cms-remote-starter/` sin una fase de migracion controlada, porque hoy esas rutas sostienen Android packaging, previews locales y CI.
+
+Arquitectura objetivo:
+
+```text
+apps/
+cms/
+analytics/
+crm/
+streaming/
+shared/
+infrastructure/
+scripts/
+docs/
+```
+
 ## Fase actual
 
 Estado al 2026-06-02: Fase 1 y Fase 1.5 estabilizadas, Fase 2 avanzada con CMC local, CMS UI local, modulos editoriales/media renderizados en la app y Analytics/CMS local organizada en vistas operativas. Backend remoto de recoleccion pendiente.

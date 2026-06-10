@@ -4,6 +4,25 @@ Usar este checklist antes de subir cambios importantes, generar APK o publicar u
 
 ## 1. Higiene Git
 
+- Confirmar que estas en la fuente oficial:
+
+```bash
+pwd
+```
+
+Debe ser:
+
+```text
+/Users/mac/AndroidProjects/Reprov2_NEXTGEN
+```
+
+- No trabajar releases desde carpetas historicas:
+
+```text
+/Users/mac/AndroidProjects/Reprov2
+/Users/mac/Desktop/Reprov2
+```
+
 - Confirmar que estas en la rama correcta:
 
 ```bash
@@ -117,4 +136,3 @@ git push origin main --tags
 ```
 
 Subir APK como GitHub Release, no dentro del repo.
-

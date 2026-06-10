@@ -1,24 +1,40 @@
-# WXM ONE RADIO NEXTGEN
+# WXM ENTERPRISE SUITE
 
-Baseline oficial de WXM ONE RADIO NEXTGEN: app Android WebView/Media3, frontend `v2`, CMS local y CMS Remote Admin.
+Suite oficial de WXM ONE RADIO: app Android WebView/Media3, frontend movil, CMS local, CMS Remote Admin, analytics y arquitectura preparada para CRM, streaming management, news, advertising, AI services y World Atlas Dashboard.
 
 ## Proyecto oficial
 
-La ruta activa de desarrollo es:
+La unica ruta activa de desarrollo es:
 
 ```bash
 /Users/mac/AndroidProjects/Reprov2_NEXTGEN
 ```
 
-La carpeta anterior queda como respaldo. A partir de este baseline, todo cambio debe hacerse sobre `Reprov2_NEXTGEN` y versionarse en Git.
+Carpetas historicas:
+
+```text
+/Users/mac/AndroidProjects/Reprov2
+/Users/mac/Desktop/Reprov2
+```
+
+No se desarrollan cambios activos en carpetas historicas. Si hace falta recuperar un archivo antiguo, se compara, se migra al proyecto oficial y se versiona en Git.
+
+Repositorio oficial:
+
+```text
+angeltheks/WXM-ENTERPRISE-SUITE
+```
 
 ## Estructura
+
+Estructura fisica actual:
 
 ```text
 android-webview/           App Android nativa con WebView, Media3, ExoPlayer, service, DSP, cache y bridge.
 v2/                        Frontend web/app que se empaqueta dentro de Android.
 v2/cms/                    CMS local visual para configurar contenido, analytics, mapa y secciones.
 cms-remote-starter/        Servidor remoto minimo: login admin, publicar wxm-cms.json, assets y analytics anonimos.
+docs/                      Documentacion de arquitectura, seguridad, despliegue, APIs y roadmap.
 scripts/                   Utilidades para sincronizar assets y compilar APK.
 *.md                       Documentacion tecnica y reporte de migracion.
 ```
@@ -30,6 +46,35 @@ Notas:
 - `v2/scratch/` contiene prototipos visuales; no es runtime de produccion.
 - `cms-remote-starter/data/` y `cms-remote-starter/public/uploads/` son runtime local y no se suben a Git.
 
+Estructura enterprise objetivo:
+
+```text
+apps/
+cms/
+analytics/
+crm/
+streaming/
+shared/
+infrastructure/
+docs/
+scripts/
+```
+
+La migracion fisica hacia esa estructura debe hacerse en una fase separada para no romper Android packaging, rutas del CMS ni CI.
+
+## Documentacion Oficial
+
+```text
+WXM_PROJECT_CONTEXT.md
+docs/ARCHITECTURE.md
+docs/ROADMAP.md
+docs/API_CONTRACT.md
+docs/DATABASE.md
+docs/SECURITY.md
+docs/DEPLOYMENT.md
+docs/WORLD_ATLAS.md
+```
+
 ## Flujo Git
 
 Ramas:
@@ -39,6 +84,8 @@ main    Version estable que compila.
 dev     Trabajo diario validado antes de merge.
 feature/* o fix/* para cambios grandes.
 ```
+
+No desarrollar directamente sobre `main`.
 
 Baseline:
 
@@ -139,4 +186,3 @@ cms-remote-starter/public/uploads/
 ```
 
 Las APKs instalables deben ir como GitHub Releases, no como archivos del repo.
-

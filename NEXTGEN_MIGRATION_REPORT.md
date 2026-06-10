@@ -1454,3 +1454,57 @@ Pendiente:
 - Subir `dev` y el tag `v0.1.0-baseline` al remoto.
 - Confirmar que el CI remoto corre correctamente en GitHub.
 - Crear milestones/issues por fase para ordenar el cierre de CMS remoto, analytics persistente, Android media service y futura migracion Compose.
+
+## Project Governance Directive - 2026-06-10
+
+Motivo:
+
+- El proyecto necesitaba una fuente unica de verdad para evitar trabajar en copias paralelas y mezclar APKs, CMS o assets de carpetas historicas.
+- La nueva direccion define a WXM como una suite enterprise, no solo como un reproductor Android.
+
+Fuente oficial:
+
+```text
+/Users/mac/AndroidProjects/Reprov2_NEXTGEN
+```
+
+Repositorios/carpetas historicas:
+
+```text
+/Users/mac/AndroidProjects/Reprov2
+/Users/mac/Desktop/Reprov2
+```
+
+Repositorio oficial:
+
+```text
+angeltheks/WXM-ENTERPRISE-SUITE
+```
+
+Archivos creados:
+
+- `WXM_PROJECT_CONTEXT.md`
+- `docs/ARCHITECTURE.md`
+- `docs/ROADMAP.md`
+- `docs/API_CONTRACT.md`
+- `docs/DATABASE.md`
+- `docs/SECURITY.md`
+- `docs/DEPLOYMENT.md`
+- `docs/WORLD_ATLAS.md`
+
+Archivos modificados:
+
+- `README.md`
+- `MCP.md`
+- `NEXTGEN_MIGRATION_REPORT.md`
+
+Decision tecnica:
+
+- No se movieron carpetas runtime todavia.
+- `android-webview/`, `v2/` y `cms-remote-starter/` permanecen en su ubicacion actual porque Android packaging, previews locales, CMS, scripts y CI dependen de esas rutas.
+- La estructura `apps/`, `cms/`, `analytics/`, `crm/`, `streaming/`, `shared/` e `infrastructure/` queda como arquitectura objetivo para una migracion controlada futura.
+
+Rollback:
+
+- Revertir el commit de gobernanza restaura la documentacion anterior.
+- No hay cambios funcionales de runtime en esta fase.
