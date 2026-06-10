@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git grep -nE '(WXM_CMS_ADMIN_PASSWORD=changeme|local-dev-secret|AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z]{20,}|BEGIN (RSA|PRIVATE) KEY)' -- ':!v2/cms/assets/vendor/**' ':!v2/cms/cms/assets/vendor/**'; then
+          if git grep -nE '(WXM_CMS_ADMIN_PASSWORD=changeme|local-dev-secret|AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z]{20,}|BEGIN (RSA|PRIVATE) KEY)' -- ':!v2/cms/assets/vendor/**' ':!v2/cms/cms/assets/vendor/**' ':!.github/workflows/ci.yml'; then
             echo "Potential secret or unsafe placeholder found."
             exit 1
           fi
@@ -82,4 +82,3 @@ jobs:
           set -euo pipefail
           chmod +x ./gradlew
           ./gradlew assembleDebug
-
