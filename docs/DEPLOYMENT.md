@@ -9,6 +9,20 @@ dev   Daily integration branch.
 
 Promote `dev` to `main` only after local validation and GitHub Actions pass.
 
+## Smoke Test
+
+Fast validation:
+
+```bash
+scripts/smoke-check.sh
+```
+
+Full validation with Android debug build:
+
+```bash
+WXM_SMOKE_BUILD_ANDROID=1 scripts/smoke-check.sh
+```
+
 ## Android APK
 
 Sync web assets before Android builds when `v2/` changes:
@@ -70,4 +84,3 @@ Open:
 ```text
 http://127.0.0.1:8787/admin/
 ```
-

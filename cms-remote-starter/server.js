@@ -76,7 +76,7 @@ function corsHeaders(req) {
     return allowed
         ? {
             "Access-Control-Allow-Origin": allowAll ? (origin || "*") : origin,
-            "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+            "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Allow-Credentials": "true",
             "Vary": "Origin"
@@ -92,7 +92,7 @@ function sendJson(req, res, status, payload, headers = {}) {
         "Content-Length": Buffer.byteLength(body),
         ...headers
     }));
-    res.end(body);
+    res.end(req.method === "HEAD" ? undefined : body);
 }
 
 function sendText(res, status, body, headers = {}) {
@@ -599,7 +599,7 @@ function serveStatic(req, res, pathname) {
     const body = fs.readFileSync(file);
     const cache = pathname.startsWith("/uploads/") ? { "Cache-Control": "public, max-age=31536000, immutable" } : {};
     res.writeHead(200, securityHeaders({ "Content-Type": types[ext] || "application/octet-stream", "Content-Length": body.length, ...cache }));
-    res.end(body);
+    res.end(req.method === "HEAD" ? undefined : body);
 }
 
 async function route(req, res) {
@@ -611,11 +611,11 @@ async function route(req, res) {
         return res.end();
     }
 
-    if (req.method === "GET" && pathname === "/health") {
+    if ((req.method === "GET" || req.method === "HEAD") && pathname === "/health") {
         return sendJson(req, res, 200, { ok: true, service: "wxm-cms-remote", hasPublishedCms: fs.existsSync(CURRENT_FILE) });
     }
 
-    if (req.method === "GET" && pathname === "/wxm-cms.json") {
+    if ((req.method === "GET" || req.method === "HEAD") && pathname === "/wxm-cms.json") {
         if (!fs.existsSync(CURRENT_FILE)) return sendJson(req, res, 404, { ok: false, error: "cms_not_published" });
         const body = fs.readFileSync(CURRENT_FILE);
         const etag = `"${sha256(body).slice(0, 16)}"`;
@@ -630,7 +630,7 @@ async function route(req, res) {
             "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
             ETag: etag
         }));
-        return res.end(body);
+        return res.end(req.method === "HEAD" ? undefined : body);
     }
 
     if (req.method === "POST" && pathname === "/api/auth/login") {
@@ -744,7 +744,7 @@ async function route(req, res) {
         return sendJson(req, res, 200, { ok: true, ...summarizeAnalytics() });
     }
 
-    if (req.method === "GET" && (pathname.startsWith("/admin") || pathname.startsWith("/uploads/"))) return serveStatic(req, res, pathname);
+    if ((req.method === "GET" || req.method === "HEAD") && (pathname.startsWith("/admin") || pathname.startsWith("/uploads/"))) return serveStatic(req, res, pathname);
     return sendJson(req, res, 404, { ok: false, error: "not_found" });
 }
 

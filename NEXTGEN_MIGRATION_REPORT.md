@@ -259,6 +259,58 @@ Validacion:
 
 - `./gradlew clean assembleDebug` completo con `BUILD SUCCESSFUL`.
 
+## Fase 0.6 - Auditoria Operativa De Continuidad - 2026-06-15
+
+Objetivo:
+
+- Confirmar que el proyecto oficial sigue siendo `/Users/mac/AndroidProjects/Reprov2_NEXTGEN`.
+- Evitar que la desconexion/interrupcion dejara cambios incompletos.
+- Crear una puerta de smoke test unica antes de seguir agregando funciones.
+- Validar app web, CMS local, CMS remoto starter y build Android debug.
+
+Archivos creados:
+
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/scripts/smoke-check.sh`
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/docs/CURRENT_STATE_AUDIT.md`
+
+Archivos modificados:
+
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/.github/workflows/ci.yml`
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/README.md`
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/RELEASE_CHECKLIST.md`
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/cms-remote-starter/server.js`
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/docs/DEPLOYMENT.md`
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/scripts/build-android-apk.sh`
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/android-webview/app/src/main/assets/public/assets/data/wxm-cmc.json`
+
+Arquitectura/operacion agregada:
+
+- Smoke test local/CI para entry points, higiene Git, secretos basicos, JSON contracts y sintaxis JS.
+- CI de `dev`/`main` ejecuta el smoke test antes del build Android.
+- Build script Android usa el Gradle Wrapper del proyecto y el JDK embebido de Android Studio si existe.
+- CMS Remote Starter responde correctamente a `HEAD` en rutas criticas.
+- Runtime Node del smoke test cae al Node embebido de Codex cuando `node` no existe en `PATH` local.
+
+Validacion:
+
+- `./scripts/smoke-check.sh` completo con `OK`.
+- `WXM_SMOKE_BUILD_ANDROID=1 ./scripts/smoke-check.sh` completo con `BUILD SUCCESSFUL` y `OK`.
+- `./scripts/build-android-apk.sh` completo con `BUILD SUCCESSFUL`.
+- CMS remoto temporal en puerto `8791` respondio `200 OK` en:
+  - `HEAD /health`
+  - `HEAD /admin/`
+  - `HEAD /wxm-cms.json`
+
+APK generado:
+
+- `/Users/mac/AndroidProjects/Reprov2_NEXTGEN/android-webview/app/build/outputs/apk/debug/app-debug.apk`
+
+Pendiente:
+
+- Smoke visual automatizado con navegador para app, CMS y World Atlas.
+- Consolidar o archivar la copia legacy `v2/cms/cms/`.
+- Mantener Gradle warnings bajo vigilancia antes de migraciones mayores.
+
 Pendiente fuera de Fase 3:
 
 - Room Data Layer.

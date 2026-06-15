@@ -51,19 +51,10 @@ cms-remote-starter/public/uploads/
 
 ## 2. Frontend y CMS
 
-Validar sintaxis:
+Validar smoke test rapido:
 
 ```bash
-node --check v2/assets/js/config.js
-node --check v2/assets/js/metadata-service.js
-node --check v2/assets/js/audio-engine.js
-node --check v2/assets/js/cms-service.js
-node --check v2/assets/js/ui-controller.js
-node --check v2/assets/js/modules/playlist/playlist-engine.js
-node --check v2/assets/js/modules/playlist/playlist-storage.js
-node --check v2/assets/js/modules/playlist/playlist-ui.js
-node --check v2/cms/assets/js/cms.js
-node --check v2/cms/assets/react/WxmWorldAtlasMap.runtime.js
+scripts/smoke-check.sh
 ```
 
 Pruebas visuales minimas:
@@ -102,8 +93,7 @@ Sincronizar assets:
 Compilar:
 
 ```bash
-cd android-webview
-JAVA_HOME='/Applications/Android Studio.app/Contents/jbr/Contents/Home' ./gradlew clean assembleDebug
+WXM_SMOKE_BUILD_ANDROID=1 scripts/smoke-check.sh
 ```
 
 Validar en dispositivo o emulador:

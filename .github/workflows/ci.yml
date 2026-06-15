@@ -34,28 +34,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git grep -nE '(WXM_CMS_ADMIN_PASSWORD=changeme|local-dev-secret|AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z]{20,}|BEGIN (RSA|PRIVATE) KEY)' -- ':!v2/cms/assets/vendor/**' ':!v2/cms/cms/assets/vendor/**' ':!.github/workflows/ci.yml'; then
+          if git grep -nE '(WXM_CMS_ADMIN_PASSWORD=changeme|local-dev-secret|AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z]{20,}|BEGIN (RSA|PRIVATE) KEY)' -- ':!v2/cms/assets/vendor/**' ':!v2/cms/cms/assets/vendor/**' ':!.github/workflows/ci.yml' ':!scripts/smoke-check.sh'; then
             echo "Potential secret or unsafe placeholder found."
             exit 1
           fi
 
-      - name: Node syntax checks
+      - name: Smoke checks
         shell: bash
         run: |
           set -euo pipefail
-          node --check v2/assets/js/config.js
-          node --check v2/assets/js/metadata-service.js
-          node --check v2/assets/js/audio-engine.js
-          node --check v2/assets/js/cms-config.js
-          node --check v2/assets/js/cms-service.js
-          node --check v2/assets/js/analytics-service.js
-          node --check v2/assets/js/ui-controller.js
-          node --check v2/assets/js/modules/playlist/playlist-engine.js
-          node --check v2/assets/js/modules/playlist/playlist-storage.js
-          node --check v2/assets/js/modules/playlist/playlist-ui.js
-          node --check v2/cms/assets/js/cms.js
-          node --check v2/cms/assets/react/WxmWorldAtlasMap.runtime.js
-          node --check cms-remote-starter/server.js
+          scripts/smoke-check.sh
 
   android-debug-build:
     name: Android debug build

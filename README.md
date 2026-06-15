@@ -97,14 +97,13 @@ Antes de cada push:
 
 ```bash
 git status --short
-node --check v2/assets/js/config.js
-node --check v2/assets/js/metadata-service.js
-node --check v2/assets/js/audio-engine.js
-node --check v2/assets/js/cms-service.js
-node --check v2/assets/js/ui-controller.js
-node --check v2/cms/assets/js/cms.js
-node --check v2/cms/assets/react/WxmWorldAtlasMap.runtime.js
-node --check cms-remote-starter/server.js
+scripts/smoke-check.sh
+```
+
+Validacion completa con build Android:
+
+```bash
+WXM_SMOKE_BUILD_ANDROID=1 scripts/smoke-check.sh
 ```
 
 ## Ver app web local

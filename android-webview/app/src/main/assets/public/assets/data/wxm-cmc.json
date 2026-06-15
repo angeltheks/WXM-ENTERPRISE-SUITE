@@ -64,11 +64,15 @@
     "enabled": true,
     "mode": "local-sample",
     "periodLabel": "Ultimos 7 dias",
+    "periodRange": {
+      "start": "Apr 30, 2026",
+      "end": "May 30, 2026"
+    },
     "ingestEndpoint": "",
     "dashboardEndpoint": "",
     "retentionDays": 90,
     "kpis": {
-      "liveListeners": 8,
+      "liveListeners": 9,
       "peakAudience": 9,
       "peakAt": "04:05",
       "avgHoursDay": 0,
@@ -97,25 +101,68 @@
       { "label": "04:10", "value": 9 },
       { "label": "04:15", "value": 8 }
     ],
+    "quickSeries": {
+      "listeningHours": [
+        { "label": "May 03", "value": 0 },
+        { "label": "May 06", "value": 0 },
+        { "label": "May 09", "value": 0 },
+        { "label": "May 12", "value": 0 },
+        { "label": "May 15", "value": 0 },
+        { "label": "May 18", "value": 0 },
+        { "label": "May 21", "value": 0 },
+        { "label": "May 24", "value": 0 },
+        { "label": "May 27", "value": 0 },
+        { "label": "May 30", "value": 0 }
+      ],
+      "uniqueListeners": [
+        { "label": "May 03", "value": 1 },
+        { "label": "May 06", "value": 2 },
+        { "label": "May 09", "value": 2 },
+        { "label": "May 12", "value": 3 },
+        { "label": "May 15", "value": 3 },
+        { "label": "May 18", "value": 4 },
+        { "label": "May 21", "value": 4 },
+        { "label": "May 24", "value": 5 },
+        { "label": "May 27", "value": 5 },
+        { "label": "May 30", "value": 6 }
+      ],
+      "accessCount": [
+        { "label": "May 03", "value": 2 },
+        { "label": "May 06", "value": 3 },
+        { "label": "May 09", "value": 3 },
+        { "label": "May 12", "value": 4 },
+        { "label": "May 15", "value": 5 },
+        { "label": "May 18", "value": 5 },
+        { "label": "May 21", "value": 6 },
+        { "label": "May 24", "value": 7 },
+        { "label": "May 27", "value": 7 },
+        { "label": "May 30", "value": 8 }
+      ]
+    },
     "countries": [
-      { "country": "Canada", "code": "CA", "listeningHours": 0, "access": 3, "uniqueListeners": 3, "live": 3 },
-      { "country": "United States", "code": "US", "listeningHours": 0, "access": 2, "uniqueListeners": 2, "live": 2 },
-      { "country": "Spain", "code": "ES", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "live": 1 }
+      { "country": "Canada", "code": "CA", "listeningHours": 0, "access": 3, "uniqueListeners": 3, "distinctIps": 3, "live": 3 },
+      { "country": "United States", "code": "US", "listeningHours": 0, "access": 2, "uniqueListeners": 2, "distinctIps": 2, "live": 2 },
+      { "country": "Spain", "code": "ES", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 },
+      { "country": "Finland", "code": "FI", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 },
+      { "country": "Hungary", "code": "HU", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 },
+      { "country": "Dominican Republic", "code": "DO", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1, "live": 1 }
     ],
     "players": [
-      { "name": "WXM Android App", "key": "wxm_android_app", "listeningHours": 0, "access": 5, "uniqueListeners": 5 },
-      { "name": "Web Browser", "key": "wxm_web_app", "listeningHours": 0, "access": 2, "uniqueListeners": 2 },
-      { "name": "External Player", "key": "external_player", "listeningHours": 0, "access": 1, "uniqueListeners": 1 }
+      { "name": "WXM Android App", "key": "wxm_android_app", "listeningHours": 0, "access": 5, "uniqueListeners": 5, "distinctIps": 5 },
+      { "name": "Web Browser", "key": "wxm_web_app", "listeningHours": 0, "access": 2, "uniqueListeners": 2, "distinctIps": 2 },
+      { "name": "External Player", "key": "external_player", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1 }
     ],
     "referrers": [
-      { "name": "WXM Android App", "source": "wxm_android_app", "listeningHours": 0, "access": 5, "uniqueListeners": 5 },
-      { "name": "Direct", "source": "direct", "listeningHours": 0, "access": 2, "uniqueListeners": 2 },
-      { "name": "wxmoneradio.com", "source": "official_site", "listeningHours": 0, "access": 1, "uniqueListeners": 1 }
+      { "name": "WXM Android App", "source": "wxm_android_app", "listeningHours": 0, "access": 5, "uniqueListeners": 5, "distinctIps": 5 },
+      { "name": "Direct", "source": "direct", "listeningHours": 0, "access": 2, "uniqueListeners": 2, "distinctIps": 2 },
+      { "name": "wxmoneradio.com", "source": "official_site", "listeningHours": 0, "access": 1, "uniqueListeners": 1, "distinctIps": 1 }
     ],
     "liveConnections": [
+      { "country": "Hungary", "ageSeconds": 9 },
       { "country": "Canada", "ageSeconds": 53 },
       { "country": "Canada", "ageSeconds": 56 },
-      { "country": "United States", "ageSeconds": 77 }
+      { "country": "United States", "ageSeconds": 77 },
+      { "country": "Dominican Republic", "ageSeconds": 82 }
     ],
     "quickStats": {
       "uniqueListeners": { "yesterday": 0, "week": 0, "month": 0, "selected": 0 },

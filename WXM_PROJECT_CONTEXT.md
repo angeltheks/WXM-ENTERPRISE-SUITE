@@ -50,3 +50,15 @@ WXM ENTERPRISE SUITE is a professional radio platform combining:
 - World Atlas Dashboard.
 
 The project must stay modular, secure, and ready for future MCP-compatible service tools.
+
+## Current Operational State
+
+As of 2026-06-15, phase `0.6 - Auditoria Operativa De Continuidad` is complete.
+
+- `scripts/smoke-check.sh` validates entry points, Git hygiene, secret guard, JSON contracts and JavaScript syntax.
+- CI runs the smoke check before Android debug build.
+- Android APK build is validated with the Gradle Wrapper.
+- CMS Remote Starter responds to `HEAD` and `GET` on critical public routes.
+- Current audit report lives in `docs/CURRENT_STATE_AUDIT.md`.
+
+Next recommended phase: `0.7 - Smoke Visual Y Consolidacion De Copias CMS`.

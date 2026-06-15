@@ -62,6 +62,38 @@ scripts/
 docs/
 ```
 
+## Fase 0.6 - Auditoria Operativa De Continuidad - 2026-06-15
+
+Estado: completada.
+
+Objetivo:
+
+- Recuperar el punto exacto tras desconexiones/interrupciones.
+- Validar que `Reprov2_NEXTGEN` sigue siendo la unica fuente activa.
+- Evitar que nuevas funciones se monten sobre una base no comprobada.
+
+Implementado:
+
+- `scripts/smoke-check.sh` como smoke test unico para app, CMS, contratos JSON, seguridad basica y JS.
+- CI ejecuta el smoke test antes de compilar Android.
+- `scripts/build-android-apk.sh` usa Gradle Wrapper y JDK de Android Studio cuando esta disponible.
+- CMS Remote Starter soporta `HEAD` en rutas publicas criticas:
+  - `/health`
+  - `/admin/`
+  - `/wxm-cms.json`
+- Reporte `docs/CURRENT_STATE_AUDIT.md` con estado real, deuda tecnica y siguiente fase.
+
+Validacion:
+
+- Smoke rapido: OK.
+- Smoke con Android build: `BUILD SUCCESSFUL`.
+- Build APK oficial: `BUILD SUCCESSFUL`.
+- CMS remoto temporal: `HEAD /health`, `HEAD /admin/` y `HEAD /wxm-cms.json` respondieron `200 OK`.
+
+Siguiente recomendacion:
+
+- Fase 0.7: smoke visual automatizado y consolidacion de copias CMS antes de expandir CRM, news manager o publicidad.
+
 ## Fase actual
 
 Estado al 2026-06-02: Fase 1 y Fase 1.5 estabilizadas, Fase 2 avanzada con CMC local, CMS UI local, modulos editoriales/media renderizados en la app y Analytics/CMS local organizada en vistas operativas. Backend remoto de recoleccion pendiente.
