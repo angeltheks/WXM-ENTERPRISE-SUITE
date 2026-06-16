@@ -193,6 +193,77 @@ function countByGroup(nodes) {
   }, {});
 }
 
+function buildTopCountries(analytics = {}) {
+  const rows = Array.isArray(analytics.countries) ? analytics.countries : [];
+  return rows
+    .map(row => ({
+      code: String(row.code || row.countryCode || "").toUpperCase(),
+      name: row.country || row.name || row.label || row.code || "Pais",
+      value: Number(row.live || row.uniqueListeners || row.listeners || row.access || 0),
+      listeningHours: Number(row.listeningHours || row.hours || 0)
+    }))
+    .filter(row => row.value > 0 || row.listeningHours > 0)
+    .sort((a, b) => (b.value || b.listeningHours) - (a.value || a.listeningHours))
+    .slice(0, 6);
+}
+
+function buildLiveConnections(analytics = {}) {
+  const rows = Array.isArray(analytics.liveConnections) ? analytics.liveConnections : [];
+  return rows.slice(0, 6).map((row, index) => ({
+    id: row.id || `${row.country || row.name || "connection"}-${index}`,
+    country: row.country || row.name || "Conexion",
+    city: row.city || row.region || "",
+    secondsAgo: Number(row.secondsAgo || row.ageSeconds || row.lastSeenSeconds || 0)
+  }));
+}
+
+function formatAge(seconds) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "ahora";
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+  return `${Math.round(seconds / 3600)}h`;
+}
+
+function getTooltipPosition(container, event) {
+  const rect = container?.getBoundingClientRect();
+  if (!rect) return { x: event.clientX + 14, y: event.clientY + 14 };
+  const maxX = Math.max(12, rect.width - 236);
+  const maxY = Math.max(12, rect.height - 156);
+  return {
+    x: Math.min(maxX, Math.max(12, event.clientX - rect.left + 14)),
+    y: Math.min(maxY, Math.max(12, event.clientY - rect.top + 14))
+  };
+}
+
+function buildSelectedPayload(selectedId, countries, activeRecords, caribbeanNodes) {
+  if (!selectedId) return null;
+  if (selectedId.startsWith("caribbean-")) {
+    const code = selectedId.replace("caribbean-", "");
+    const node = caribbeanNodes.find(item => item.code === code);
+    if (!node) return null;
+    const record = getRecordForCode(activeRecords, code);
+    const live = record?.live ?? record?.uniqueListeners ?? record?.value ?? 0;
+    return {
+      title: node.label,
+      kicker: node.group,
+      meta: live > 0 ? `${formatAtlasNumber(live)} oyentes activos` : "Sin datos activos",
+      detail: node.territory ? "Territorio caribeno monitoreado" : "Nodo WXM Caribe"
+    };
+  }
+
+  const country = countries.find(featureItem => String(featureItem.id || "") === selectedId);
+  if (!country) return null;
+  const record = activeRecords.get(selectedId);
+  const name = record?.name || country.properties?.name || selectedId;
+  const live = record?.live ?? record?.uniqueListeners ?? record?.value ?? 0;
+  return {
+    title: name,
+    kicker: record ? "Pais activo" : "Pais sin actividad",
+    meta: record ? `${formatAtlasNumber(live)} oyentes activos` : "Sin conexiones recientes",
+    detail: record?.routeNode ? "Nodo estrategico WXM" : "Datos agregados por pais"
+  };
+}
+
 function routePath(projection, destination, index) {
   const start = projection([ORIGIN.lng, ORIGIN.lat]);
   const end = projection([destination.lng, destination.lat]);
@@ -222,6 +293,7 @@ export default function WxmWorldAtlasMap({
   const [error, setError] = useState("");
   const [tooltip, setTooltip] = useState(null);
   const [selectedId, setSelectedId] = useState("");
+  const [atlasMode, setAtlasMode] = useState("world");
 
   useEffect(() => {
     let active = true;
@@ -295,6 +367,10 @@ export default function WxmWorldAtlasMap({
   if (!mapData) return <div className="wxm-atlas-loading">Cargando world atlas real...</div>;
 
   const { countries, projection, path, graticule, activeRecords, activeIds } = mapData;
+  const compact = size.width < 720;
+  const topCountries = buildTopCountries(analytics);
+  const liveConnections = buildLiveConnections(analytics);
+  const selectedPayload = buildSelectedPayload(selectedId, countries, activeRecords, CARIBBEAN_NODES);
   const originPoint = projection([ORIGIN.lng, ORIGIN.lat]);
   const routes = ROUTES.map((route, index) => ({
     ...route,
@@ -321,6 +397,7 @@ export default function WxmWorldAtlasMap({
       return;
     }
     if (action === "caribbean") {
+      setAtlasMode("caribbean");
       const center = projection([-70.8, 17.5]);
       if (!center) return;
       const scale = size.width < 720 ? 5.2 : 4.1;
@@ -332,11 +409,12 @@ export default function WxmWorldAtlasMap({
       );
       return;
     }
+    setAtlasMode("world");
     zoomBehaviorRef.current.transform(transition, d3.zoomIdentity);
   };
 
   return (
-    <div className="wxm-atlas-shell" ref={containerRef}>
+    <div className={`wxm-atlas-shell ${atlasMode === "caribbean" ? "is-caribbean-focus" : ""}`} ref={containerRef}>
       <div className="wxm-atlas-hud">
         <div>
           <span className="wxm-atlas-kicker">CMS DASHBOARD</span>
@@ -350,7 +428,7 @@ export default function WxmWorldAtlasMap({
         <button type="button" onClick={() => applyZoom("in")} aria-label="Acercar mapa">+</button>
         <button type="button" onClick={() => applyZoom("out")} aria-label="Alejar mapa">-</button>
         <button type="button" className="is-wide" onClick={() => applyZoom("caribbean")} aria-label="Enfocar Caribe">Caribe</button>
-        <button type="button" onClick={() => applyZoom("reset")} aria-label="Centrar mapa">0</button>
+        <button type="button" onClick={() => applyZoom("reset")} aria-label="Centrar mapa">Mundo</button>
       </div>
 
       <svg ref={svgRef} className="wxm-atlas-svg" viewBox={`0 0 ${size.width} ${size.height}`} role="img" aria-label="WXM world atlas analytics map">
@@ -404,11 +482,14 @@ export default function WxmWorldAtlasMap({
                       setSelectedId(id);
                     }
                   }}
-                  onMouseMove={event => setTooltip({
-                    x: event.clientX + 14,
-                    y: event.clientY + 14,
-                    ...buildTooltipPayload(name, active, isActive)
-                  })}
+                  onMouseMove={event => {
+                    const position = getTooltipPosition(containerRef.current, event);
+                    setTooltip({
+                      x: position.x,
+                      y: position.y,
+                      ...buildTooltipPayload(name, active, isActive)
+                    });
+                  }}
                   onMouseLeave={() => setTooltip(null)}
                 />
               );
@@ -437,11 +518,17 @@ export default function WxmWorldAtlasMap({
                 node.territory ? "is-territory" : "",
                 selected ? "is-selected" : ""
               ].filter(Boolean).join(" ");
-              const showLabel = node.major || ["BS", "BB", "TT", "PA", "CO", "VE"].includes(node.code);
+              const showLabel = atlasMode === "caribbean"
+                ? node.major || active || selected || ["BS", "BB", "TT", "PA", "CO", "VE"].includes(node.code)
+                : node.major && !compact;
+              const nodeClassName = [
+                className,
+                showLabel ? "has-label" : ""
+              ].filter(Boolean).join(" ");
               return (
                 <g
                   key={`caribbean-${node.code}-${node.label}`}
-                  className={className}
+                  className={nodeClassName}
                   transform={`translate(${node.point[0]}, ${node.point[1]})`}
                   tabIndex={0}
                   role="button"
@@ -453,11 +540,14 @@ export default function WxmWorldAtlasMap({
                       setSelectedId(`caribbean-${node.code}`);
                     }
                   }}
-                  onMouseMove={event => setTooltip({
-                    x: event.clientX + 14,
-                    y: event.clientY + 14,
-                    ...buildCaribbeanTooltipPayload(node, node.record)
-                  })}
+                  onMouseMove={event => {
+                    const position = getTooltipPosition(containerRef.current, event);
+                    setTooltip({
+                      x: position.x,
+                      y: position.y,
+                      ...buildCaribbeanTooltipPayload(node, node.record)
+                    });
+                  }}
                   onMouseLeave={() => setTooltip(null)}
                 >
                   <circle r={node.major ? 4.8 : 3.4} />
@@ -476,7 +566,7 @@ export default function WxmWorldAtlasMap({
                 <text x="-26" y="49">DOMINICANA</text>
               </g>
             )}
-            {routes.map(route => route.point && (
+            {!compact && atlasMode === "world" && routes.map(route => route.point && (
               <g key={`${route.id}-label`} className="wxm-atlas-node-label" transform={`translate(${route.point[0]}, ${route.point[1]})`}>
                 <circle r="4" className="wxm-atlas-node-dot" />
                 <text x="10" y="-8">{route.label}</text>
@@ -487,16 +577,47 @@ export default function WxmWorldAtlasMap({
         </g>
       </svg>
 
-      <div className="wxm-caribbean-inset">
-        <span className="wxm-atlas-kicker">Caribe WXM</span>
-        <strong>{caribbeanActiveCount} activos / {CARIBBEAN_NODES.length} nodos</strong>
-        <small>Antillas Mayores, Antillas Menores y costa continental monitoreadas.</small>
-        <div className="wxm-caribbean-groups">
+      <aside className="wxm-atlas-side-panel" aria-label="Resumen operativo del mapa">
+        <section className="wxm-atlas-panel-section is-selected">
+          <span>{selectedPayload?.kicker || "Selecciona un pais"}</span>
+          <strong>{selectedPayload?.title || "Mapa WXM"}</strong>
+          <small>{selectedPayload?.meta || "Actividad agregada en tiempo real"}</small>
+          <em>{selectedPayload?.detail || "Haz zoom en Caribe para ver islas y territorios."}</em>
+        </section>
+        <section className="wxm-atlas-panel-section">
+          <span>Live connections</span>
+          {liveConnections.length ? (
+            liveConnections.map(item => (
+              <p key={item.id}>
+                <strong>{item.country}</strong>
+                <small>{item.city || "WXM"} · {formatAge(item.secondsAgo)}</small>
+              </p>
+            ))
+          ) : (
+            <p><strong>Sin conexiones</strong><small>Esperando telemetria</small></p>
+          )}
+        </section>
+        <section className="wxm-atlas-panel-section">
+          <span>Top paises</span>
+          {topCountries.length ? (
+            topCountries.map(item => (
+              <p key={`${item.code}-${item.name}`}>
+                <strong>{item.name}</strong>
+                <small>{formatAtlasNumber(item.value || item.listeningHours)} oyentes</small>
+              </p>
+            ))
+          ) : (
+            <p><strong>Sin ranking</strong><small>No hay datos agregados</small></p>
+          )}
+        </section>
+        <section className="wxm-atlas-panel-section is-caribbean">
+          <span>Caribe monitorizado</span>
+          <p><strong>{caribbeanActiveCount}</strong><small>activos ahora</small></p>
           {Object.entries(caribbeanGroups).map(([group, count]) => (
-            <span key={group}><b>{count}</b>{group}</span>
+            <p key={group}><strong>{count}</strong><small>{group}</small></p>
           ))}
-        </div>
-      </div>
+        </section>
+      </aside>
 
       <div className="wxm-atlas-legend">
         <span><i className="is-active" />Pais activo</span>

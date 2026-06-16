@@ -924,6 +924,36 @@ Pendiente recomendado:
 - Agregar export CSV/JSON protegido desde el admin remoto.
 - Si el operador requiere precision cartografica de territorios pequenos, usar dataset GeoJSON caribeno de mayor resolucion solo para esa subregion.
 
+## Fase CMS Analytics 2.6 - World Atlas Polish 1.0 - 2026-06-16
+
+Objetivo:
+
+- Pulir el World Atlas antes de seguir ampliando fases para que el mapa sea mas legible, menos ruidoso y mas cercano a un dashboard premium de radio global.
+
+Implementado:
+
+- `v2/cms/assets/react/WxmWorldAtlasMap.jsx` y su runtime activo `WxmWorldAtlasMap.runtime.js` agregan:
+  - modo explicito `Caribe`/`Mundo`;
+  - tooltips posicionados dentro del contenedor para evitar desbordes;
+  - panel lateral operativo con seleccionado, `Live connections`, top paises y resumen Caribe;
+  - rótulos reducidos en vista mundial y mas visibles al enfocar Caribe;
+  - panel responsive que se compacta en pantallas moviles;
+  - soporte visual para usuarios con `prefers-reduced-motion`.
+- `v2/cms/assets/css/cms.css` reduce el ruido del grid/fondo, elimina visualmente el inset Caribe antiguo y estiliza el nuevo panel lateral.
+
+Reglas:
+
+- La ruta activa del CMS local es `v2/cms/index.html` con assets en `v2/cms/assets/`.
+- La copia `v2/cms/cms/` queda como legado/backup de continuidad; no debe editarse como fuente principal.
+- El dataset `countries-110m.json` sirve para paises grandes y fronteras generales, pero no para precision fina de islas pequenas. Para Caribe se mantiene overlay operativo agregado.
+- No usar Google Maps como mapa principal del Atlas WXM; si se usa en el futuro, debe ser opcional para geocoding o vistas administrativas auxiliares.
+
+Pendiente recomendado:
+
+- Migrar a un dataset 50m/10m o GeoJSON dedicado del Caribe cuando haya red/dependencias aprobadas.
+- Crear smoke visual automatizado para desktop y mobile del Atlas.
+- Archivar o eliminar formalmente `v2/cms/cms/` cuando el equipo confirme que ya no se necesita como respaldo.
+
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 
 Objetivo:

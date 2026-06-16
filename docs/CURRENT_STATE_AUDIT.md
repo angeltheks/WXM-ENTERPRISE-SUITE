@@ -152,6 +152,7 @@ Riesgo:
 - Existe copia legacy `v2/cms/cms/`.
 - `index.html` y `cms.js` coinciden con el CMS activo, pero `cms.css` y `WxmWorldAtlasMap.runtime.js` ya difieren.
 - Esta divergencia puede provocar confusion de edicion y bugs visuales si alguien abre la copia equivocada.
+- Tras World Atlas Polish 1.0, la fuente activa queda explicitamente en `v2/cms/assets/`; la copia `v2/cms/cms/` no debe recibir trabajo nuevo.
 
 Recomendacion:
 
@@ -183,12 +184,14 @@ Estado: operativo a nivel frontend/starter.
 
 - Hay dashboard local, analytics starter y mapa React/D3.
 - La capa Caribe esta documentada como necesidad especial.
+- El Atlas activo tiene modo Caribe/Mundo, panel lateral operativo, tooltips contenidos y responsive compactado.
 
 Pendiente:
 
 - Conectar datos reales agregados desde backend persistente.
 - Export CSV/JSON protegido.
 - Geolocalizacion agregada server-side sin exponer IP.
+- Smoke visual automatizado para validar mapa desktop/mobile y evitar regresiones de layout.
 
 ### 7. Seguridad
 

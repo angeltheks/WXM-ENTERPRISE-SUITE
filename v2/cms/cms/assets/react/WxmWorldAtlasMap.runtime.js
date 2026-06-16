@@ -7,22 +7,38 @@
     const topojson = global.topojson;
 
     const COUNTRY_CODE_TO_ID = {
+        AG: "028",
         AR: "032",
         AU: "036",
+        BS: "044",
+        BB: "052",
+        BZ: "084",
         BR: "076",
         CA: "124",
         CL: "152",
         CN: "156",
         CO: "170",
+        CR: "188",
+        CU: "192",
+        DM: "212",
         DO: "214",
         EC: "218",
         FI: "246",
         FR: "250",
         DE: "276",
+        GD: "308",
+        GT: "320",
+        GY: "328",
+        HT: "332",
+        HN: "340",
         HU: "348",
         IN: "356",
         IT: "380",
+        JM: "388",
         JP: "392",
+        KN: "659",
+        LC: "662",
+        VC: "670",
         MX: "484",
         NL: "528",
         PA: "591",
@@ -30,6 +46,8 @@
         PR: "630",
         RU: "643",
         ES: "724",
+        SR: "740",
+        TT: "780",
         AE: "784",
         GB: "826",
         US: "840",
@@ -37,24 +55,45 @@
     };
 
     const COUNTRY_NAME_TO_CODE = {
+        antigua: "AG",
+        "antigua and barbuda": "AG",
+        "antigua y barbuda": "AG",
         argentina: "AR",
         australia: "AU",
+        bahamas: "BS",
+        barbados: "BB",
+        belize: "BZ",
         brasil: "BR",
         brazil: "BR",
         canada: "CA",
         chile: "CL",
         china: "CN",
         colombia: "CO",
+        "costa rica": "CR",
+        cuba: "CU",
+        dominica: "DM",
         "dominican republic": "DO",
         "republica dominicana": "DO",
         ecuador: "EC",
         finland: "FI",
         france: "FR",
         germany: "DE",
+        grenada: "GD",
+        guatemala: "GT",
+        guyana: "GY",
+        haiti: "HT",
+        honduras: "HN",
         hungary: "HU",
         india: "IN",
         italy: "IT",
+        jamaica: "JM",
         japan: "JP",
+        "saint kitts and nevis": "KN",
+        "san cristobal y nieves": "KN",
+        "saint lucia": "LC",
+        "santa lucia": "LC",
+        "saint vincent and the grenadines": "VC",
+        "san vicente": "VC",
         mexico: "MX",
         netherlands: "NL",
         panama: "PA",
@@ -63,6 +102,9 @@
         russia: "RU",
         spain: "ES",
         espana: "ES",
+        suriname: "SR",
+        "trinidad and tobago": "TT",
+        "trinidad y tobago": "TT",
         "united arab emirates": "AE",
         "united kingdom": "GB",
         "united states": "US",
@@ -79,6 +121,47 @@
         { id: "mexico-city", label: "Mexico City", country: "Mexico", lat: 19.4326, lng: -99.1332, code: "MX" },
         { id: "bogota", label: "Bogota", country: "Colombia", lat: 4.7110, lng: -74.0721, code: "CO" },
         { id: "dubai", label: "Dubai", country: "Emiratos", lat: 25.2048, lng: 55.2708, code: "AE" }
+    ];
+
+    const CARIBBEAN_NODES = [
+        { code: "CU", label: "Cuba", group: "Antillas Mayores", lat: 21.5218, lng: -77.7812, major: true },
+        { code: "JM", label: "Jamaica", group: "Antillas Mayores", lat: 18.1096, lng: -77.2975, major: true },
+        { code: "HT", label: "Haiti", group: "Antillas Mayores", lat: 18.9712, lng: -72.2852, major: true },
+        { code: "DO", label: "Rep. Dominicana", group: "Antillas Mayores", lat: 18.4861, lng: -69.9312, major: true },
+        { code: "PR", label: "Puerto Rico", group: "Antillas Mayores", lat: 18.2208, lng: -66.5901, major: true },
+        { code: "BS", label: "Bahamas", group: "Antillas Menores", lat: 25.0343, lng: -77.3963 },
+        { code: "TC", label: "Turks & Caicos", group: "Antillas Menores", lat: 21.6940, lng: -71.7979, territory: true },
+        { code: "KY", label: "Cayman", group: "Antillas Menores", lat: 19.3133, lng: -81.2546, territory: true },
+        { code: "VG", label: "BVI", group: "Antillas Menores", lat: 18.4207, lng: -64.6400, territory: true },
+        { code: "VI", label: "USVI", group: "Antillas Menores", lat: 18.3358, lng: -64.8963, territory: true },
+        { code: "SX", label: "Sint Maarten", group: "Antillas Menores", lat: 18.0425, lng: -63.0548, territory: true },
+        { code: "MF", label: "Saint Martin", group: "Antillas Menores", lat: 18.0708, lng: -63.0501, territory: true },
+        { code: "BL", label: "St. Barthelemy", group: "Antillas Menores", lat: 17.9000, lng: -62.8333, territory: true },
+        { code: "KN", label: "St. Kitts", group: "Antillas Menores", lat: 17.3578, lng: -62.7830 },
+        { code: "AG", label: "Antigua", group: "Antillas Menores", lat: 17.0608, lng: -61.7964 },
+        { code: "MS", label: "Montserrat", group: "Antillas Menores", lat: 16.7425, lng: -62.1874, territory: true },
+        { code: "GP", label: "Guadeloupe", group: "Antillas Menores", lat: 16.2650, lng: -61.5510, territory: true },
+        { code: "DM", label: "Dominica", group: "Antillas Menores", lat: 15.4150, lng: -61.3710 },
+        { code: "MQ", label: "Martinique", group: "Antillas Menores", lat: 14.6415, lng: -61.0242, territory: true },
+        { code: "LC", label: "St. Lucia", group: "Antillas Menores", lat: 13.9094, lng: -60.9789 },
+        { code: "VC", label: "St. Vincent", group: "Antillas Menores", lat: 13.2528, lng: -61.1971 },
+        { code: "BB", label: "Barbados", group: "Antillas Menores", lat: 13.1939, lng: -59.5432 },
+        { code: "GD", label: "Grenada", group: "Antillas Menores", lat: 12.1165, lng: -61.6790 },
+        { code: "TT", label: "Trinidad", group: "Antillas Menores", lat: 10.6918, lng: -61.2225 },
+        { code: "AW", label: "Aruba", group: "Antillas Menores", lat: 12.5211, lng: -69.9683, territory: true },
+        { code: "CW", label: "Curazao", group: "Antillas Menores", lat: 12.1696, lng: -68.9900, territory: true },
+        { code: "BQ", label: "Bonaire", group: "Antillas Menores", lat: 12.1784, lng: -68.2385, territory: true },
+        { code: "BZ", label: "Belize", group: "Costa Caribe", lat: 17.1899, lng: -88.4976 },
+        { code: "GT", label: "Guatemala", group: "Costa Caribe", lat: 15.7835, lng: -90.2308 },
+        { code: "HN", label: "Honduras", group: "Costa Caribe", lat: 15.2000, lng: -86.2419 },
+        { code: "NI", label: "Nicaragua", group: "Costa Caribe", lat: 12.8654, lng: -85.2072, territory: true },
+        { code: "CR", label: "Costa Rica", group: "Costa Caribe", lat: 9.7489, lng: -83.7534 },
+        { code: "PA", label: "Panama", group: "Costa Caribe", lat: 8.5380, lng: -80.7821 },
+        { code: "CO", label: "Colombia", group: "Costa Caribe", lat: 10.3910, lng: -75.4794 },
+        { code: "VE", label: "Venezuela", group: "Costa Caribe", lat: 10.4806, lng: -66.9036 },
+        { code: "GY", label: "Guyana", group: "Costa Caribe", lat: 6.8013, lng: -58.1551 },
+        { code: "SR", label: "Suriname", group: "Costa Caribe", lat: 5.8520, lng: -55.2038 },
+        { code: "GF", label: "Guayana Francesa", group: "Costa Caribe", lat: 4.9224, lng: -52.3135, territory: true }
     ];
 
     const ORIGIN = {
@@ -176,6 +259,110 @@
         };
     }
 
+    function getRecordForCode(records, code) {
+        const id = COUNTRY_CODE_TO_ID[String(code || "").toUpperCase()];
+        return id ? records.get(id) : null;
+    }
+
+    function isLiveCaribbeanRecord(record) {
+        return Boolean(record && (Number(record.live || 0) > 0 || Number(record.value || 0) > 0));
+    }
+
+    function buildCaribbeanTooltipPayload(node, record) {
+        const live = isLiveCaribbeanRecord(record);
+        const details = [
+            `Grupo: ${node.group}`,
+            node.territory ? "Tipo: territorio / isla asociada" : "Tipo: pais o costa continental",
+            record ? `Live: ${formatAtlasNumber(record.live)}` : "Live: sin datos",
+            record ? `Access: ${formatAtlasNumber(record.access)}` : "Access: sin datos"
+        ];
+
+        return {
+            name: node.label,
+            meta: live ? "Conexion caribena detectada" : "Nodo caribeno monitoreado",
+            status: live ? "Activo WXM" : "Sin actividad agregada",
+            details
+        };
+    }
+
+    function countByGroup(nodes) {
+        return nodes.reduce((acc, node) => {
+            acc[node.group] = (acc[node.group] || 0) + 1;
+            return acc;
+        }, {});
+    }
+
+    function buildTopCountries(analytics = {}) {
+        const rows = Array.isArray(analytics.countries) ? analytics.countries : [];
+        return rows
+            .map(row => ({
+                code: String(row.code || row.countryCode || "").toUpperCase(),
+                name: row.country || row.name || row.label || row.code || "Pais",
+                value: Number(row.live || row.uniqueListeners || row.listeners || row.access || 0),
+                listeningHours: Number(row.listeningHours || row.hours || 0)
+            }))
+            .filter(row => row.value > 0 || row.listeningHours > 0)
+            .sort((a, b) => (b.value || b.listeningHours) - (a.value || a.listeningHours))
+            .slice(0, 6);
+    }
+
+    function buildLiveConnections(analytics = {}) {
+        const rows = Array.isArray(analytics.liveConnections) ? analytics.liveConnections : [];
+        return rows.slice(0, 6).map((row, index) => ({
+            id: row.id || `${row.country || row.name || "connection"}-${index}`,
+            country: row.country || row.name || "Conexion",
+            city: row.city || row.region || "",
+            secondsAgo: Number(row.secondsAgo || row.ageSeconds || row.lastSeenSeconds || 0)
+        }));
+    }
+
+    function formatAge(seconds) {
+        if (!Number.isFinite(seconds) || seconds <= 0) return "ahora";
+        if (seconds < 60) return `${Math.round(seconds)}s`;
+        if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+        return `${Math.round(seconds / 3600)}h`;
+    }
+
+    function getTooltipPosition(container, event) {
+        const rect = container?.getBoundingClientRect();
+        if (!rect) return { x: event.clientX + 14, y: event.clientY + 14 };
+        const maxX = Math.max(12, rect.width - 236);
+        const maxY = Math.max(12, rect.height - 156);
+        return {
+            x: Math.min(maxX, Math.max(12, event.clientX - rect.left + 14)),
+            y: Math.min(maxY, Math.max(12, event.clientY - rect.top + 14))
+        };
+    }
+
+    function buildSelectedPayload(selectedId, countries, activeRecords, caribbeanNodes) {
+        if (!selectedId) return null;
+        if (selectedId.startsWith("caribbean-")) {
+            const code = selectedId.replace("caribbean-", "");
+            const node = caribbeanNodes.find(item => item.code === code);
+            if (!node) return null;
+            const record = getRecordForCode(activeRecords, code);
+            const live = record?.live ?? record?.uniqueListeners ?? record?.value ?? 0;
+            return {
+                title: node.label,
+                kicker: node.group,
+                meta: live > 0 ? `${formatAtlasNumber(live)} oyentes activos` : "Sin datos activos",
+                detail: node.territory ? "Territorio caribeno monitoreado" : "Nodo WXM Caribe"
+            };
+        }
+
+        const country = countries.find(featureItem => String(featureItem.id || "") === selectedId);
+        if (!country) return null;
+        const record = activeRecords.get(selectedId);
+        const name = record?.name || getFeatureName(country);
+        const live = record?.live ?? record?.uniqueListeners ?? record?.value ?? 0;
+        return {
+            title: name,
+            kicker: record ? "Pais activo" : "Pais sin actividad",
+            meta: record ? `${formatAtlasNumber(live)} oyentes activos` : "Sin conexiones recientes",
+            detail: record?.routeNode ? "Nodo estrategico WXM" : "Datos agregados por pais"
+        };
+    }
+
     function routePath(projection, destination, index) {
         const start = projection([ORIGIN.lng, ORIGIN.lat]);
         const end = projection([destination.lng, destination.lat]);
@@ -217,6 +404,7 @@
         const [error, setError] = React.useState("");
         const [tooltip, setTooltip] = React.useState(null);
         const [selectedId, setSelectedId] = React.useState("");
+        const [atlasMode, setAtlasMode] = React.useState("world");
 
         React.useEffect(() => {
             let active = true;
@@ -244,8 +432,9 @@
             const observer = new ResizeObserver(entries => {
                 const rect = entries[0]?.contentRect;
                 if (!rect) return;
-                const width = Math.max(620, Math.round(rect.width));
-                const height = Math.max(330, Math.round(rect.height));
+                const width = Math.max(360, Math.round(rect.width));
+                const compact = width < 720;
+                const height = Math.max(compact ? 420 : 330, Math.round(rect.height));
                 setSize({ width, height });
             });
             observer.observe(containerRef.current);
@@ -274,8 +463,12 @@
         const mapData = React.useMemo(() => {
             if (!topology || !topojson || !d3) return null;
             const countries = topojson.feature(topology, topology.objects.countries).features;
+            const compact = size.width < 720;
+            const horizontalPadding = compact ? 8 : 18;
+            const topPadding = compact ? 64 : 18;
+            const bottomPadding = compact ? 80 : 18;
             const projection = d3.geoNaturalEarth1()
-                .fitExtent([[18, 18], [size.width - 18, size.height - 18]], { type: "Sphere" });
+                .fitExtent([[horizontalPadding, topPadding], [size.width - horizontalPadding, size.height - bottomPadding]], { type: "Sphere" });
             const path = d3.geoPath(projection);
             const graticule = d3.geoGraticule10();
             const activeRecords = buildActiveRecords(analytics);
@@ -310,12 +503,23 @@
         }
 
         const { countries, projection, path, graticule, activeRecords, activeIds } = mapData;
+        const compact = size.width < 720;
+        const topCountries = buildTopCountries(analytics);
+        const liveConnections = buildLiveConnections(analytics);
+        const selectedPayload = buildSelectedPayload(selectedId, countries, activeRecords, CARIBBEAN_NODES);
         const originPoint = projection([ORIGIN.lng, ORIGIN.lat]);
         const topRoutes = ROUTES.map((route, index) => ({
             ...route,
             path: routePath(projection, route, index),
             point: projection([route.lng, route.lat])
         }));
+        const caribbeanNodes = CARIBBEAN_NODES.map(node => ({
+            ...node,
+            point: projection([node.lng, node.lat]),
+            record: getRecordForCode(activeRecords, node.code)
+        })).filter(node => node.point);
+        const caribbeanActiveCount = caribbeanNodes.filter(node => isLiveCaribbeanRecord(node.record)).length;
+        const caribbeanGroups = countByGroup(CARIBBEAN_NODES);
         const applyZoom = action => {
             if (!svgRef.current || !zoomBehaviorRef.current || !d3) return;
             const svg = d3.select(svgRef.current);
@@ -328,10 +532,24 @@
                 zoomBehaviorRef.current.scaleBy(transition, 1 / 1.35);
                 return;
             }
+            if (action === "caribbean") {
+                setAtlasMode("caribbean");
+                const center = projection([-70.8, 17.5]);
+                if (!center) return;
+                const scale = size.width < 720 ? 5.2 : 4.1;
+                zoomBehaviorRef.current.transform(
+                    transition,
+                    d3.zoomIdentity
+                        .translate(size.width / 2 - center[0] * scale, size.height / 2 - center[1] * scale)
+                        .scale(scale)
+                );
+                return;
+            }
+            setAtlasMode("world");
             zoomBehaviorRef.current.transform(transition, d3.zoomIdentity);
         };
 
-        return e("div", { className: "wxm-atlas-shell", ref: containerRef },
+        return e("div", { className: `wxm-atlas-shell ${atlasMode === "caribbean" ? "is-caribbean-focus" : ""}`, ref: containerRef },
             e("div", { className: "wxm-atlas-hud" },
                 e("div", null,
                     e("span", { className: "wxm-atlas-kicker" }, "CMS DASHBOARD"),
@@ -343,7 +561,8 @@
             e("div", { className: "wxm-atlas-controls", "aria-label": "Controles del mapa" },
                 e("button", { type: "button", onClick: () => applyZoom("in"), "aria-label": "Acercar mapa" }, "+"),
                 e("button", { type: "button", onClick: () => applyZoom("out"), "aria-label": "Alejar mapa" }, "-"),
-                e("button", { type: "button", onClick: () => applyZoom("reset"), "aria-label": "Centrar mapa" }, "0")
+                e("button", { type: "button", className: "is-wide", onClick: () => applyZoom("caribbean"), "aria-label": "Enfocar Caribe" }, "Caribe"),
+                e("button", { type: "button", onClick: () => applyZoom("reset"), "aria-label": "Centrar mapa" }, "Mundo")
             ),
             e("svg", {
                 ref: svgRef,
@@ -409,9 +628,10 @@
                                     }
                                 },
                                 onMouseMove: event => {
+                                    const position = getTooltipPosition(containerRef.current, event);
                                     setTooltip({
-                                        x: event.clientX + 14,
-                                        y: event.clientY + 14,
+                                        x: position.x,
+                                        y: position.y,
                                         ...buildTooltipPayload(name, record, isActive)
                                     });
                                 },
@@ -438,6 +658,50 @@
                             )
                             : null)
                     ),
+                    e("g", { className: "wxm-atlas-caribbean-nodes", "aria-label": "Capa Caribe WXM" },
+                        caribbeanNodes.map(node => {
+                            const active = isLiveCaribbeanRecord(node.record);
+                            const selected = selectedId === `caribbean-${node.code}`;
+                            const showLabel = atlasMode === "caribbean"
+                                ? node.major || active || selected || ["BS", "BB", "TT", "PA", "CO", "VE"].includes(node.code)
+                                : node.major && !compact;
+                            const className = [
+                                "wxm-atlas-caribbean-node",
+                                active ? "is-active" : "is-idle",
+                                node.major ? "is-major" : "",
+                                node.territory ? "is-territory" : "",
+                                selected ? "is-selected" : "",
+                                showLabel ? "has-label" : ""
+                            ].filter(Boolean).join(" ");
+                            return e("g", {
+                                key: `caribbean-${node.code}-${node.label}`,
+                                className,
+                                transform: `translate(${node.point[0]}, ${node.point[1]})`,
+                                tabIndex: 0,
+                                role: "button",
+                                "aria-label": `${node.label} ${active ? "activo" : "monitoreado"}`,
+                                onClick: () => setSelectedId(`caribbean-${node.code}`),
+                                onKeyDown: event => {
+                                    if (event.key === "Enter" || event.key === " ") {
+                                        event.preventDefault();
+                                        setSelectedId(`caribbean-${node.code}`);
+                                    }
+                                },
+                                onMouseMove: event => {
+                                    const position = getTooltipPosition(containerRef.current, event);
+                                    setTooltip({
+                                        x: position.x,
+                                        y: position.y,
+                                        ...buildCaribbeanTooltipPayload(node, node.record)
+                                    });
+                                },
+                                onMouseLeave: () => setTooltip(null)
+                            },
+                                e("circle", { r: node.major ? 4.8 : 3.4 }),
+                                showLabel ? e("text", { x: 7, y: -7 }, node.label) : null
+                            );
+                        })
+                    ),
                     e("g", { className: "wxm-atlas-nodes" },
                         originPoint
                             ? e("g", { className: "wxm-atlas-origin", transform: `translate(${originPoint[0]}, ${originPoint[1]})` },
@@ -447,13 +711,47 @@
                                 e("text", { x: -26, y: 49 }, "DOMINICANA")
                             )
                             : null,
-                        topRoutes.map(route => e(NodeLabel, {
+                        !compact && atlasMode === "world" ? topRoutes.map(route => e(NodeLabel, {
                             key: `${route.id}-label`,
                             point: route.point,
                             label: route.label,
                             country: route.country
-                        }))
+                        })) : null
                     )
+                )
+            ),
+            e("aside", { className: "wxm-atlas-side-panel", "aria-label": "Resumen operativo del mapa" },
+                e("section", { className: "wxm-atlas-panel-section is-selected" },
+                    e("span", null, selectedPayload?.kicker || "Selecciona un pais"),
+                    e("strong", null, selectedPayload?.title || "Mapa WXM"),
+                    e("small", null, selectedPayload?.meta || "Actividad agregada en tiempo real"),
+                    e("em", null, selectedPayload?.detail || "Haz zoom en Caribe para ver islas y territorios.")
+                ),
+                e("section", { className: "wxm-atlas-panel-section" },
+                    e("span", null, "Live connections"),
+                    liveConnections.length
+                        ? liveConnections.map(item => e("p", { key: item.id },
+                            e("strong", null, item.country),
+                            e("small", null, `${item.city || "WXM"} · ${formatAge(item.secondsAgo)}`)
+                        ))
+                        : e("p", null, e("strong", null, "Sin conexiones"), e("small", null, "Esperando telemetria"))
+                ),
+                e("section", { className: "wxm-atlas-panel-section" },
+                    e("span", null, "Top paises"),
+                    topCountries.length
+                        ? topCountries.map(item => e("p", { key: `${item.code}-${item.name}` },
+                            e("strong", null, item.name),
+                            e("small", null, `${formatAtlasNumber(item.value || item.listeningHours)} oyentes`)
+                        ))
+                        : e("p", null, e("strong", null, "Sin ranking"), e("small", null, "No hay datos agregados"))
+                ),
+                e("section", { className: "wxm-atlas-panel-section is-caribbean" },
+                    e("span", null, "Caribe monitorizado"),
+                    e("p", null, e("strong", null, caribbeanActiveCount), e("small", null, "activos ahora")),
+                    Object.entries(caribbeanGroups).map(([group, count]) => e("p", { key: group },
+                        e("strong", null, count),
+                        e("small", null, group)
+                    ))
                 )
             ),
             e("div", { className: "wxm-atlas-legend" },

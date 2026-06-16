@@ -292,6 +292,77 @@
         }, {});
     }
 
+    function buildTopCountries(analytics = {}) {
+        const rows = Array.isArray(analytics.countries) ? analytics.countries : [];
+        return rows
+            .map(row => ({
+                code: String(row.code || row.countryCode || "").toUpperCase(),
+                name: row.country || row.name || row.label || row.code || "Pais",
+                value: Number(row.live || row.uniqueListeners || row.listeners || row.access || 0),
+                listeningHours: Number(row.listeningHours || row.hours || 0)
+            }))
+            .filter(row => row.value > 0 || row.listeningHours > 0)
+            .sort((a, b) => (b.value || b.listeningHours) - (a.value || a.listeningHours))
+            .slice(0, 6);
+    }
+
+    function buildLiveConnections(analytics = {}) {
+        const rows = Array.isArray(analytics.liveConnections) ? analytics.liveConnections : [];
+        return rows.slice(0, 6).map((row, index) => ({
+            id: row.id || `${row.country || row.name || "connection"}-${index}`,
+            country: row.country || row.name || "Conexion",
+            city: row.city || row.region || "",
+            secondsAgo: Number(row.secondsAgo || row.ageSeconds || row.lastSeenSeconds || 0)
+        }));
+    }
+
+    function formatAge(seconds) {
+        if (!Number.isFinite(seconds) || seconds <= 0) return "ahora";
+        if (seconds < 60) return `${Math.round(seconds)}s`;
+        if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+        return `${Math.round(seconds / 3600)}h`;
+    }
+
+    function getTooltipPosition(container, event) {
+        const rect = container?.getBoundingClientRect();
+        if (!rect) return { x: event.clientX + 14, y: event.clientY + 14 };
+        const maxX = Math.max(12, rect.width - 236);
+        const maxY = Math.max(12, rect.height - 156);
+        return {
+            x: Math.min(maxX, Math.max(12, event.clientX - rect.left + 14)),
+            y: Math.min(maxY, Math.max(12, event.clientY - rect.top + 14))
+        };
+    }
+
+    function buildSelectedPayload(selectedId, countries, activeRecords, caribbeanNodes) {
+        if (!selectedId) return null;
+        if (selectedId.startsWith("caribbean-")) {
+            const code = selectedId.replace("caribbean-", "");
+            const node = caribbeanNodes.find(item => item.code === code);
+            if (!node) return null;
+            const record = getRecordForCode(activeRecords, code);
+            const live = record?.live ?? record?.uniqueListeners ?? record?.value ?? 0;
+            return {
+                title: node.label,
+                kicker: node.group,
+                meta: live > 0 ? `${formatAtlasNumber(live)} oyentes activos` : "Sin datos activos",
+                detail: node.territory ? "Territorio caribeno monitoreado" : "Nodo WXM Caribe"
+            };
+        }
+
+        const country = countries.find(featureItem => String(featureItem.id || "") === selectedId);
+        if (!country) return null;
+        const record = activeRecords.get(selectedId);
+        const name = record?.name || getFeatureName(country);
+        const live = record?.live ?? record?.uniqueListeners ?? record?.value ?? 0;
+        return {
+            title: name,
+            kicker: record ? "Pais activo" : "Pais sin actividad",
+            meta: record ? `${formatAtlasNumber(live)} oyentes activos` : "Sin conexiones recientes",
+            detail: record?.routeNode ? "Nodo estrategico WXM" : "Datos agregados por pais"
+        };
+    }
+
     function routePath(projection, destination, index) {
         const start = projection([ORIGIN.lng, ORIGIN.lat]);
         const end = projection([destination.lng, destination.lat]);
@@ -333,6 +404,7 @@
         const [error, setError] = React.useState("");
         const [tooltip, setTooltip] = React.useState(null);
         const [selectedId, setSelectedId] = React.useState("");
+        const [atlasMode, setAtlasMode] = React.useState("world");
 
         React.useEffect(() => {
             let active = true;
@@ -431,6 +503,10 @@
         }
 
         const { countries, projection, path, graticule, activeRecords, activeIds } = mapData;
+        const compact = size.width < 720;
+        const topCountries = buildTopCountries(analytics);
+        const liveConnections = buildLiveConnections(analytics);
+        const selectedPayload = buildSelectedPayload(selectedId, countries, activeRecords, CARIBBEAN_NODES);
         const originPoint = projection([ORIGIN.lng, ORIGIN.lat]);
         const topRoutes = ROUTES.map((route, index) => ({
             ...route,
@@ -457,6 +533,7 @@
                 return;
             }
             if (action === "caribbean") {
+                setAtlasMode("caribbean");
                 const center = projection([-70.8, 17.5]);
                 if (!center) return;
                 const scale = size.width < 720 ? 5.2 : 4.1;
@@ -468,10 +545,11 @@
                 );
                 return;
             }
+            setAtlasMode("world");
             zoomBehaviorRef.current.transform(transition, d3.zoomIdentity);
         };
 
-        return e("div", { className: "wxm-atlas-shell", ref: containerRef },
+        return e("div", { className: `wxm-atlas-shell ${atlasMode === "caribbean" ? "is-caribbean-focus" : ""}`, ref: containerRef },
             e("div", { className: "wxm-atlas-hud" },
                 e("div", null,
                     e("span", { className: "wxm-atlas-kicker" }, "CMS DASHBOARD"),
@@ -484,7 +562,7 @@
                 e("button", { type: "button", onClick: () => applyZoom("in"), "aria-label": "Acercar mapa" }, "+"),
                 e("button", { type: "button", onClick: () => applyZoom("out"), "aria-label": "Alejar mapa" }, "-"),
                 e("button", { type: "button", className: "is-wide", onClick: () => applyZoom("caribbean"), "aria-label": "Enfocar Caribe" }, "Caribe"),
-                e("button", { type: "button", onClick: () => applyZoom("reset"), "aria-label": "Centrar mapa" }, "0")
+                e("button", { type: "button", onClick: () => applyZoom("reset"), "aria-label": "Centrar mapa" }, "Mundo")
             ),
             e("svg", {
                 ref: svgRef,
@@ -550,9 +628,10 @@
                                     }
                                 },
                                 onMouseMove: event => {
+                                    const position = getTooltipPosition(containerRef.current, event);
                                     setTooltip({
-                                        x: event.clientX + 14,
-                                        y: event.clientY + 14,
+                                        x: position.x,
+                                        y: position.y,
                                         ...buildTooltipPayload(name, record, isActive)
                                     });
                                 },
@@ -583,14 +662,17 @@
                         caribbeanNodes.map(node => {
                             const active = isLiveCaribbeanRecord(node.record);
                             const selected = selectedId === `caribbean-${node.code}`;
+                            const showLabel = atlasMode === "caribbean"
+                                ? node.major || active || selected || ["BS", "BB", "TT", "PA", "CO", "VE"].includes(node.code)
+                                : node.major && !compact;
                             const className = [
                                 "wxm-atlas-caribbean-node",
                                 active ? "is-active" : "is-idle",
                                 node.major ? "is-major" : "",
                                 node.territory ? "is-territory" : "",
-                                selected ? "is-selected" : ""
+                                selected ? "is-selected" : "",
+                                showLabel ? "has-label" : ""
                             ].filter(Boolean).join(" ");
-                            const showLabel = node.major || ["BS", "BB", "TT", "PA", "CO", "VE"].includes(node.code);
                             return e("g", {
                                 key: `caribbean-${node.code}-${node.label}`,
                                 className,
@@ -606,9 +688,10 @@
                                     }
                                 },
                                 onMouseMove: event => {
+                                    const position = getTooltipPosition(containerRef.current, event);
                                     setTooltip({
-                                        x: event.clientX + 14,
-                                        y: event.clientY + 14,
+                                        x: position.x,
+                                        y: position.y,
                                         ...buildCaribbeanTooltipPayload(node, node.record)
                                     });
                                 },
@@ -628,23 +711,46 @@
                                 e("text", { x: -26, y: 49 }, "DOMINICANA")
                             )
                             : null,
-                        topRoutes.map(route => e(NodeLabel, {
+                        !compact && atlasMode === "world" ? topRoutes.map(route => e(NodeLabel, {
                             key: `${route.id}-label`,
                             point: route.point,
                             label: route.label,
                             country: route.country
-                        }))
+                        })) : null
                     )
                 )
             ),
-            e("div", { className: "wxm-caribbean-inset" },
-                e("span", { className: "wxm-atlas-kicker" }, "Caribe WXM"),
-                e("strong", null, `${caribbeanActiveCount} activos / ${CARIBBEAN_NODES.length} nodos`),
-                e("small", null, "Antillas Mayores, Antillas Menores y costa continental monitoreadas."),
-                e("div", { className: "wxm-caribbean-groups" },
-                    Object.entries(caribbeanGroups).map(([group, count]) => e("span", { key: group },
-                        e("b", null, count),
-                        group
+            e("aside", { className: "wxm-atlas-side-panel", "aria-label": "Resumen operativo del mapa" },
+                e("section", { className: "wxm-atlas-panel-section is-selected" },
+                    e("span", null, selectedPayload?.kicker || "Selecciona un pais"),
+                    e("strong", null, selectedPayload?.title || "Mapa WXM"),
+                    e("small", null, selectedPayload?.meta || "Actividad agregada en tiempo real"),
+                    e("em", null, selectedPayload?.detail || "Haz zoom en Caribe para ver islas y territorios.")
+                ),
+                e("section", { className: "wxm-atlas-panel-section" },
+                    e("span", null, "Live connections"),
+                    liveConnections.length
+                        ? liveConnections.map(item => e("p", { key: item.id },
+                            e("strong", null, item.country),
+                            e("small", null, `${item.city || "WXM"} · ${formatAge(item.secondsAgo)}`)
+                        ))
+                        : e("p", null, e("strong", null, "Sin conexiones"), e("small", null, "Esperando telemetria"))
+                ),
+                e("section", { className: "wxm-atlas-panel-section" },
+                    e("span", null, "Top paises"),
+                    topCountries.length
+                        ? topCountries.map(item => e("p", { key: `${item.code}-${item.name}` },
+                            e("strong", null, item.name),
+                            e("small", null, `${formatAtlasNumber(item.value || item.listeningHours)} oyentes`)
+                        ))
+                        : e("p", null, e("strong", null, "Sin ranking"), e("small", null, "No hay datos agregados"))
+                ),
+                e("section", { className: "wxm-atlas-panel-section is-caribbean" },
+                    e("span", null, "Caribe monitorizado"),
+                    e("p", null, e("strong", null, caribbeanActiveCount), e("small", null, "activos ahora")),
+                    Object.entries(caribbeanGroups).map(([group, count]) => e("p", { key: group },
+                        e("strong", null, count),
+                        e("small", null, group)
                     ))
                 )
             ),

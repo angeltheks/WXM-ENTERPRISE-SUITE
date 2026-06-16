@@ -1566,8 +1566,8 @@ body.analytics-focus .preview-panel {
     overflow: hidden;
     border-radius: inherit;
     background:
-        radial-gradient(circle at 48% 42%, rgba(255,0,122,0.13), transparent 27%),
-        linear-gradient(180deg, rgba(255,255,255,0.03), transparent 32%),
+        radial-gradient(circle at 48% 42%, rgba(255,0,122,0.10), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.026), transparent 34%),
         #050505;
     color: #fff;
 }
@@ -1579,16 +1579,17 @@ body.analytics-focus .preview-panel {
     z-index: 0;
     pointer-events: none;
     background:
-        radial-gradient(circle at 18% 72%, rgba(255,0,122,0.18), transparent 24%),
-        repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 78px),
-        repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 78px);
+        radial-gradient(circle at 18% 72%, rgba(255,0,122,0.13), transparent 25%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.019) 0 1px, transparent 1px 78px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.014) 0 1px, transparent 1px 78px);
     mix-blend-mode: screen;
 }
 
 .wxm-atlas-hud,
 .wxm-atlas-legend,
 .wxm-atlas-tooltip,
-.wxm-atlas-controls {
+.wxm-atlas-controls,
+.wxm-atlas-side-panel {
     position: absolute;
     z-index: 4;
 }
@@ -1665,6 +1666,15 @@ body.analytics-focus .preview-panel {
     font-weight: 950;
     cursor: pointer;
     transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.wxm-atlas-controls button.is-wide {
+    width: auto;
+    min-width: 62px;
+    padding: 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .wxm-atlas-controls button:hover,
@@ -1769,6 +1779,165 @@ body.analytics-focus .preview-panel {
     letter-spacing: 0.04em;
 }
 
+.wxm-atlas-caribbean-node {
+    cursor: pointer;
+}
+
+.wxm-atlas-caribbean-node circle {
+    fill: rgba(255,255,255,0.76);
+    stroke: rgba(255,0,122,0.72);
+    stroke-width: 1.1;
+    filter: url(#wxmAtlasMagentaGlow);
+    vector-effect: non-scaling-stroke;
+    transition: fill 160ms ease, stroke 160ms ease, opacity 160ms ease;
+}
+
+.wxm-atlas-caribbean-node.is-active circle {
+    fill: #ff007a;
+    stroke: rgba(255,255,255,0.96);
+}
+
+.wxm-atlas-caribbean-node.is-idle circle {
+    opacity: 0.74;
+}
+
+.wxm-atlas-caribbean-node.is-territory circle {
+    fill: rgba(5,5,5,0.82);
+    stroke-dasharray: 2 2;
+}
+
+.wxm-atlas-caribbean-node.is-selected circle,
+.wxm-atlas-caribbean-node:focus-visible circle {
+    fill: #fff;
+    stroke: #fff;
+    filter: url(#wxmAtlasWhiteGlow);
+}
+
+.wxm-atlas-caribbean-node text {
+    fill: rgba(255,255,255,0.94);
+    stroke: rgba(0,0,0,0.72);
+    stroke-width: 2.4;
+    paint-order: stroke;
+    font-size: 8px;
+    font-weight: 950;
+    letter-spacing: 0.03em;
+    pointer-events: none;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-route,
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-route-pulse,
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-node-label {
+    opacity: 0.34;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node circle {
+    opacity: 0.96;
+    stroke-width: 1.35;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node.is-major circle,
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node.is-active circle {
+    r: 5.4px;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node text {
+    font-size: 9px;
+}
+
+.wxm-caribbean-inset {
+    display: none;
+}
+
+.wxm-atlas-side-panel {
+    top: 148px;
+    right: 16px;
+    width: min(286px, calc(100% - 32px));
+    display: grid;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.wxm-atlas-panel-section {
+    min-width: 0;
+    padding: 10px 11px;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(18,18,24,0.78), rgba(5,5,7,0.68)),
+        radial-gradient(circle at 8% 10%, rgba(255,0,122,0.16), transparent 44%);
+    box-shadow: 0 18px 44px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.045);
+    color: #fff;
+    backdrop-filter: blur(12px);
+}
+
+.wxm-atlas-panel-section span,
+.wxm-atlas-panel-section strong,
+.wxm-atlas-panel-section small,
+.wxm-atlas-panel-section em {
+    display: block;
+}
+
+.wxm-atlas-panel-section span {
+    color: #ff2d95;
+    font-size: 9px;
+    font-weight: 950;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.wxm-atlas-panel-section strong {
+    min-width: 0;
+    margin-top: 4px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 950;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wxm-atlas-panel-section small,
+.wxm-atlas-panel-section em {
+    margin-top: 2px;
+    color: rgba(255,255,255,0.62);
+    font-size: 10px;
+    line-height: 1.3;
+    font-style: normal;
+}
+
+.wxm-atlas-panel-section p {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: baseline;
+    margin: 7px 0 0;
+}
+
+.wxm-atlas-panel-section p strong,
+.wxm-atlas-panel-section p small {
+    margin: 0;
+    min-width: 0;
+}
+
+.wxm-atlas-panel-section p strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wxm-atlas-panel-section.is-selected {
+    border-color: rgba(255,45,149,0.32);
+}
+
+.wxm-atlas-panel-section.is-caribbean {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wxm-atlas-panel-section.is-caribbean > span {
+    grid-column: 1 / -1;
+}
+
 .wxm-atlas-legend {
     left: 16px;
     bottom: 14px;
@@ -1867,6 +2036,100 @@ body.analytics-focus .preview-panel {
     background: #050505;
     font-weight: 850;
     text-align: center;
+}
+
+@media (max-width: 760px) {
+    .geo-map.atlas-map-ready,
+    .dashboard-geo-map.atlas-map-ready {
+        min-height: 520px;
+    }
+
+    .wxm-atlas-hud {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .wxm-atlas-live-pill {
+        display: none;
+    }
+
+    .wxm-atlas-controls {
+        top: auto;
+        right: 10px;
+        bottom: 10px;
+        grid-template-columns: repeat(4, auto);
+        grid-auto-flow: column;
+    }
+
+    .wxm-atlas-controls button {
+        width: 36px;
+        height: 36px;
+    }
+
+    .wxm-atlas-controls button.is-wide {
+        min-width: 70px;
+    }
+
+    .wxm-atlas-legend {
+        left: 10px;
+        right: 104px;
+        bottom: 10px;
+        max-height: 44px;
+        overflow: hidden;
+    }
+
+    .wxm-atlas-side-panel {
+        top: auto;
+        left: 10px;
+        right: 10px;
+        bottom: 66px;
+        width: auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-height: 178px;
+        overflow: hidden;
+    }
+
+    .wxm-atlas-node-label text,
+    .wxm-atlas-caribbean-node text {
+        font-size: 7px;
+    }
+}
+
+@media (max-width: 480px) {
+    .geo-map.atlas-map-ready,
+    .dashboard-geo-map.atlas-map-ready {
+        min-height: 560px;
+    }
+
+    .wxm-atlas-hud strong {
+        font-size: 15px;
+    }
+
+    .wxm-atlas-hud small {
+        max-width: 230px;
+    }
+
+    .wxm-atlas-legend {
+        display: none;
+    }
+
+    .wxm-atlas-side-panel {
+        grid-template-columns: 1fr;
+        max-height: 154px;
+    }
+
+    .wxm-atlas-panel-section:not(.is-selected) {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wxm-atlas-route,
+    .wxm-atlas-origin-halo,
+    .wxm-atlas-route-pulse {
+        animation: none;
+    }
 }
 
 @keyframes wxmAtlasDash {
