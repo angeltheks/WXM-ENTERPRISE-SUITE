@@ -1824,10 +1824,31 @@ body.analytics-focus .preview-panel {
     pointer-events: none;
 }
 
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-routes,
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-route,
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-route-pulse,
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-node-label {
-    opacity: 0.34;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-route,
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-route-pulse {
+    display: none;
+    animation: none;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin text {
+    display: none;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin-halo {
+    opacity: 0.38;
+    animation: none;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin-core {
+    opacity: 0.86;
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node circle {
@@ -1842,6 +1863,47 @@ body.analytics-focus .preview-panel {
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node text {
     font-size: 9px;
+}
+
+.wxm-atlas-place-node {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 160ms ease;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-place-node {
+    opacity: 1;
+}
+
+.wxm-atlas-place-node circle {
+    fill: #fff;
+    stroke: #ff2d95;
+    stroke-width: 0.65;
+    filter: url(#wxmAtlasWhiteGlow);
+    vector-effect: non-scaling-stroke;
+}
+
+.wxm-atlas-place-node text {
+    fill: rgba(255,255,255,0.96);
+    stroke: rgba(0,0,0,0.78);
+    stroke-width: 1.7;
+    paint-order: stroke;
+    font-size: 4.7px;
+    font-weight: 900;
+    letter-spacing: 0.015em;
+}
+
+.wxm-atlas-place-node.is-tier-1 text {
+    font-size: 5.4px;
+    font-weight: 950;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-side-panel {
+    display: none;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-legend {
+    opacity: 0.62;
 }
 
 .wxm-caribbean-inset {
@@ -2094,6 +2156,47 @@ body.analytics-focus .preview-panel {
     .wxm-atlas-caribbean-node text {
         font-size: 7px;
     }
+}
+
+.wxm-atlas-shell.is-compact-atlas .wxm-atlas-live-pill {
+    display: none;
+}
+
+.wxm-atlas-shell.is-compact-atlas .wxm-atlas-controls {
+    top: auto;
+    right: 10px;
+    bottom: 10px;
+    grid-template-columns: repeat(4, auto);
+    grid-auto-flow: column;
+}
+
+.wxm-atlas-shell.is-compact-atlas .wxm-atlas-controls button {
+    width: 36px;
+    height: 36px;
+}
+
+.wxm-atlas-shell.is-compact-atlas .wxm-atlas-controls button.is-wide {
+    min-width: 70px;
+}
+
+.wxm-atlas-shell.is-compact-atlas .wxm-atlas-side-panel {
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: 66px;
+    width: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 128px;
+    overflow: hidden;
+}
+
+.wxm-atlas-shell.is-compact-atlas .wxm-atlas-node-label text,
+.wxm-atlas-shell.is-compact-atlas .wxm-atlas-caribbean-node text {
+    font-size: 7px;
+}
+
+.wxm-atlas-shell.is-compact-atlas.is-caribbean-focus .wxm-atlas-place-node text {
+    font-size: 4.4px;
 }
 
 @media (max-width: 480px) {

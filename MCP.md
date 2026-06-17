@@ -954,6 +954,37 @@ Pendiente recomendado:
 - Crear smoke visual automatizado para desktop y mobile del Atlas.
 - Archivar o eliminar formalmente `v2/cms/cms/` cuando el equipo confirme que ya no se necesita como respaldo.
 
+## Fase CMS Analytics 2.6.1 - World Atlas Caribe Inspection - 2026-06-17
+
+Objetivo:
+
+- Corregir el problema visual reportado en el mapa donde las rutas animadas, el panel flotante y los elementos en movimiento tapaban los paises del Caribe y dificultaban leer nombres, ciudades y pueblos al acercar el zoom.
+
+Implementado:
+
+- `v2/cms/assets/react/WxmWorldAtlasMap.jsx` y `v2/cms/assets/react/WxmWorldAtlasMap.runtime.js` agregan una capa `CARIBBEAN_PLACES` con ciudades principales:
+  - Santo Domingo, Santiago, Punta Cana;
+  - San Juan, La Habana, Kingston, Puerto Principe;
+  - Nassau, Bridgetown, Port of Spain, Willemstad, Oranjestad, Castries;
+  - Cartagena, Panama City y Caracas.
+- El zoom maximo sube de `7x` a `9x`.
+- El enfoque Caribe usa mayor escala para que Antillas Mayores, Antillas Menores y costa Caribe sean mas legibles.
+- El Atlas ahora agrega clase `is-compact-atlas` segun ancho real del componente, no solo segun ancho de viewport.
+- `v2/cms/assets/css/cms.css` convierte el modo Caribe en modo inspeccion:
+  - oculta rutas animadas;
+  - oculta pulsos viajeros;
+  - oculta el panel lateral interno que tapaba islas;
+  - mantiene leyenda reducida;
+  - muestra etiquetas de ciudades principales.
+
+Validacion:
+
+- En el CMS local, el Atlas visible muestra `sidePanelDisplay: none`, rutas `display: none`, `visibleRouteCount: 0`, 11 etiquetas de nodos Caribe y 16 etiquetas de ciudades principales en modo Caribe.
+
+Regla:
+
+- Las rutas de transmision pertenecen al modo `Mundo`. El modo `Caribe` debe priorizar lectura geografica, islas, paises/territorios y ciudades agregadas.
+
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 
 Objetivo:

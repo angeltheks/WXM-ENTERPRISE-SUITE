@@ -185,6 +185,7 @@ Estado: operativo a nivel frontend/starter.
 - Hay dashboard local, analytics starter y mapa React/D3.
 - La capa Caribe esta documentada como necesidad especial.
 - El Atlas activo tiene modo Caribe/Mundo, panel lateral operativo, tooltips contenidos y responsive compactado.
+- World Atlas Polish 1.1 corrige el modo Caribe: las rutas animadas se ocultan durante inspeccion, el panel interno deja de tapar islas y se agregan etiquetas de ciudades principales para lectura con zoom.
 
 Pendiente:
 

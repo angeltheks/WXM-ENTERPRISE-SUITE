@@ -86,6 +86,25 @@ const CARIBBEAN_NODES = [
   { code: "GF", label: "Guayana Francesa", group: "Costa Caribe", lat: 4.9224, lng: -52.3135, territory: true }
 ];
 
+const CARIBBEAN_PLACES = [
+  { code: "DO", label: "Santo Domingo", lat: 18.4861, lng: -69.9312, tier: 1 },
+  { code: "DO", label: "Santiago", lat: 19.4517, lng: -70.6970, tier: 2 },
+  { code: "DO", label: "Punta Cana", lat: 18.5601, lng: -68.3725, tier: 2 },
+  { code: "PR", label: "San Juan", lat: 18.4655, lng: -66.1057, tier: 1 },
+  { code: "CU", label: "La Habana", lat: 23.1136, lng: -82.3666, tier: 1 },
+  { code: "JM", label: "Kingston", lat: 17.9712, lng: -76.7936, tier: 1 },
+  { code: "HT", label: "Puerto Principe", lat: 18.5944, lng: -72.3074, tier: 1 },
+  { code: "BS", label: "Nassau", lat: 25.0443, lng: -77.3504, tier: 2 },
+  { code: "BB", label: "Bridgetown", lat: 13.0975, lng: -59.6167, tier: 2 },
+  { code: "TT", label: "Port of Spain", lat: 10.6596, lng: -61.5086, tier: 2 },
+  { code: "CW", label: "Willemstad", lat: 12.1224, lng: -68.8824, tier: 2 },
+  { code: "AW", label: "Oranjestad", lat: 12.5092, lng: -70.0086, tier: 2 },
+  { code: "LC", label: "Castries", lat: 14.0101, lng: -60.9875, tier: 3 },
+  { code: "CO", label: "Cartagena", lat: 10.3910, lng: -75.4794, tier: 2 },
+  { code: "PA", label: "Panama City", lat: 8.9824, lng: -79.5199, tier: 2 },
+  { code: "VE", label: "Caracas", lat: 10.4806, lng: -66.9036, tier: 2 }
+];
+
 function resolveCountryCode(row) {
   const direct = String(row?.code || "").trim().toUpperCase();
   if (COUNTRY_CODE_TO_ID[direct]) return direct;
@@ -335,7 +354,7 @@ export default function WxmWorldAtlasMap({
     const svg = d3.select(svgRef.current);
     const layer = d3.select(zoomLayerRef.current);
     const zoom = d3.zoom()
-      .scaleExtent([1, 7])
+      .scaleExtent([1, 9])
       .translateExtent([[-size.width, -size.height], [size.width * 2, size.height * 2]])
       .on("zoom", event => layer.attr("transform", event.transform.toString()));
     zoomBehaviorRef.current = zoom;
@@ -382,6 +401,10 @@ export default function WxmWorldAtlasMap({
     point: projection([node.lng, node.lat]),
     record: getRecordForCode(activeRecords, node.code)
   })).filter(node => node.point);
+  const caribbeanPlaces = CARIBBEAN_PLACES.map(place => ({
+    ...place,
+    point: projection([place.lng, place.lat])
+  })).filter(place => place.point);
   const caribbeanActiveCount = caribbeanNodes.filter(node => isLiveCaribbeanRecord(node.record)).length;
   const caribbeanGroups = countByGroup(CARIBBEAN_NODES);
   const applyZoom = action => {
@@ -400,7 +423,7 @@ export default function WxmWorldAtlasMap({
       setAtlasMode("caribbean");
       const center = projection([-70.8, 17.5]);
       if (!center) return;
-      const scale = size.width < 720 ? 5.2 : 4.1;
+      const scale = size.width < 720 ? 6.4 : 5.35;
       zoomBehaviorRef.current.transform(
         transition,
         d3.zoomIdentity
@@ -414,7 +437,11 @@ export default function WxmWorldAtlasMap({
   };
 
   return (
-    <div className={`wxm-atlas-shell ${atlasMode === "caribbean" ? "is-caribbean-focus" : ""}`} ref={containerRef}>
+    <div className={[
+      "wxm-atlas-shell",
+      atlasMode === "caribbean" ? "is-caribbean-focus" : "",
+      compact ? "is-compact-atlas" : ""
+    ].filter(Boolean).join(" ")} ref={containerRef}>
       <div className="wxm-atlas-hud">
         <div>
           <span className="wxm-atlas-kicker">CMS DASHBOARD</span>
@@ -556,6 +583,21 @@ export default function WxmWorldAtlasMap({
               );
             })}
           </g>
+
+          {atlasMode === "caribbean" && (
+            <g className="wxm-atlas-caribbean-places" aria-label="Ciudades principales del Caribe">
+              {caribbeanPlaces.map(place => (
+                <g
+                  key={`${place.code}-${place.label}`}
+                  className={`wxm-atlas-place-node is-tier-${place.tier}`}
+                  transform={`translate(${place.point[0]}, ${place.point[1]})`}
+                >
+                  <circle r={place.tier === 1 ? 2.5 : 1.9} />
+                  <text x="4.5" y={place.tier === 1 ? "-4.8" : "-3.8"}>{place.label}</text>
+                </g>
+              ))}
+            </g>
+          )}
 
           <g className="wxm-atlas-nodes">
             {originPoint && (

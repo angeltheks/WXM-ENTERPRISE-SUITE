@@ -62,6 +62,14 @@ As of World Atlas Polish 1.0, the map includes:
 - tooltip positioning inside the map container;
 - reduced-motion CSS fallback for route/pulse animations.
 
+As of World Atlas Polish 1.1, Caribbean focus mode is treated as an inspection mode:
+
+- animated transmission routes are hidden while the Caribbean is focused, so they do not cover islands, labels or connection nodes;
+- the internal side panel is hidden in Caribbean focus, because the dashboard already has a Live Connections panel outside the map;
+- city/place labels are rendered for key Caribbean and Caribbean-coast locations such as Santo Domingo, Santiago, Punta Cana, San Juan, La Habana, Kingston, Nassau, Willemstad, Cartagena and Panama City;
+- the zoom ceiling is increased to support closer inspection of small islands and territories;
+- compact Atlas styling is driven by component width, not only browser viewport width, because the CMS analytics grid can place the map inside a narrower card on desktop.
+
 The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as the active source.
 
 ## Rules
@@ -72,6 +80,7 @@ The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as
 - If exact Caribbean geography is needed, add a dedicated higher-resolution GeoJSON layer for that subregion.
 - Do not use Google Maps as the main visual identity of WXM World Atlas. Google Maps can be considered later for internal address/geocoding tools only.
 - Do not expose personal location. The map must remain aggregated by country, city or region.
+- In Caribbean focus, do not display route animations over the islands. Routes belong to global broadcast mode, not inspection mode.
 
 ## Next Cartography Upgrade
 
