@@ -183,6 +183,18 @@
         { code: "VE", label: "Caracas", lat: 10.4806, lng: -66.9036, tier: 2 }
     ];
 
+    const CARIBBEAN_LABEL_PRIORITY = new Set(["CU", "JM", "HT", "DO", "PR", "BS", "PA", "CO", "VE"]);
+    const CARIBBEAN_PLACE_LABEL_PRIORITY = new Set([
+        "Santo Domingo",
+        "San Juan",
+        "La Habana",
+        "Kingston",
+        "Nassau",
+        "Bridgetown",
+        "Port of Spain",
+        "Cartagena"
+    ]);
+
     const ORIGIN = {
         label: "Republica Dominicana",
         lat: 18.4861,
@@ -693,8 +705,11 @@
                             const active = isLiveCaribbeanRecord(node.record);
                             const selected = selectedId === `caribbean-${node.code}`;
                             const showLabel = atlasMode === "caribbean"
-                                ? node.major || active || selected || ["BS", "BB", "TT", "PA", "CO", "VE"].includes(node.code)
+                                ? selected || active || CARIBBEAN_LABEL_PRIORITY.has(node.code)
                                 : node.major && !compact;
+                            const markerRadius = atlasMode === "caribbean"
+                                ? (node.major || active || selected ? 1.9 : 1.15)
+                                : (node.major ? 4.8 : 3.4);
                             const className = [
                                 "wxm-atlas-caribbean-node",
                                 active ? "is-active" : "is-idle",
@@ -727,20 +742,23 @@
                                 },
                                 onMouseLeave: () => setTooltip(null)
                             },
-                                e("circle", { r: node.major ? 4.8 : 3.4 }),
-                                showLabel ? e("text", { x: 7, y: -7 }, node.label) : null
+                                e("circle", { r: markerRadius }),
+                                showLabel ? e("text", { x: 2.6, y: -2.8 }, node.label) : null
                             );
                         })
                     ),
                     atlasMode === "caribbean" ? e("g", { className: "wxm-atlas-caribbean-places", "aria-label": "Ciudades principales del Caribe" },
-                        caribbeanPlaces.map(place => e("g", {
-                            key: `${place.code}-${place.label}`,
-                            className: `wxm-atlas-place-node is-tier-${place.tier}`,
-                            transform: `translate(${place.point[0]}, ${place.point[1]})`
-                        },
-                            e("circle", { r: place.tier === 1 ? 2.5 : 1.9 }),
-                            e("text", { x: 4.5, y: place.tier === 1 ? -4.8 : -3.8 }, place.label)
-                        ))
+                        caribbeanPlaces.map(place => {
+                            const showPlaceLabel = place.tier === 1 || CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
+                            return e("g", {
+                                key: `${place.code}-${place.label}`,
+                                className: `wxm-atlas-place-node is-tier-${place.tier} ${showPlaceLabel ? "has-label" : "is-dot-only"}`,
+                                transform: `translate(${place.point[0]}, ${place.point[1]})`
+                            },
+                                e("circle", { r: place.tier === 1 ? 0.98 : 0.72 }),
+                                showPlaceLabel ? e("text", { x: 1.7, y: place.tier === 1 ? -1.9 : -1.5 }, place.label) : null
+                            );
+                        })
                     ) : null,
                     e("g", { className: "wxm-atlas-nodes" },
                         originPoint

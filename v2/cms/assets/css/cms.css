@@ -1784,32 +1784,34 @@ body.analytics-focus .preview-panel {
 }
 
 .wxm-atlas-caribbean-node circle {
-    fill: rgba(255,255,255,0.76);
-    stroke: rgba(255,0,122,0.72);
-    stroke-width: 1.1;
-    filter: url(#wxmAtlasMagentaGlow);
+    fill: rgba(26,26,26,0.92);
+    stroke: rgba(255,45,149,0.58);
+    stroke-width: 0.58;
+    filter: none;
     vector-effect: non-scaling-stroke;
     transition: fill 160ms ease, stroke 160ms ease, opacity 160ms ease;
 }
 
 .wxm-atlas-caribbean-node.is-active circle {
     fill: #ff007a;
-    stroke: rgba(255,255,255,0.96);
+    stroke: rgba(255,255,255,0.78);
+    filter: url(#wxmAtlasMagentaGlow);
 }
 
 .wxm-atlas-caribbean-node.is-idle circle {
-    opacity: 0.74;
+    opacity: 0.34;
 }
 
 .wxm-atlas-caribbean-node.is-territory circle {
-    fill: rgba(5,5,5,0.82);
-    stroke-dasharray: 2 2;
+    fill: rgba(5,5,5,0.74);
+    stroke-dasharray: 1.2 1.8;
+    opacity: 0.28;
 }
 
 .wxm-atlas-caribbean-node.is-selected circle,
 .wxm-atlas-caribbean-node:focus-visible circle {
-    fill: #fff;
-    stroke: #fff;
+    fill: #ff2d95;
+    stroke: rgba(255,255,255,0.94);
     filter: url(#wxmAtlasWhiteGlow);
 }
 
@@ -1843,26 +1845,37 @@ body.analytics-focus .preview-panel {
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin-halo {
-    opacity: 0.38;
+    opacity: 0.18;
     animation: none;
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin-core {
-    opacity: 0.86;
+    opacity: 0.72;
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node circle {
-    opacity: 0.96;
-    stroke-width: 1.35;
+    stroke-width: 0.48;
 }
 
-.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node.is-major circle,
-.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node.is-active circle {
-    r: 5.4px;
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node.is-major circle {
+    opacity: 0.58;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node.is-active circle,
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node.is-selected circle {
+    opacity: 0.92;
+}
+
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-country.is-active {
+    fill: rgba(255,0,122,0.50);
+    stroke: rgba(255,119,188,0.74);
+    filter: url(#wxmAtlasMagentaGlow);
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node text {
-    font-size: 9px;
+    font-size: 3.2px;
+    stroke-width: 0.92;
+    letter-spacing: 0.02em;
 }
 
 .wxm-atlas-place-node {
@@ -1876,25 +1889,34 @@ body.analytics-focus .preview-panel {
 }
 
 .wxm-atlas-place-node circle {
-    fill: #fff;
-    stroke: #ff2d95;
-    stroke-width: 0.65;
-    filter: url(#wxmAtlasWhiteGlow);
+    fill: rgba(255,45,149,0.82);
+    stroke: rgba(255,255,255,0.56);
+    stroke-width: 0.32;
+    filter: none;
     vector-effect: non-scaling-stroke;
 }
 
+.wxm-atlas-place-node.is-dot-only {
+    opacity: 0.46;
+}
+
+.wxm-atlas-place-node.is-dot-only circle {
+    fill: rgba(255,45,149,0.46);
+    stroke: rgba(255,255,255,0.28);
+}
+
 .wxm-atlas-place-node text {
-    fill: rgba(255,255,255,0.96);
-    stroke: rgba(0,0,0,0.78);
-    stroke-width: 1.7;
+    fill: rgba(255,255,255,0.90);
+    stroke: rgba(0,0,0,0.72);
+    stroke-width: 0.62;
     paint-order: stroke;
-    font-size: 4.7px;
+    font-size: 1.95px;
     font-weight: 900;
-    letter-spacing: 0.015em;
+    letter-spacing: 0.01em;
 }
 
 .wxm-atlas-place-node.is-tier-1 text {
-    font-size: 5.4px;
+    font-size: 2.25px;
     font-weight: 950;
 }
 
@@ -2195,8 +2217,18 @@ body.analytics-focus .preview-panel {
     font-size: 7px;
 }
 
+.wxm-atlas-shell.is-compact-atlas.is-caribbean-focus .wxm-atlas-caribbean-node text {
+    font-size: 3px;
+    stroke-width: 0.86;
+}
+
 .wxm-atlas-shell.is-compact-atlas.is-caribbean-focus .wxm-atlas-place-node text {
-    font-size: 4.4px;
+    font-size: 1.85px;
+    stroke-width: 0.55;
+}
+
+.wxm-atlas-shell.is-compact-atlas.is-caribbean-focus .wxm-atlas-place-node.is-tier-1 text {
+    font-size: 2.1px;
 }
 
 @media (max-width: 480px) {

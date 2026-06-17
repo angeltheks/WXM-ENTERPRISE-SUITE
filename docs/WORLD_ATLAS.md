@@ -70,6 +70,14 @@ As of World Atlas Polish 1.1, Caribbean focus mode is treated as an inspection m
 - the zoom ceiling is increased to support closer inspection of small islands and territories;
 - compact Atlas styling is driven by component width, not only browser viewport width, because the CMS analytics grid can place the map inside a narrower card on desktop.
 
+As of World Atlas Polish 1.2, Caribbean focus mode is visually restrained:
+
+- operational markers use smaller radii in Caribbean zoom so dots do not become large white circles;
+- inactive/territory nodes are dark and subtle, while live/selected nodes keep magenta emphasis;
+- labels are priority-based instead of rendering every country and city at the same weight;
+- place labels are limited to key Caribbean/capital nodes, with secondary places remaining as small dots;
+- active country fills are less opaque so borders, coastlines and silhouettes remain readable.
+
 The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as the active source.
 
 ## Rules
@@ -81,6 +89,7 @@ The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as
 - Do not use Google Maps as the main visual identity of WXM World Atlas. Google Maps can be considered later for internal address/geocoding tools only.
 - Do not expose personal location. The map must remain aggregated by country, city or region.
 - In Caribbean focus, do not display route animations over the islands. Routes belong to global broadcast mode, not inspection mode.
+- In Caribbean focus, do not use large white nodes or full label dumps. The visual priority is country shape, border readability and a small set of high-value labels.
 
 ## Next Cartography Upgrade
 

@@ -985,6 +985,28 @@ Regla:
 
 - Las rutas de transmision pertenecen al modo `Mundo`. El modo `Caribe` debe priorizar lectura geografica, islas, paises/territorios y ciudades agregadas.
 
+## Fase CMS Analytics 2.6.2 - World Atlas Caribe Visual Cleanup - 2026-06-18
+
+Objetivo:
+
+- Corregir el exceso visual detectado en modo Caribe: mapas de paises poco legibles, etiquetas montadas, puntos blancos demasiado grandes y apariencia poco profesional.
+
+Implementado:
+
+- `v2/cms/assets/react/WxmWorldAtlasMap.jsx` y runtime:
+  - reducen el radio de marcadores en modo Caribe para que el zoom no convierta los puntos en circulos gigantes;
+  - priorizan etiquetas de pais/isla: Cuba, Jamaica, Haiti, Rep. Dominicana, Puerto Rico, Bahamas, Panama, Colombia y Venezuela;
+  - priorizan etiquetas de ciudades clave y dejan el resto como puntos discretos.
+- `v2/cms/assets/css/cms.css`:
+  - elimina el look dominante de puntos blancos;
+  - usa nodos magenta/dark graphite mas sutiles;
+  - baja el tamano de etiquetas en modo Caribe y en modo compacto;
+  - reduce la intensidad de paises activos para conservar bordes/silueta geografica.
+
+Regla:
+
+- En modo Caribe el mapa debe verse primero como atlas geografico y segundo como analytics. Los efectos neon deben apoyar la lectura, no tapar islas, paises, ciudades o costas.
+
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 
 Objetivo:

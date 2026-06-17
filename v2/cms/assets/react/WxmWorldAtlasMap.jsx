@@ -105,6 +105,18 @@ const CARIBBEAN_PLACES = [
   { code: "VE", label: "Caracas", lat: 10.4806, lng: -66.9036, tier: 2 }
 ];
 
+const CARIBBEAN_LABEL_PRIORITY = new Set(["CU", "JM", "HT", "DO", "PR", "BS", "PA", "CO", "VE"]);
+const CARIBBEAN_PLACE_LABEL_PRIORITY = new Set([
+  "Santo Domingo",
+  "San Juan",
+  "La Habana",
+  "Kingston",
+  "Nassau",
+  "Bridgetown",
+  "Port of Spain",
+  "Cartagena"
+]);
+
 function resolveCountryCode(row) {
   const direct = String(row?.code || "").trim().toUpperCase();
   if (COUNTRY_CODE_TO_ID[direct]) return direct;
@@ -546,8 +558,11 @@ export default function WxmWorldAtlasMap({
                 selected ? "is-selected" : ""
               ].filter(Boolean).join(" ");
               const showLabel = atlasMode === "caribbean"
-                ? node.major || active || selected || ["BS", "BB", "TT", "PA", "CO", "VE"].includes(node.code)
+                ? selected || active || CARIBBEAN_LABEL_PRIORITY.has(node.code)
                 : node.major && !compact;
+              const markerRadius = atlasMode === "caribbean"
+                ? (node.major || active || selected ? 1.9 : 1.15)
+                : (node.major ? 4.8 : 3.4);
               const nodeClassName = [
                 className,
                 showLabel ? "has-label" : ""
@@ -577,8 +592,8 @@ export default function WxmWorldAtlasMap({
                   }}
                   onMouseLeave={() => setTooltip(null)}
                 >
-                  <circle r={node.major ? 4.8 : 3.4} />
-                  {showLabel && <text x="7" y="-7">{node.label}</text>}
+                  <circle r={markerRadius} />
+                  {showLabel && <text x="2.6" y="-2.8">{node.label}</text>}
                 </g>
               );
             })}
@@ -586,16 +601,19 @@ export default function WxmWorldAtlasMap({
 
           {atlasMode === "caribbean" && (
             <g className="wxm-atlas-caribbean-places" aria-label="Ciudades principales del Caribe">
-              {caribbeanPlaces.map(place => (
+              {caribbeanPlaces.map(place => {
+                const showPlaceLabel = place.tier === 1 || CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
+                return (
                 <g
                   key={`${place.code}-${place.label}`}
-                  className={`wxm-atlas-place-node is-tier-${place.tier}`}
+                  className={`wxm-atlas-place-node is-tier-${place.tier} ${showPlaceLabel ? "has-label" : "is-dot-only"}`}
                   transform={`translate(${place.point[0]}, ${place.point[1]})`}
                 >
-                  <circle r={place.tier === 1 ? 2.5 : 1.9} />
-                  <text x="4.5" y={place.tier === 1 ? "-4.8" : "-3.8"}>{place.label}</text>
+                  <circle r={place.tier === 1 ? 0.98 : 0.72} />
+                  {showPlaceLabel && <text x="1.7" y={place.tier === 1 ? "-1.9" : "-1.5"}>{place.label}</text>}
                 </g>
-              ))}
+                );
+              })}
             </g>
           )}
 
