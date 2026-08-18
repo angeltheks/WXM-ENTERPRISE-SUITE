@@ -9,6 +9,7 @@ const ATLAS_MAP_DATASET_URL = "assets/maps/countries-110m.json";
 const REMOTE_ANALYTICS_TIMEOUT_MS = 8000;
 const MAX_EMBEDDED_IMAGE_CHARS = 900_000;
 const MAX_UPLOAD_IMAGE_BYTES = 8 * 1024 * 1024;
+let generatedFieldId = 0;
 
 const IMAGE_PRESETS = {
     logo: {
@@ -602,6 +603,7 @@ function showAnalyticsTab(name) {
         const active = panel.dataset.analyticsPanel === target;
         panel.classList.toggle("active", active);
         panel.toggleAttribute("hidden", !active);
+        panel.setAttribute("aria-hidden", String(!active));
     });
 }
 
@@ -619,7 +621,58 @@ function showSystemTab(name) {
         const active = panel.dataset.systemPanel === target;
         panel.classList.toggle("active", active);
         panel.toggleAttribute("hidden", !active);
+        panel.setAttribute("aria-hidden", String(!active));
     });
+}
+
+function setupTabSemantics(tabs, panels, prefix, tabDatasetKey, panelDatasetKey) {
+    tabs.forEach(button => {
+        const key = button.dataset[tabDatasetKey];
+        if (!key) return;
+        button.id = button.id || `${prefix}-tab-${key}`;
+        button.setAttribute("aria-controls", `${prefix}-panel-${key}`);
+    });
+
+    panels.forEach(panel => {
+        const key = panel.dataset[panelDatasetKey];
+        if (!key) return;
+        panel.id = panel.id || `${prefix}-panel-${key}`;
+        panel.setAttribute("role", "tabpanel");
+        panel.setAttribute("aria-labelledby", `${prefix}-tab-${key}`);
+        panel.setAttribute("aria-hidden", String(!panel.classList.contains("active")));
+        panel.toggleAttribute("hidden", !panel.classList.contains("active"));
+    });
+}
+
+function setupInterfaceSemantics() {
+    dom.panels.forEach(panel => {
+        const key = panel.dataset.panel;
+        if (!key) return;
+        panel.id = panel.id || `cms-panel-${key}`;
+        const heading = panel.querySelector("h2, h3");
+        if (heading) {
+            heading.id = heading.id || `${panel.id}-heading`;
+            panel.setAttribute("aria-labelledby", heading.id);
+        }
+        panel.setAttribute("aria-hidden", String(!panel.classList.contains("active")));
+        panel.toggleAttribute("hidden", !panel.classList.contains("active"));
+    });
+
+    dom.nav.forEach(button => {
+        const key = button.dataset.section;
+        const panel = key ? document.getElementById(`cms-panel-${key}`) : null;
+        button.type = "button";
+        if (panel) button.setAttribute("aria-controls", panel.id);
+        button.setAttribute("aria-expanded", String(button.classList.contains("active")));
+        if (button.classList.contains("active")) {
+            button.setAttribute("aria-current", "page");
+        } else {
+            button.removeAttribute("aria-current");
+        }
+    });
+
+    setupTabSemantics(dom.analyticsTabs, dom.analyticsTabPanels, "analytics", "analyticsTab", "analyticsPanel");
+    setupTabSemantics(dom.systemTabs, dom.systemTabPanels, "system", "systemTab", "systemPanel");
 }
 
 function boundedNumber(value, fallback, min, max) {
@@ -645,6 +698,11 @@ function setSelectValue(node, value) {
     node.value = String(value);
 }
 
+function nextFieldId(prefix = "cms-field") {
+    generatedFieldId += 1;
+    return `${prefix}-${generatedFieldId}`;
+}
+
 function field(label, value, onInput, options = {}) {
     const wrapper = document.createElement("label");
     wrapper.className = options.wide ? "field wide" : "field";
@@ -668,16 +726,24 @@ function field(label, value, onInput, options = {}) {
 
 function imageField(label, value, onInput, options = {}) {
     const preset = options.preset || IMAGE_PRESETS.banner;
+    const fieldId = nextFieldId("cms-image");
+    const labelId = `${fieldId}-label`;
+    const hintId = `${fieldId}-hint`;
     const wrapper = document.createElement("div");
     wrapper.className = options.wide === false ? "field image-field" : "field image-field wide";
 
     const span = document.createElement("span");
+    span.id = labelId;
     span.textContent = label;
 
     const input = document.createElement("input");
+    input.id = `${fieldId}-url`;
     input.type = "text";
     input.maxLength = MAX_EMBEDDED_IMAGE_CHARS;
     input.placeholder = "assets/img/... o https://...";
+    input.setAttribute("aria-labelledby", labelId);
+    input.setAttribute("aria-describedby", hintId);
+    input.setAttribute("autocomplete", "off");
     input.value = imageInputDisplay(value);
     input.addEventListener("input", () => {
         onInput(normalizeImageInput(input.value));
@@ -685,6 +751,7 @@ function imageField(label, value, onInput, options = {}) {
     });
 
     const hint = document.createElement("small");
+    hint.id = hintId;
     hint.className = "image-hint";
     hint.textContent = `${preset.hint} Puedes elegir archivo local para borrador o usar URL HTTPS/CDN en produccion.`;
 
@@ -692,9 +759,12 @@ function imageField(label, value, onInput, options = {}) {
     controls.className = "image-tools";
 
     const fileInput = document.createElement("input");
+    fileInput.id = `${fieldId}-file`;
     fileInput.className = "image-file-input";
     fileInput.type = "file";
     fileInput.accept = "image/png,image/jpeg,image/webp";
+    fileInput.setAttribute("aria-label", `Seleccionar archivo para ${label}`);
+    fileInput.setAttribute("aria-describedby", hintId);
     fileInput.addEventListener("change", async () => {
         const prepared = await handleImageFile(fileInput, preset);
         if (!prepared) return;
@@ -708,6 +778,7 @@ function imageField(label, value, onInput, options = {}) {
     clearButton.className = "ghost-btn tiny-btn";
     clearButton.type = "button";
     clearButton.textContent = "Limpiar";
+    clearButton.setAttribute("aria-label", `Limpiar imagen de ${label}`);
     clearButton.addEventListener("click", () => {
         onInput("");
         input.value = "";
@@ -3033,8 +3104,22 @@ function bindActions() {
 
 function showPanel(name) {
     activePanel = name || "overview";
-    dom.nav.forEach(button => button.classList.toggle("active", button.dataset.section === activePanel));
-    dom.panels.forEach(panel => panel.classList.toggle("active", panel.dataset.panel === activePanel));
+    dom.nav.forEach(button => {
+        const active = button.dataset.section === activePanel;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-expanded", String(active));
+        if (active) {
+            button.setAttribute("aria-current", "page");
+        } else {
+            button.removeAttribute("aria-current");
+        }
+    });
+    dom.panels.forEach(panel => {
+        const active = panel.dataset.panel === activePanel;
+        panel.classList.toggle("active", active);
+        panel.toggleAttribute("hidden", !active);
+        panel.setAttribute("aria-hidden", String(!active));
+    });
     if (activePanel === "system") showSystemTab(activeSystemTab);
     applyPreviewState();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -3263,8 +3348,10 @@ function toast(message) {
 
 bindStaticForms();
 bindActions();
+setupInterfaceSemantics();
 applyPreviewState();
 applyAdvancedVisibility();
+showPanel(activePanel);
 showAnalyticsTab("dashboard");
 showSystemTab("operations");
 loadInitialCmc();

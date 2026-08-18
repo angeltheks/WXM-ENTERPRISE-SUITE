@@ -1015,6 +1015,33 @@ Regla:
 - Las rutas animadas de transmision solo pertenecen al modo `Mundo`; en modo `Caribe` no deben renderizarse para preservar fronteras, islas y etiquetas.
 - Las etiquetas de ciudades del Caribe no deben mostrarse todas por defecto; se activan en zoom profundo o como tooltip/seleccion para mantener lectura profesional.
 
+## Fase CMS Quality 2.6.3 - Semantica De Interfaz - 2026-08-19
+
+Objetivo:
+
+- Elevar la interfaz del CMS de "visual funcional" a "panel profesional operable", con semantica clara para navegacion, tabs, formularios dinamicos y validaciones futuras.
+
+Implementado:
+
+- Los campos dinamicos de imagen generados por `imageField()` ahora tienen IDs unicos, `aria-labelledby`, `aria-describedby`, `autocomplete="off"` y selector de archivo con `aria-label`.
+- Los botones `Limpiar` de imagen anuncian a que imagen pertenecen.
+- El menu lateral del CMS declara estado real con `aria-current`, `aria-expanded` y `aria-controls`.
+- Las secciones principales del CMS tienen ID estable, `aria-labelledby`, `aria-hidden` y `hidden` cuando no estan activas.
+- Las pestañas de Analytics y Sistema quedan conectadas con `aria-controls`, paneles `role="tabpanel"`, `aria-labelledby`, `aria-hidden` y `hidden`.
+- El sidebar y el preview movil del CMS tienen `aria-label` para diferenciar landmarks.
+- Se sincronizaron los cambios en la ruta principal `v2/cms/` y en la copia servida por `/cms/` mientras esa copia siga existiendo.
+
+Validacion:
+
+- Auditoria DOM local en `http://localhost:8126/cms/index.html`: 13 navegaciones, 13 paneles, 10 tabs y 10 tabpanels sin issues.
+- Resultado: `0` inputs visibles sin etiqueta, `0` botones visibles sin nombre, `0` paneles con estado oculto inconsistente y `0` overflow horizontal.
+- `node --check` OK para ambos `cms.js`.
+- `scripts/smoke-check.sh` OK.
+
+Regla:
+
+- Antes de abrir nuevas fases visuales del CMS, la interfaz debe conservar semantica navegable: ningun input sin etiqueta, ningun boton sin nombre, tabs con `aria-controls`, paneles ocultos con `hidden/aria-hidden` y sin overflow horizontal.
+
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 
 Objetivo:

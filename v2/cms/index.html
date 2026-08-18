@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>WXM Control Center</title>
     <meta name="description" content="Panel local para administrar WXM ONE RADIO CMC.">
-    <link rel="stylesheet" href="assets/css/cms.css?v=20260605-react-atlas">
+    <link rel="stylesheet" href="assets/css/cms.css?v=20260819-ui-semantics">
 </head>
 <body>
 <div class="cms-shell">
-    <aside class="cms-sidebar">
+    <aside class="cms-sidebar" aria-label="Panel lateral del CMS WXM">
         <div class="brand-block">
             <div class="brand-mark">WX</div>
             <div>
@@ -21,31 +21,31 @@
         <nav class="cms-nav" aria-label="Navegacion del CMS">
             <div class="nav-group">
                 <span class="nav-group-title">Centro de mando</span>
-                <button class="nav-pill active" data-section="overview">Dashboard</button>
-                <button class="nav-pill" data-section="analytics">Analytics</button>
+                <button class="nav-pill active" type="button" data-section="overview" aria-current="page" aria-expanded="true">Dashboard</button>
+                <button class="nav-pill" type="button" data-section="analytics" aria-expanded="false">Analytics</button>
             </div>
             <div class="nav-group">
                 <span class="nav-group-title">Emisora</span>
-                <button class="nav-pill" data-section="station">Identidad</button>
-                <button class="nav-pill" data-section="schedule">Programacion</button>
-                <button class="nav-pill" data-section="presenters">Locutores</button>
-                <button class="nav-pill" data-section="stations">Canales</button>
+                <button class="nav-pill" type="button" data-section="station" aria-expanded="false">Identidad</button>
+                <button class="nav-pill" type="button" data-section="schedule" aria-expanded="false">Programacion</button>
+                <button class="nav-pill" type="button" data-section="presenters" aria-expanded="false">Locutores</button>
+                <button class="nav-pill" type="button" data-section="stations" aria-expanded="false">Canales</button>
             </div>
             <div class="nav-group">
                 <span class="nav-group-title">Contenido</span>
-                <button class="nav-pill" data-section="banners">Banners</button>
-                <button class="nav-pill" data-section="highlights">Destacados</button>
-                <button class="nav-pill" data-section="content">Noticias / Replays</button>
+                <button class="nav-pill" type="button" data-section="banners" aria-expanded="false">Banners</button>
+                <button class="nav-pill" type="button" data-section="highlights" aria-expanded="false">Destacados</button>
+                <button class="nav-pill" type="button" data-section="content" aria-expanded="false">Noticias / Replays</button>
             </div>
             <div class="nav-group">
                 <span class="nav-group-title">Crecimiento</span>
-                <button class="nav-pill" data-section="features">Funciones app</button>
-                <button class="nav-pill" data-section="interaction">Interaccion</button>
-                <button class="nav-pill" data-section="sponsors">Sponsors</button>
+                <button class="nav-pill" type="button" data-section="features" aria-expanded="false">Funciones app</button>
+                <button class="nav-pill" type="button" data-section="interaction" aria-expanded="false">Interaccion</button>
+                <button class="nav-pill" type="button" data-section="sponsors" aria-expanded="false">Sponsors</button>
             </div>
             <div class="nav-group">
                 <span class="nav-group-title">Tecnico</span>
-                <button class="nav-pill" data-section="system">Sistema / Config</button>
+                <button class="nav-pill" type="button" data-section="system" aria-expanded="false">Sistema / Config</button>
             </div>
         </nav>
 
@@ -71,7 +71,7 @@
 
         <section class="cms-grid">
             <div class="workspace">
-                <section class="cms-section active" data-panel="overview">
+                <section class="cms-section active" data-panel="overview" aria-hidden="false">
                     <div class="section-heading">
                         <span class="eyebrow">Resumen operativo</span>
                         <h2>Panel de control local</h2>
@@ -967,7 +967,7 @@
                 </section>
             </div>
 
-            <aside class="preview-panel">
+            <aside class="preview-panel" aria-label="Vista previa movil de la app WXM">
                 <div class="phone-frame">
                     <div class="phone-status">
                         <span>9:41</span>
@@ -1000,11 +1000,11 @@
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="assets/vendor/react.production.min.js?v=20260605-react-atlas"></script>
-<script src="assets/vendor/react-dom.production.min.js?v=20260605-react-atlas"></script>
-<script src="assets/vendor/d3.min.js?v=20260605-react-atlas"></script>
-<script src="assets/vendor/topojson-client.min.js?v=20260605-react-atlas"></script>
-<script src="assets/react/WxmWorldAtlasMap.runtime.js?v=20260605-react-atlas"></script>
-<script type="module" src="assets/js/cms.js?v=20260605-react-atlas"></script>
+<script src="assets/vendor/react.production.min.js?v=20260819-ui-semantics"></script>
+<script src="assets/vendor/react-dom.production.min.js?v=20260819-ui-semantics"></script>
+<script src="assets/vendor/d3.min.js?v=20260819-ui-semantics"></script>
+<script src="assets/vendor/topojson-client.min.js?v=20260819-ui-semantics"></script>
+<script src="assets/react/WxmWorldAtlasMap.runtime.js?v=20260819-ui-semantics"></script>
+<script type="module" src="assets/js/cms.js?v=20260819-ui-semantics"></script>
 </body>
 </html>
