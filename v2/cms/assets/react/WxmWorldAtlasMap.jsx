@@ -106,6 +106,17 @@ const CARIBBEAN_PLACES = [
 ];
 
 const CARIBBEAN_LABEL_PRIORITY = new Set(["CU", "JM", "HT", "DO", "PR", "BS", "PA", "CO", "VE"]);
+const CARIBBEAN_LABEL_OFFSETS = {
+  BS: { x: 1.8, y: -3.8, anchor: "start" },
+  CU: { x: -3.8, y: 3.2, anchor: "end" },
+  JM: { x: -3.4, y: 4.1, anchor: "end" },
+  HT: { x: -2.8, y: -2.6, anchor: "end" },
+  DO: { x: 2.1, y: 4.4, anchor: "start" },
+  PR: { x: 3.0, y: -3.1, anchor: "start" },
+  PA: { x: -2.8, y: 3.8, anchor: "end" },
+  CO: { x: 2.6, y: 4.1, anchor: "start" },
+  VE: { x: 3.0, y: 3.6, anchor: "start" }
+};
 const CARIBBEAN_PLACE_LABEL_PRIORITY = new Set([
   "Santo Domingo",
   "San Juan",
@@ -325,6 +336,7 @@ export default function WxmWorldAtlasMap({
   const [tooltip, setTooltip] = useState(null);
   const [selectedId, setSelectedId] = useState("");
   const [atlasMode, setAtlasMode] = useState("world");
+  const [zoomScale, setZoomScale] = useState(1);
 
   useEffect(() => {
     let active = true;
@@ -368,7 +380,10 @@ export default function WxmWorldAtlasMap({
     const zoom = d3.zoom()
       .scaleExtent([1, 9])
       .translateExtent([[-size.width, -size.height], [size.width * 2, size.height * 2]])
-      .on("zoom", event => layer.attr("transform", event.transform.toString()));
+      .on("zoom", event => {
+        layer.attr("transform", event.transform.toString());
+        setZoomScale(event.transform.k);
+      });
     zoomBehaviorRef.current = zoom;
     svg.call(zoom);
     svg.on("dblclick.zoom", null);
@@ -535,16 +550,18 @@ export default function WxmWorldAtlasMap({
             })}
           </g>
 
-          <g className="wxm-atlas-routes">
-            {routes.map((route, index) => route.path && (
-              <g key={route.id} className="wxm-atlas-route-group">
-                <path id={`wxm-route-${route.id}`} d={route.path} className="wxm-atlas-route" style={{ animationDelay: `${index * 0.35}s` }} />
-                <circle r="3.8" className="wxm-atlas-route-pulse">
-                  <animateMotion dur={`${4.8 + index * 0.24}s`} repeatCount="indefinite" path={route.path} />
-                </circle>
-              </g>
-            ))}
-          </g>
+          {atlasMode === "world" && (
+            <g className="wxm-atlas-routes">
+              {routes.map((route, index) => route.path && (
+                <g key={route.id} className="wxm-atlas-route-group">
+                  <path id={`wxm-route-${route.id}`} d={route.path} className="wxm-atlas-route" style={{ animationDelay: `${index * 0.35}s` }} />
+                  <circle r="3.8" className="wxm-atlas-route-pulse">
+                    <animateMotion dur={`${4.8 + index * 0.24}s`} repeatCount="indefinite" path={route.path} />
+                  </circle>
+                </g>
+              ))}
+            </g>
+          )}
 
           <g className="wxm-atlas-caribbean-nodes" aria-label="Capa Caribe WXM">
             {caribbeanNodes.map(node => {
@@ -558,10 +575,11 @@ export default function WxmWorldAtlasMap({
                 selected ? "is-selected" : ""
               ].filter(Boolean).join(" ");
               const showLabel = atlasMode === "caribbean"
-                ? selected || active || CARIBBEAN_LABEL_PRIORITY.has(node.code)
+                ? selected || CARIBBEAN_LABEL_PRIORITY.has(node.code)
                 : node.major && !compact;
+              const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
               const markerRadius = atlasMode === "caribbean"
-                ? (node.major || active || selected ? 1.9 : 1.15)
+                ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
                 : (node.major ? 4.8 : 3.4);
               const nodeClassName = [
                 className,
@@ -593,7 +611,7 @@ export default function WxmWorldAtlasMap({
                   onMouseLeave={() => setTooltip(null)}
                 >
                   <circle r={markerRadius} />
-                  {showLabel && <text x="2.6" y="-2.8">{node.label}</text>}
+                  {showLabel && <text x={labelOffset.x} y={labelOffset.y} textAnchor={labelOffset.anchor}>{node.label}</text>}
                 </g>
               );
             })}
@@ -602,7 +620,7 @@ export default function WxmWorldAtlasMap({
           {atlasMode === "caribbean" && (
             <g className="wxm-atlas-caribbean-places" aria-label="Ciudades principales del Caribe">
               {caribbeanPlaces.map(place => {
-                const showPlaceLabel = place.tier === 1 || CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
+                const showPlaceLabel = zoomScale >= 8 && CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
                 return (
                 <g
                   key={`${place.code}-${place.label}`}
@@ -618,7 +636,7 @@ export default function WxmWorldAtlasMap({
           )}
 
           <g className="wxm-atlas-nodes">
-            {originPoint && (
+            {originPoint && atlasMode === "world" && (
               <g className="wxm-atlas-origin" transform={`translate(${originPoint[0]}, ${originPoint[1]})`}>
                 <circle r="22" className="wxm-atlas-origin-halo" />
                 <circle r="9" className="wxm-atlas-origin-core" />

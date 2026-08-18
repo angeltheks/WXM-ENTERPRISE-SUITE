@@ -1840,17 +1840,20 @@ body.analytics-focus .preview-panel {
     animation: none;
 }
 
+.wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin,
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin text {
     display: none;
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin-halo {
-    opacity: 0.18;
+    display: none;
+    opacity: 0;
     animation: none;
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-origin-core {
-    opacity: 0.72;
+    display: none;
+    opacity: 0;
 }
 
 .wxm-atlas-shell.is-caribbean-focus .wxm-atlas-caribbean-node circle {

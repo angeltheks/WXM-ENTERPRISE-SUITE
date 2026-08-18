@@ -995,17 +995,25 @@ Implementado:
 
 - `v2/cms/assets/react/WxmWorldAtlasMap.jsx` y runtime:
   - reducen el radio de marcadores en modo Caribe para que el zoom no convierta los puntos en circulos gigantes;
+  - reducen aun mas los marcadores en zoom Caribe: seleccionados, paises principales, activos e inactivos usan radios separados para no tapar islas;
+  - dejan de renderizar el origen global de transmision cuando `atlasMode === "caribbean"`;
+  - dejan de renderizar rutas y pulsos animados cuando `atlasMode === "caribbean"`; las transmisiones animadas pertenecen al modo `Mundo`;
+  - agregan offsets por pais/isla para separar Cuba, Jamaica, Haiti, Rep. Dominicana, Puerto Rico, Bahamas y costas Caribe;
   - priorizan etiquetas de pais/isla: Cuba, Jamaica, Haiti, Rep. Dominicana, Puerto Rico, Bahamas, Panama, Colombia y Venezuela;
-  - priorizan etiquetas de ciudades clave y dejan el resto como puntos discretos.
+  - convierten ciudades en puntos discretos por defecto y solo muestran etiquetas de ciudades clave en zoom profundo para evitar saturacion visual.
 - `v2/cms/assets/css/cms.css`:
   - elimina el look dominante de puntos blancos;
   - usa nodos magenta/dark graphite mas sutiles;
   - baja el tamano de etiquetas en modo Caribe y en modo compacto;
-  - reduce la intensidad de paises activos para conservar bordes/silueta geografica.
+  - reduce la intensidad de paises activos para conservar bordes/silueta geografica;
+  - mantiene una defensa CSS que oculta completamente el halo/origen global en modo Caribe si alguna version antigua llegara a renderizarlo.
 
 Regla:
 
 - En modo Caribe el mapa debe verse primero como atlas geografico y segundo como analytics. Los efectos neon deben apoyar la lectura, no tapar islas, paises, ciudades o costas.
+- El halo de transmision desde Republica Dominicana solo pertenece al modo `Mundo`; en modo `Caribe` no debe renderizarse.
+- Las rutas animadas de transmision solo pertenecen al modo `Mundo`; en modo `Caribe` no deben renderizarse para preservar fronteras, islas y etiquetas.
+- Las etiquetas de ciudades del Caribe no deben mostrarse todas por defecto; se activan en zoom profundo o como tooltip/seleccion para mantener lectura profesional.
 
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 

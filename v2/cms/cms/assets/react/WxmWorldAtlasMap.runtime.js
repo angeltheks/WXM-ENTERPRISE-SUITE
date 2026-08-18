@@ -184,6 +184,17 @@
     ];
 
     const CARIBBEAN_LABEL_PRIORITY = new Set(["CU", "JM", "HT", "DO", "PR", "BS", "PA", "CO", "VE"]);
+    const CARIBBEAN_LABEL_OFFSETS = {
+        BS: { x: 1.8, y: -3.8, anchor: "start" },
+        CU: { x: -3.8, y: 3.2, anchor: "end" },
+        JM: { x: -3.4, y: 4.1, anchor: "end" },
+        HT: { x: -2.8, y: -2.6, anchor: "end" },
+        DO: { x: 2.1, y: 4.4, anchor: "start" },
+        PR: { x: 3.0, y: -3.1, anchor: "start" },
+        PA: { x: -2.8, y: 3.8, anchor: "end" },
+        CO: { x: 2.6, y: 4.1, anchor: "start" },
+        VE: { x: 3.0, y: 3.6, anchor: "start" }
+    };
     const CARIBBEAN_PLACE_LABEL_PRIORITY = new Set([
         "Santo Domingo",
         "San Juan",
@@ -436,6 +447,7 @@
         const [tooltip, setTooltip] = React.useState(null);
         const [selectedId, setSelectedId] = React.useState("");
         const [atlasMode, setAtlasMode] = React.useState("world");
+        const [zoomScale, setZoomScale] = React.useState(1);
 
         React.useEffect(() => {
             let active = true;
@@ -481,6 +493,7 @@
                 .translateExtent([[-size.width, -size.height], [size.width * 2, size.height * 2]])
                 .on("zoom", event => {
                     layer.attr("transform", event.transform.toString());
+                    setZoomScale(event.transform.k);
                 });
             zoomBehaviorRef.current = zoom;
             svg.call(zoom);
@@ -681,7 +694,7 @@
                             });
                         })
                     ),
-                    e("g", { className: "wxm-atlas-routes" },
+                    atlasMode === "world" ? e("g", { className: "wxm-atlas-routes" },
                         topRoutes.map((route, index) => route.path
                             ? e("g", { key: route.id, className: "wxm-atlas-route-group" },
                                 e("path", {
@@ -699,16 +712,17 @@
                                 )
                             )
                             : null)
-                    ),
+                    ) : null,
                     e("g", { className: "wxm-atlas-caribbean-nodes", "aria-label": "Capa Caribe WXM" },
                         caribbeanNodes.map(node => {
                             const active = isLiveCaribbeanRecord(node.record);
                             const selected = selectedId === `caribbean-${node.code}`;
                             const showLabel = atlasMode === "caribbean"
-                                ? selected || active || CARIBBEAN_LABEL_PRIORITY.has(node.code)
+                                ? selected || CARIBBEAN_LABEL_PRIORITY.has(node.code)
                                 : node.major && !compact;
+                            const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
                             const markerRadius = atlasMode === "caribbean"
-                                ? (node.major || active || selected ? 1.9 : 1.15)
+                                ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
                                 : (node.major ? 4.8 : 3.4);
                             const className = [
                                 "wxm-atlas-caribbean-node",
@@ -743,13 +757,13 @@
                                 onMouseLeave: () => setTooltip(null)
                             },
                                 e("circle", { r: markerRadius }),
-                                showLabel ? e("text", { x: 2.6, y: -2.8 }, node.label) : null
+                                showLabel ? e("text", { x: labelOffset.x, y: labelOffset.y, textAnchor: labelOffset.anchor }, node.label) : null
                             );
                         })
                     ),
                     atlasMode === "caribbean" ? e("g", { className: "wxm-atlas-caribbean-places", "aria-label": "Ciudades principales del Caribe" },
                         caribbeanPlaces.map(place => {
-                            const showPlaceLabel = place.tier === 1 || CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
+                            const showPlaceLabel = zoomScale >= 8 && CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
                             return e("g", {
                                 key: `${place.code}-${place.label}`,
                                 className: `wxm-atlas-place-node is-tier-${place.tier} ${showPlaceLabel ? "has-label" : "is-dot-only"}`,
@@ -761,7 +775,7 @@
                         })
                     ) : null,
                     e("g", { className: "wxm-atlas-nodes" },
-                        originPoint
+                        originPoint && atlasMode === "world"
                             ? e("g", { className: "wxm-atlas-origin", transform: `translate(${originPoint[0]}, ${originPoint[1]})` },
                                 e("circle", { r: 22, className: "wxm-atlas-origin-halo" }),
                                 e("circle", { r: 9, className: "wxm-atlas-origin-core" }),

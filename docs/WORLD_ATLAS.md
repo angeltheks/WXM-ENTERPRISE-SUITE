@@ -75,8 +75,12 @@ As of World Atlas Polish 1.2, Caribbean focus mode is visually restrained:
 - operational markers use smaller radii in Caribbean zoom so dots do not become large white circles;
 - inactive/territory nodes are dark and subtle, while live/selected nodes keep magenta emphasis;
 - labels are priority-based instead of rendering every country and city at the same weight;
-- place labels are limited to key Caribbean/capital nodes, with secondary places remaining as small dots;
-- active country fills are less opaque so borders, coastlines and silhouettes remain readable.
+- country/island labels use dedicated offsets to reduce overlap around Haiti, Dominican Republic and Puerto Rico;
+- place labels are hidden by default and enabled only at deep zoom; secondary places remain as small dots with tooltip context;
+- active country fills are less opaque so borders, coastlines and silhouettes remain readable;
+- the global Dominican Republic transmission origin halo/core is not rendered in Caribbean focus because it covers the Antilles at inspection zoom;
+- global transmission routes and moving pulse dots are not rendered in Caribbean focus; route animation is reserved for the `Mundo` broadcast view;
+- CSS also keeps a defensive hide rule for older runtime copies, but the source of truth is the React mode condition.
 
 The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as the active source.
 
@@ -85,11 +89,13 @@ The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as
 - Do not invent personal-level geolocation.
 - Use aggregated country, city or region metrics.
 - Keep Google Maps API keys out of Git and out of public CMS JSON.
+- Render the WXM transmission origin only in `Mundo`; `Caribe` is an inspection mode and must preserve island/country readability first.
 - If exact Caribbean geography is needed, add a dedicated higher-resolution GeoJSON layer for that subregion.
 - Do not use Google Maps as the main visual identity of WXM World Atlas. Google Maps can be considered later for internal address/geocoding tools only.
 - Do not expose personal location. The map must remain aggregated by country, city or region.
 - In Caribbean focus, do not display route animations over the islands. Routes belong to global broadcast mode, not inspection mode.
 - In Caribbean focus, do not use large white nodes or full label dumps. The visual priority is country shape, border readability and a small set of high-value labels.
+- In Caribbean focus, do not render the global origin halo/core over Dominican Republic. Use the Caribbean node/place layers instead.
 
 ## Next Cartography Upgrade
 
