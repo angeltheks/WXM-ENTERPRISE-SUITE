@@ -555,7 +555,7 @@ export default function WxmWorldAtlasMap({
               {routes.map((route, index) => route.path && (
                 <g key={route.id} className="wxm-atlas-route-group">
                   <path id={`wxm-route-${route.id}`} d={route.path} className="wxm-atlas-route" style={{ animationDelay: `${index * 0.35}s` }} />
-                  <circle r="3.8" className="wxm-atlas-route-pulse">
+                  <circle r="2.8" className="wxm-atlas-route-pulse">
                     <animateMotion dur={`${4.8 + index * 0.24}s`} repeatCount="indefinite" path={route.path} />
                   </circle>
                 </g>
@@ -578,7 +578,7 @@ export default function WxmWorldAtlasMap({
               const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
               const markerRadius = atlasMode === "caribbean"
                 ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
-                : (node.major ? 4.8 : 3.4);
+                : (node.major ? 2.8 : 1.8);
               const nodeClassName = [
                 className,
                 showLabel ? "has-label" : ""
@@ -636,8 +636,8 @@ export default function WxmWorldAtlasMap({
           <g className="wxm-atlas-nodes">
             {originPoint && atlasMode === "world" && (
               <g className="wxm-atlas-origin" transform={`translate(${originPoint[0]}, ${originPoint[1]})`}>
-                <circle r="22" className="wxm-atlas-origin-halo" />
-                <circle r="9" className="wxm-atlas-origin-core" />
+                <circle r="13" className="wxm-atlas-origin-halo" />
+                <circle r="5.5" className="wxm-atlas-origin-core" />
               </g>
             )}
             {!compact && atlasMode === "world" && routes.map(route => route.point && (
@@ -648,48 +648,6 @@ export default function WxmWorldAtlasMap({
           </g>
         </g>
       </svg>
-
-      <aside className="wxm-atlas-side-panel" aria-label="Resumen operativo del mapa">
-        <section className="wxm-atlas-panel-section is-selected">
-          <span>{selectedPayload?.kicker || "Selecciona un pais"}</span>
-          <strong>{selectedPayload?.title || "Mapa WXM"}</strong>
-          <small>{selectedPayload?.meta || "Actividad agregada en tiempo real"}</small>
-          <em>{selectedPayload?.detail || "Haz zoom en Caribe para ver islas y territorios."}</em>
-        </section>
-        <section className="wxm-atlas-panel-section">
-          <span>Live connections</span>
-          {liveConnections.length ? (
-            liveConnections.map(item => (
-              <p key={item.id}>
-                <strong>{item.country}</strong>
-                <small>{item.city || "WXM"} · {formatAge(item.secondsAgo)}</small>
-              </p>
-            ))
-          ) : (
-            <p><strong>Sin conexiones</strong><small>Esperando telemetria</small></p>
-          )}
-        </section>
-        <section className="wxm-atlas-panel-section">
-          <span>Top paises</span>
-          {topCountries.length ? (
-            topCountries.map(item => (
-              <p key={`${item.code}-${item.name}`}>
-                <strong>{item.name}</strong>
-                <small>{formatAtlasNumber(item.value || item.listeningHours)} oyentes</small>
-              </p>
-            ))
-          ) : (
-            <p><strong>Sin ranking</strong><small>No hay datos agregados</small></p>
-          )}
-        </section>
-        <section className="wxm-atlas-panel-section is-caribbean">
-          <span>Caribe monitorizado</span>
-          <p><strong>{caribbeanActiveCount}</strong><small>activos ahora</small></p>
-          {Object.entries(caribbeanGroups).map(([group, count]) => (
-            <p key={group}><strong>{count}</strong><small>{group}</small></p>
-          ))}
-        </section>
-      </aside>
 
       <div className="wxm-atlas-legend">
         <span><i className="is-active" />Pais activo</span>

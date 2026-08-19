@@ -1065,6 +1065,26 @@ Regla:
 - Las capas de ciudad/localidad deben ser agregadas y privadas: no mostrar ubicacion exacta ni datos con muestra pequena.
 - La prioridad visual del Atlas es lectura geografica y decision operativa; los efectos neon y marcadores no deben tapar paises ni islas.
 
+## Fase CMS Analytics 2.6.5 - World Atlas Layout Cleanup - 2026-08-19
+
+Objetivo:
+
+- Corregir la capa operativa interna del World Atlas que duplicaba `Live connections`, `Top paises` y contexto de seleccion encima del SVG, tapando controles de zoom y reduciendo la lectura del Caribe.
+
+Implementado:
+
+- Se elimina el panel interno `wxm-atlas-side-panel` del componente React y de su runtime en `v2/cms/` y `v2/cms/cms/`.
+- Se agrega defensa CSS para ocultar cualquier panel interno residual si el navegador conserva runtime viejo en cache.
+- Los controles de zoom quedan con `z-index` superior y `pointer-events` activo para que sean clicables.
+- En modo mundial se reducen los puntos del Caribe, el halo de origen dominicano, el pulso de rutas y la opacidad de rutas/paises activos.
+- El `cache-buster` del CMS cambia a `20260819-atlas-layout-clean` para forzar carga de CSS/runtime nuevo.
+
+Regla:
+
+- El mapa debe ser navegacion y lectura geografica. Los datos operativos viven en paneles externos del dashboard o en tooltips/seleccion, nunca como panel fijo encima del mapa.
+- El modo `Mundo` puede tener rutas animadas discretas; el modo `Caribe` debe priorizar siluetas, fronteras e islas pequenas.
+- Ninguna tarjeta interna del Atlas debe tapar controles de zoom, boton `Caribe`, boton `Mundo`, paises pequenos o zonas de inspeccion.
+
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 
 Objetivo:

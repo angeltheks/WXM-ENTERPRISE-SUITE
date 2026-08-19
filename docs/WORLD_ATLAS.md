@@ -90,6 +90,14 @@ As of World Atlas Polish 1.3, the Atlas uses clean-label behavior:
 - Caribbean city/place nodes are visual dots only by default, with future tooltip/drilldown interaction planned;
 - the Dominican Republic origin halo remains available in `Mundo`, but its text label is no longer rendered permanently.
 
+As of World Atlas Polish 1.4, the Atlas uses an unobstructed dashboard layout:
+
+- the internal map side panel is removed from the React component and runtime because Analytics already owns the external `Live connections` panel;
+- a defensive CSS rule hides stale internal side panels if a browser cache loads older runtime code;
+- zoom and focus controls keep a higher interaction layer and must remain clickable at desktop, compact and mobile widths;
+- global route animation, pulse dots and Dominican origin halo are visually restrained so the Caribbean is not covered in `Mundo`;
+- active country fill is less opaque, preserving borders, coastlines and small-island silhouettes.
+
 The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as the active source.
 
 ## Rules
@@ -105,6 +113,8 @@ The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as
 - In Caribbean focus, do not use large white nodes or full label dumps. The visual priority is country shape, border readability and a small set of high-value labels.
 - In Caribbean focus, do not render the global origin halo/core over Dominican Republic. Use the Caribbean node/place layers instead.
 - Do not render permanent geographic labels in default map state. Names belong in hover tooltips, selected-country panels, side lists or drilldown sheets.
+- Do not render fixed operational panels inside the map when the Atlas is embedded in Analytics. The external dashboard panel owns live connection lists and ranking context.
+- Zoom/focus controls must never be covered by route summaries, selected-country cards, live lists or decorative effects.
 - City, town and locality layers must be progressive: country first, then region/province, then city/locality only after user zoom or selection.
 - City/locality analytics must be aggregated and privacy-safe. Do not show personal-level location or exact listener coordinates.
 

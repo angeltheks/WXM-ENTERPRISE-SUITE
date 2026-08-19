@@ -701,7 +701,7 @@
                                     className: "wxm-atlas-route",
                                     style: { animationDelay: `${index * 0.35}s` }
                                 }),
-                                e("circle", { r: "3.8", className: "wxm-atlas-route-pulse" },
+                                e("circle", { r: "2.8", className: "wxm-atlas-route-pulse" },
                                     e("animateMotion", {
                                         dur: `${4.8 + index * 0.24}s`,
                                         repeatCount: "indefinite",
@@ -719,7 +719,7 @@
                             const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
                             const markerRadius = atlasMode === "caribbean"
                                 ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
-                                : (node.major ? 4.8 : 3.4);
+                                : (node.major ? 2.8 : 1.8);
                             const className = [
                                 "wxm-atlas-caribbean-node",
                                 active ? "is-active" : "is-idle",
@@ -773,8 +773,8 @@
                     e("g", { className: "wxm-atlas-nodes" },
                         originPoint && atlasMode === "world"
                             ? e("g", { className: "wxm-atlas-origin", transform: `translate(${originPoint[0]}, ${originPoint[1]})` },
-                                e("circle", { r: 22, className: "wxm-atlas-origin-halo" }),
-                                e("circle", { r: 9, className: "wxm-atlas-origin-core" })
+                                e("circle", { r: 13, className: "wxm-atlas-origin-halo" }),
+                                e("circle", { r: 5.5, className: "wxm-atlas-origin-core" })
                             )
                             : null,
                         !compact && atlasMode === "world" ? topRoutes.map(route => e(NodeLabel, {
@@ -784,40 +784,6 @@
                             country: route.country
                         })) : null
                     )
-                )
-            ),
-            e("aside", { className: "wxm-atlas-side-panel", "aria-label": "Resumen operativo del mapa" },
-                e("section", { className: "wxm-atlas-panel-section is-selected" },
-                    e("span", null, selectedPayload?.kicker || "Selecciona un pais"),
-                    e("strong", null, selectedPayload?.title || "Mapa WXM"),
-                    e("small", null, selectedPayload?.meta || "Actividad agregada en tiempo real"),
-                    e("em", null, selectedPayload?.detail || "Haz zoom en Caribe para ver islas y territorios.")
-                ),
-                e("section", { className: "wxm-atlas-panel-section" },
-                    e("span", null, "Live connections"),
-                    liveConnections.length
-                        ? liveConnections.map(item => e("p", { key: item.id },
-                            e("strong", null, item.country),
-                            e("small", null, `${item.city || "WXM"} · ${formatAge(item.secondsAgo)}`)
-                        ))
-                        : e("p", null, e("strong", null, "Sin conexiones"), e("small", null, "Esperando telemetria"))
-                ),
-                e("section", { className: "wxm-atlas-panel-section" },
-                    e("span", null, "Top paises"),
-                    topCountries.length
-                        ? topCountries.map(item => e("p", { key: `${item.code}-${item.name}` },
-                            e("strong", null, item.name),
-                            e("small", null, `${formatAtlasNumber(item.value || item.listeningHours)} oyentes`)
-                        ))
-                        : e("p", null, e("strong", null, "Sin ranking"), e("small", null, "No hay datos agregados"))
-                ),
-                e("section", { className: "wxm-atlas-panel-section is-caribbean" },
-                    e("span", null, "Caribe monitorizado"),
-                    e("p", null, e("strong", null, caribbeanActiveCount), e("small", null, "activos ahora")),
-                    Object.entries(caribbeanGroups).map(([group, count]) => e("p", { key: group },
-                        e("strong", null, count),
-                        e("small", null, group)
-                    ))
                 )
             ),
             e("div", { className: "wxm-atlas-legend" },
