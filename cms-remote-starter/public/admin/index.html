@@ -340,6 +340,8 @@
           <button type="button" id="refreshAnalytics">Analytics</button>
           <button type="button" id="refreshServer">Estado servidor</button>
           <button type="button" id="refreshAudit">Auditoria</button>
+          <button type="button" id="refreshStorage">Persistencia</button>
+          <button type="button" id="createSnapshot">Snapshot</button>
           <a class="link-button secondary" href="/wxm-cms.json" target="_blank" rel="noreferrer">JSON publico</a>
           <a class="link-button secondary" href="/health" target="_blank" rel="noreferrer">Health</a>
           <button type="button" id="logout" class="secondary wide">Cerrar sesion</button>
@@ -392,6 +394,23 @@
             </div>
           </div>
         </section>
+
+        <section class="card" style="margin-top:18px">
+          <div class="panel-head">
+            <h2>Persistencia y snapshots</h2>
+            <span class="eyebrow">Fase 5.2</span>
+          </div>
+          <div class="split">
+            <div>
+              <label>Estado del almacenamiento</label>
+              <ul id="storageList" class="mini-list"></ul>
+            </div>
+            <div>
+              <label>Snapshots recientes</label>
+              <ul id="snapshotList" class="mini-list"></ul>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -407,6 +426,8 @@
       refreshAnalytics: document.getElementById("refreshAnalytics"),
       refreshServer: document.getElementById("refreshServer"),
       refreshAudit: document.getElementById("refreshAudit"),
+      refreshStorage: document.getElementById("refreshStorage"),
+      createSnapshot: document.getElementById("createSnapshot"),
       logout: document.getElementById("logout"),
       metricStatus: document.getElementById("metricStatus"),
       metricSource: document.getElementById("metricSource"),
@@ -420,6 +441,8 @@
       playersList: document.getElementById("playersList"),
       hardeningList: document.getElementById("hardeningList"),
       auditList: document.getElementById("auditList"),
+      storageList: document.getElementById("storageList"),
+      snapshotList: document.getElementById("snapshotList"),
       updatedAt: document.getElementById("updatedAt"),
       jsonPreview: document.getElementById("jsonPreview")
     };
@@ -537,6 +560,41 @@
       });
     }
 
+    function readableBytes(bytes) {
+      const value = Number(bytes || 0);
+      if (value >= 1024 * 1024) return `${(value / 1024 / 1024).toFixed(1)} MB`;
+      if (value >= 1024) return `${(value / 1024).toFixed(1)} KB`;
+      return `${value} B`;
+    }
+
+    function renderStorage(payload) {
+      const storage = payload?.storage || payload || {};
+      const manifest = storage.manifest || payload?.manifest || {
+        mode: storage.mode,
+        currentCms: storage.currentCms,
+        revisions: storage.revisions,
+        analytics: storage.analytics,
+        audit: storage.audit,
+        snapshots: storage.snapshots,
+        uploads: storage.uploads
+      };
+      const health = storage.health || payload?.health || { ok: storage.ok, checks: storage.checks || [] };
+      const snapshots = storage.latestSnapshots || storage.snapshots || payload?.snapshots || [];
+      const rows = [
+        { name: "Modo", count: manifest.mode || "local-file-store" },
+        { name: "CMS actual", count: manifest.currentCms?.exists ? readableBytes(manifest.currentCms.bytes) : "No publicado" },
+        { name: "Revisiones", count: manifest.revisions?.files || 0 },
+        { name: "Analytics", count: manifest.analytics?.files || 0 },
+        { name: "Uploads", count: manifest.uploads?.files || 0 },
+        { name: "Health", count: health.ok ? "OK" : "Revisar" }
+      ];
+      renderList(els.storageList, rows, "Sin estado de persistencia");
+      renderList(els.snapshotList, snapshots.map(snapshot => ({
+        name: snapshot.file,
+        count: readableBytes(snapshot.bytes)
+      })), "Sin snapshots");
+    }
+
     async function loadCms() {
       try {
         setMessage("Cargando contrato CMS protegido...");
@@ -564,8 +622,10 @@
       try {
         const payload = await api("/api/admin/status");
         renderHardening(payload);
+        renderStorage(payload.storage || {});
       } catch (error) {
         renderList(els.hardeningList, [], "Estado no disponible");
+        renderList(els.storageList, [], "Persistencia no disponible");
       }
     }
 
@@ -578,6 +638,36 @@
       }
     }
 
+    async function loadStorage() {
+      try {
+        setMessage("Cargando estado de persistencia...");
+        const payload = await api("/api/admin/storage");
+        renderStorage(payload);
+        setMessage("Persistencia cargada.", "ok");
+      } catch (error) {
+        setMessage(`Persistencia no disponible: ${error.message}`, "error");
+      }
+    }
+
+    async function createSnapshot() {
+      try {
+        setMessage("Creando snapshot manual...");
+        const payload = await api("/api/admin/snapshot", {
+          method: "POST",
+          body: JSON.stringify({
+            label: "manual-admin",
+            reason: "remote_admin_manual_snapshot",
+            includeAnalyticsSummary: true
+          })
+        });
+        renderStorage(payload.storage || {});
+        await loadAudit();
+        setMessage(`Snapshot creado: ${payload.snapshot?.file || "OK"}`, "ok");
+      } catch (error) {
+        setMessage(`No se pudo crear snapshot: ${error.message}`, "error");
+      }
+    }
+
     async function checkStatus() {
       try {
         const payload = await api("/api/auth/status");
@@ -585,7 +675,7 @@
         setAuthed(Boolean(payload.authenticated));
         if (payload.authenticated) {
           setMessage("Sesion recuperada.", "ok");
-          await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit()]);
+          await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit(), loadStorage()]);
         } else {
           setMessage("Inicia sesion para administrar el CMS remoto.");
         }
@@ -608,7 +698,7 @@
         els.password.value = "";
         setAuthed(true);
         setMessage("Sesion iniciada.", "ok");
-        await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit()]);
+        await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit(), loadStorage()]);
       } catch (error) {
         setAuthed(false);
         setMessage(`Login fallido: ${error.message}`, "error");
@@ -619,6 +709,8 @@
     els.refreshAnalytics.addEventListener("click", loadAnalytics);
     els.refreshServer.addEventListener("click", loadServerStatus);
     els.refreshAudit.addEventListener("click", loadAudit);
+    els.refreshStorage.addEventListener("click", loadStorage);
+    els.createSnapshot.addEventListener("click", createSnapshot);
     els.logout.addEventListener("click", async () => {
       try { await api("/api/auth/logout", { method: "POST" }); } catch (_) {}
       state.csrfToken = "";

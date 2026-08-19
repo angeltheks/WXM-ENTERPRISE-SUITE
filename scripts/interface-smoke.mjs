@@ -127,8 +127,12 @@ requiredIds(remoteAdminHtml, "cms-remote-starter/public/admin/index.html", [
   "refreshAnalytics",
   "refreshServer",
   "refreshAudit",
+  "refreshStorage",
+  "createSnapshot",
   "hardeningList",
   "auditList",
+  "storageList",
+  "snapshotList",
   "jsonPreview",
 ]);
 [
@@ -137,6 +141,8 @@ requiredIds(remoteAdminHtml, "cms-remote-starter/public/admin/index.html", [
   "/api/auth/status",
   "/api/admin/status",
   "/api/admin/audit",
+  "/api/admin/storage",
+  "/api/admin/snapshot",
   "/api/auth/logout",
 ].forEach((token) => assert(remoteAdminHtml.includes(token), `Remote Admin is missing contract token: ${token}`));
 

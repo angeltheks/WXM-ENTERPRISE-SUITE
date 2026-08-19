@@ -48,7 +48,9 @@
 - CMS JSON publishing.
 - Upload handling.
 - Analytics summary.
-- Future roles and audit trail.
+- CSRF and admin audit trail.
+- Storage manifest and snapshots.
+- Future roles and database adapter.
 
 ## Phase 6 - Enterprise Modules
 
@@ -74,5 +76,5 @@ Before expanding CRM, advertising or AI services:
 - Keep the World Atlas stable and readable.
 - Run interface smoke checks on every UI change.
 - Consolidate active CMS vs legacy mirror discipline.
-- Connect analytics to persistent backend data.
-- Harden Remote Admin auth, uploads, CSRF and audit trail.
+- Keep analytics flowing through the remote storage adapter.
+- Harden Remote Admin auth, uploads, CSRF, audit trail and snapshots.

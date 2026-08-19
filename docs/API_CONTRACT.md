@@ -41,6 +41,8 @@ POST /api/auth/logout
 GET  /api/auth/status
 GET  /api/admin/status
 GET  /api/admin/audit
+GET  /api/admin/storage
+POST /api/admin/snapshot
 GET  /api/cms/current
 POST /api/cms/publish
 GET  /api/cms/revisions
@@ -65,6 +67,56 @@ The token is returned by:
 POST /api/auth/login
 GET  /api/auth/status
 ```
+
+## Remote Storage Contract
+
+The remote CMS exposes a protected storage health contract for operational dashboards:
+
+```text
+GET /api/admin/storage
+```
+
+Response shape:
+
+```json
+{
+  "ok": true,
+  "health": {
+    "ok": true,
+    "checks": [
+      { "name": "write_access", "ok": true, "value": "ok" }
+    ]
+  },
+  "manifest": {
+    "schemaVersion": 1,
+    "mode": "local-file-store",
+    "currentCms": { "exists": true, "bytes": 1200, "sha256": "..." },
+    "revisions": { "files": 8, "bytes": 9000 },
+    "analytics": { "files": 3, "bytes": 4500 },
+    "audit": { "exists": true, "bytes": 800 },
+    "uploads": { "files": 12, "bytes": 900000 }
+  },
+  "snapshots": []
+}
+```
+
+Manual snapshots are created through:
+
+```text
+POST /api/admin/snapshot
+```
+
+Payload:
+
+```json
+{
+  "label": "before-stream-change",
+  "reason": "manual backup",
+  "includeAnalyticsSummary": true
+}
+```
+
+This endpoint requires authentication and `X-WXM-CSRF`.
 
 ## Analytics Events
 

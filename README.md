@@ -146,6 +146,13 @@ Abrir:
 http://127.0.0.1:8787/admin/
 ```
 
+El Remote Admin incluye login protegido, CSRF, auditoria pseudonima, resumen de analytics, manifiesto de almacenamiento y snapshots operativos. Los endpoints de persistencia protegidos son:
+
+```text
+GET  /api/admin/storage
+POST /api/admin/snapshot
+```
+
 ## Compilar APK Android
 
 Si cambias `v2`, sincroniza assets antes de compilar:

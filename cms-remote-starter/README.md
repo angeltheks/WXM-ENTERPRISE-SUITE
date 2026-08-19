@@ -7,6 +7,7 @@ Servidor minimo para convertir el CMS local en una operacion remota segura:
 - Protege mutaciones admin con token CSRF por sesion.
 - Limita intentos de login por ventana de tiempo.
 - Registra auditoria admin pseudonima en NDJSON.
+- Mantiene manifiesto de almacenamiento y snapshots operativos.
 - Valida contrato antes de publicar.
 - Guarda revision historica y permite rollback.
 - Recibe analytics anonimos por `POST /api/analytics/ingest`.
@@ -50,6 +51,8 @@ Endpoints protegidos nuevos:
 ```text
 GET /api/admin/status
 GET /api/admin/audit?limit=80
+GET /api/admin/storage
+POST /api/admin/snapshot
 ```
 
 Mutaciones que requieren `X-WXM-CSRF`:
@@ -59,6 +62,7 @@ POST /api/auth/logout
 POST /api/cms/publish
 POST /api/cms/rollback
 POST /api/assets/upload
+POST /api/admin/snapshot
 ```
 
 Ejemplo:
@@ -81,6 +85,7 @@ curl -X POST https://tu-dominio.com/api/cms/publish \
 6. Configura `WXM_CMS_PUBLIC_BASE_URL` con el dominio publico HTTPS del CMS.
 7. Ajusta `WXM_CMS_LOGIN_MAX_ATTEMPTS` si necesitas una politica distinta.
 8. Publica el endpoint en la app: `https://tu-dominio.com/wxm-cms.json`.
+9. Programa backups externos del directorio `WXM_CMS_DATA_DIR` y de `public/uploads`.
 
 Generar hash de password:
 
@@ -197,6 +202,48 @@ Requiere cookie de admin. Devuelve conteos agregados y un objeto `analytics` com
 ```
 
 Las horas de escucha solo suben si la app envia `durationSeconds` o eventos de cierre de sesion. No se inventan listening hours.
+
+## Persistencia y snapshots
+
+La fase 5.2 introduce una capa local formal llamada `WxmFileStore`:
+
+```text
+cms-remote-starter/lib/storage.js
+```
+
+Esta capa centraliza:
+
+- escritura atomica;
+- append seguro en NDJSON;
+- manifiesto de almacenamiento;
+- estado de health;
+- snapshots manuales y automaticos tras publish/rollback;
+- conteo de CMS actual, revisiones, analytics, auditoria, uploads y snapshots.
+
+Endpoints privados:
+
+```text
+GET  /api/admin/storage
+POST /api/admin/snapshot
+```
+
+El snapshot guarda:
+
+- manifiesto del almacenamiento;
+- copia del CMS publico actual;
+- resumen de analytics si `includeAnalyticsSummary` es `true`.
+
+Ejemplo:
+
+```bash
+curl -X POST https://tu-dominio.com/api/admin/snapshot \
+  -H 'Content-Type: application/json' \
+  -H 'Cookie: wxm_session=...' \
+  -H 'X-WXM-CSRF: token-devuelto-por-login' \
+  --data '{"label":"antes-cambio-stream","reason":"backup_manual","includeAnalyticsSummary":true}'
+```
+
+Esto no reemplaza una base SQL final, pero deja el servidor preparado para migrar a SQLite/Postgres con un adaptador equivalente.
 
 ## Rollback
 

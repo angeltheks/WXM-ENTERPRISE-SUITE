@@ -187,6 +187,62 @@ Pendiente para produccion:
 - Hash de password con KDF fuerte (`argon2`/`bcrypt`) cuando se permita dependencia externa.
 - Backups, rotacion de logs y alertas.
 
+## Fase 5.2 - Persistencia Operativa Del CMS Remoto - 2026-08-20
+
+Objetivo:
+
+- Dejar el CMS remoto listo para operar con una frontera clara de persistencia.
+- Evitar que `server.js` siga acumulando toda la logica de archivos.
+- Preparar migracion futura a SQLite/Postgres sin romper los endpoints actuales.
+- Dar visibilidad al admin sobre estado de almacenamiento, snapshots y backups.
+
+Implementado:
+
+- Nuevo modulo:
+  - `cms-remote-starter/lib/storage.js`
+  - clase `WxmFileStore`.
+- `WxmFileStore` centraliza:
+  - escritura atomica;
+  - append NDJSON;
+  - listado de revisiones;
+  - listado de analytics;
+  - auditoria reciente;
+  - manifiesto de almacenamiento;
+  - health checks;
+  - snapshots.
+- Nuevos endpoints protegidos:
+  - `GET /api/admin/storage`
+  - `POST /api/admin/snapshot`
+- `POST /api/admin/snapshot` requiere `X-WXM-CSRF`.
+- `POST /api/cms/publish` ahora:
+  - escribe revision de forma atomica;
+  - actualiza CMS actual;
+  - crea snapshot automatico;
+  - actualiza manifiesto;
+  - registra auditoria.
+- `POST /api/cms/rollback` ahora:
+  - restaura revision;
+  - crea snapshot automatico;
+  - actualiza manifiesto;
+  - registra auditoria.
+- `POST /api/assets/upload` actualiza manifiesto.
+- `POST /api/analytics/ingest` usa el adaptador de append NDJSON.
+- `GET /api/admin/status` ahora expone storage sanitizado sin rutas absolutas.
+- Admin remoto muestra:
+  - estado de persistencia;
+  - snapshots recientes;
+  - boton para crear snapshot manual.
+- Smoke de interfaz valida contrato de persistencia del Admin remoto.
+
+Pendiente para produccion:
+
+- Implementar `WxmSqliteStore` para hosting simple.
+- Implementar `WxmPostgresStore` para despliegue multi-instancia.
+- Usuarios admin reales con roles.
+- Backups externos automatizados.
+- Retencion y rotacion de snapshots/audit logs.
+- Restore visual desde el panel admin.
+
 ## Fase actual
 
 Estado al 2026-06-02: Fase 1 y Fase 1.5 estabilizadas, Fase 2 avanzada con CMC local, CMS UI local, modulos editoriales/media renderizados en la app y Analytics/CMS local organizada en vistas operativas. Backend remoto de recoleccion pendiente.

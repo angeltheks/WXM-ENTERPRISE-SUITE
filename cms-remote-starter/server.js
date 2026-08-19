@@ -5,16 +5,17 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const { WxmFileStore } = require("./lib/storage");
 
 const PORT = Number.parseInt(process.env.PORT || "8787", 10);
 const DATA_DIR = path.resolve(process.env.WXM_CMS_DATA_DIR || path.join(__dirname, "data"));
 const PUBLIC_DIR = path.resolve(path.join(__dirname, "public"));
-const UPLOAD_DIR = path.join(PUBLIC_DIR, "uploads");
-const CURRENT_FILE = path.join(DATA_DIR, "current", "wxm-cms.json");
-const REVISION_DIR = path.join(DATA_DIR, "revisions");
-const ANALYTICS_DIR = path.join(DATA_DIR, "analytics");
-const AUDIT_DIR = path.join(DATA_DIR, "audit");
-const AUDIT_FILE = path.join(AUDIT_DIR, "admin.ndjson");
+const store = new WxmFileStore({ dataDir: DATA_DIR, publicDir: PUBLIC_DIR });
+const UPLOAD_DIR = store.paths.uploadDir;
+const CURRENT_FILE = store.paths.currentFile;
+const REVISION_DIR = store.paths.revisionDir;
+const ANALYTICS_DIR = store.paths.analyticsDir;
+const AUDIT_FILE = store.paths.auditFile;
 const MAX_JSON_BYTES = 220 * 1024;
 const MAX_ASSET_JSON_BYTES = 2 * 1024 * 1024;
 const MAX_ASSET_BYTES = 900 * 1024;
@@ -58,12 +59,6 @@ const COUNTRY_CODES = {
 
 const analyticsRate = new Map();
 const loginRate = new Map();
-
-fs.mkdirSync(path.dirname(CURRENT_FILE), { recursive: true });
-fs.mkdirSync(REVISION_DIR, { recursive: true });
-fs.mkdirSync(ANALYTICS_DIR, { recursive: true });
-fs.mkdirSync(AUDIT_DIR, { recursive: true });
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 function securityHeaders(extra = {}) {
     return {
@@ -376,38 +371,24 @@ function writeAudit(action, req, details = {}) {
         userAgent: text(req.headers["user-agent"], 180),
         details: auditDetails(details)
     };
-    fs.appendFileSync(AUDIT_FILE, JSON.stringify(entry) + "\n", { mode: 0o640 });
+    store.appendJsonl(AUDIT_FILE, entry);
 }
 
 function recentAudit(limit = 80) {
-    if (!fs.existsSync(AUDIT_FILE)) return [];
-    const lines = fs.readFileSync(AUDIT_FILE, "utf8").split("\n").filter(Boolean);
-    return lines.slice(-Math.max(1, Math.min(limit, 200))).reverse().map(line => {
-        try {
-            return JSON.parse(line);
-        } catch {
-            return { ts: "", action: "corrupted_audit_line", client: "", details: {} };
-        }
-    });
+    return store.tailJsonl(AUDIT_FILE, Math.max(1, Math.min(limit, 200)))
+        .map(entry => entry || { ts: "", action: "corrupted_audit_line", client: "", details: {} });
 }
 
 function writeAtomic(file, content) {
-    const temp = `${file}.${process.pid}.${Date.now()}.tmp`;
-    fs.writeFileSync(temp, content, { mode: 0o640 });
-    fs.renameSync(temp, file);
+    store.writeAtomic(file, content);
 }
 
 function listRevisions() {
-    if (!fs.existsSync(REVISION_DIR)) return [];
-    return fs.readdirSync(REVISION_DIR)
-        .filter(name => /^wxm-cms-\d{8}T\d{6}Z-[a-f0-9]{12}\.json$/.test(name))
-        .sort()
-        .reverse()
-        .slice(0, 80);
+    return store.listRevisions(80);
 }
 
 function todayAnalyticsFile() {
-    return path.join(ANALYTICS_DIR, `${new Date().toISOString().slice(0, 10)}.ndjson`);
+    return store.todayAnalyticsFile();
 }
 
 function sanitizeAnalyticsEvent(event, req) {
@@ -503,10 +484,7 @@ function emptySeries(days) {
 }
 
 function summarizeAnalytics() {
-    const files = fs.existsSync(ANALYTICS_DIR)
-        ? fs.readdirSync(ANALYTICS_DIR).filter(name => name.endsWith(".ndjson")).sort()
-        : [];
-    const selectedFiles = files.slice(-ANALYTICS_LOOKBACK_DAYS);
+    const selectedFiles = store.listAnalyticsFiles(ANALYTICS_LOOKBACK_DAYS);
     const events = [];
     const byEvent = {};
     const byCountry = {};
@@ -672,6 +650,18 @@ function summarizeAnalytics() {
     };
 }
 
+function storageStatusPayload() {
+    const manifest = store.overview({
+        generatedBy: "admin-read",
+        generatedAt: new Date().toISOString()
+    });
+    return {
+        health: store.storageHealth(),
+        manifest,
+        snapshots: store.listSnapshots(12)
+    };
+}
+
 function serveStatic(req, res, pathname) {
     const requested = pathname === "/admin" || pathname === "/admin/" ? "/admin/index.html" : pathname;
     const file = path.resolve(PUBLIC_DIR, `.${requested}`);
@@ -712,7 +702,13 @@ async function route(req, res) {
     }
 
     if ((req.method === "GET" || req.method === "HEAD") && pathname === "/health") {
-        return sendJson(req, res, 200, { ok: true, service: "wxm-cms-remote", hasPublishedCms: fs.existsSync(CURRENT_FILE) });
+        const storage = store.storageHealth();
+        return sendJson(req, res, 200, {
+            ok: storage.ok,
+            service: "wxm-cms-remote",
+            storageMode: "local-file-store",
+            hasPublishedCms: fs.existsSync(CURRENT_FILE)
+        });
     }
 
     if ((req.method === "GET" || req.method === "HEAD") && pathname === "/wxm-cms.json") {
@@ -776,14 +772,27 @@ async function route(req, res) {
 
     if (req.method === "GET" && pathname === "/api/admin/status") {
         if (!requireAuth(req, res)) return;
+        const storage = storageStatusPayload();
         return sendJson(req, res, 200, {
             ok: true,
             service: "wxm-cms-remote",
             hasPublishedCms: fs.existsSync(CURRENT_FILE),
             revisions: listRevisions().length,
             uploadsEnabled: true,
-            analyticsFiles: fs.existsSync(ANALYTICS_DIR) ? fs.readdirSync(ANALYTICS_DIR).filter(name => name.endsWith(".ndjson")).length : 0,
+            analyticsFiles: store.listAnalyticsFiles(500).length,
             auditEntries: recentAudit(1).length ? "available" : "empty",
+            storage: {
+                mode: storage.manifest.mode,
+                ok: storage.health.ok,
+                currentCms: storage.manifest.currentCms,
+                revisions: storage.manifest.revisions,
+                analytics: storage.manifest.analytics,
+                audit: storage.manifest.audit,
+                snapshots: storage.manifest.snapshots,
+                uploads: storage.manifest.uploads,
+                checks: storage.health.checks,
+                latestSnapshots: storage.snapshots
+            },
             hardening: {
                 csrf: true,
                 csp: true,
@@ -799,6 +808,25 @@ async function route(req, res) {
         if (!requireAuth(req, res)) return;
         const limit = Number.parseInt(url.searchParams.get("limit") || "80", 10);
         return sendJson(req, res, 200, { ok: true, entries: recentAudit(limit) });
+    }
+
+    if (req.method === "GET" && pathname === "/api/admin/storage") {
+        if (!requireAuth(req, res)) return;
+        return sendJson(req, res, 200, { ok: true, ...storageStatusPayload() });
+    }
+
+    if (req.method === "POST" && pathname === "/api/admin/snapshot") {
+        if (!requireAuth(req, res)) return;
+        if (!requireCsrf(req, res)) return;
+        const body = await readJson(req);
+        const analyticsSummary = body.includeAnalyticsSummary ? summarizeAnalytics() : null;
+        const snapshot = store.createSnapshot({
+            label: body.label || "manual",
+            reason: body.reason || "admin_manual_snapshot",
+            analyticsSummary
+        });
+        writeAudit("storage_snapshot", req, { file: snapshot.file, bytes: snapshot.bytes, sha256: snapshot.sha256 });
+        return sendJson(req, res, 201, { ok: true, snapshot, storage: storageStatusPayload() });
     }
 
     if (req.method === "GET" && pathname === "/api/cms/current") {
@@ -817,10 +845,12 @@ async function route(req, res) {
         const hash = sha256(payload);
         const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
         const revisionFile = `wxm-cms-${stamp}-${hash.slice(0, 12)}.json`;
-        fs.writeFileSync(path.join(REVISION_DIR, revisionFile), payload, { mode: 0o640 });
+        writeAtomic(path.join(REVISION_DIR, revisionFile), payload);
         writeAtomic(CURRENT_FILE, payload);
-        writeAudit("cms_publish", req, { revisionFile, sha256: hash.slice(0, 16), warnings: validation.warnings.length });
-        return sendJson(req, res, 200, { ok: true, revisionFile, sha256: hash, warnings: validation.warnings });
+        const snapshot = store.createSnapshot({ label: "publish", reason: revisionFile });
+        const manifest = store.persistManifest({ lastOperation: "cms_publish", lastRevision: revisionFile, lastSnapshot: snapshot.file });
+        writeAudit("cms_publish", req, { revisionFile, sha256: hash.slice(0, 16), warnings: validation.warnings.length, snapshot: snapshot.file });
+        return sendJson(req, res, 200, { ok: true, revisionFile, sha256: hash, warnings: validation.warnings, snapshot, manifest });
     }
 
     if (req.method === "GET" && pathname === "/api/cms/revisions") {
@@ -836,8 +866,10 @@ async function route(req, res) {
         if (!listRevisions().includes(file)) return sendJson(req, res, 404, { ok: false, error: "revision_not_found" });
         const payload = fs.readFileSync(path.join(REVISION_DIR, file), "utf8");
         writeAtomic(CURRENT_FILE, payload);
-        writeAudit("cms_rollback", req, { restored: file });
-        return sendJson(req, res, 200, { ok: true, restored: file });
+        const snapshot = store.createSnapshot({ label: "rollback", reason: file });
+        const manifest = store.persistManifest({ lastOperation: "cms_rollback", restored: file, lastSnapshot: snapshot.file });
+        writeAudit("cms_rollback", req, { restored: file, snapshot: snapshot.file });
+        return sendJson(req, res, 200, { ok: true, restored: file, snapshot, manifest });
     }
 
     if (req.method === "POST" && pathname === "/api/assets/upload") {
@@ -855,6 +887,7 @@ async function route(req, res) {
         if (!file.startsWith(UPLOAD_DIR)) return sendJson(req, res, 403, { ok: false, error: "invalid_asset_path" });
         writeAtomic(file, image.buffer);
         const publicPath = `/uploads/${month}/${filename}`;
+        const manifest = store.persistManifest({ lastOperation: "asset_upload", lastAsset: publicPath });
         writeAudit("asset_upload", req, { path: publicPath, bytes: image.buffer.length, mime: image.mime });
         return sendJson(req, res, 201, {
             ok: true,
@@ -862,7 +895,8 @@ async function route(req, res) {
             url: publicAssetUrl(req, publicPath),
             sha256: hash,
             bytes: image.buffer.length,
-            mime: image.mime
+            mime: image.mime,
+            manifest
         });
     }
 
@@ -894,7 +928,7 @@ async function route(req, res) {
         const body = await readJson(req);
         const events = Array.isArray(body.events) ? body.events : [body];
         const safeEvents = events.slice(0, 50).map(event => sanitizeAnalyticsEvent(event, req));
-        fs.appendFileSync(todayAnalyticsFile(), safeEvents.map(event => JSON.stringify(event)).join("\n") + "\n", { mode: 0o640 });
+        store.appendJsonl(todayAnalyticsFile(), safeEvents);
         return sendJson(req, res, 202, { ok: true, accepted: safeEvents.length });
     }
 

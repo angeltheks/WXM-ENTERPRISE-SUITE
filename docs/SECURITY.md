@@ -19,6 +19,9 @@
 - Rate-limit admin login attempts.
 - Keep admin audit logs pseudonymous; never store raw IP in audit UI.
 - Expose operational status without leaking filesystem paths or secrets.
+- Protect storage snapshots with authentication and CSRF.
+- Keep storage manifests sanitized; never expose absolute server paths or secrets.
+- Treat snapshots as sensitive operational backups.
 
 ## Android
 
