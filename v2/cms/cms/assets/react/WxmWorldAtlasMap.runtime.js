@@ -419,13 +419,13 @@
         return `M ${start[0].toFixed(2)} ${start[1].toFixed(2)} Q ${cx.toFixed(2)} ${cy.toFixed(2)} ${end[0].toFixed(2)} ${end[1].toFixed(2)}`;
     }
 
-    function NodeLabel({ point }) {
+    function NodeLabel({ point, radius = 1.85 }) {
         if (!point) return null;
         return e("g", {
             className: "wxm-atlas-node-label is-marker-only",
             transform: `translate(${point[0]}, ${point[1]})`
         },
-            e("circle", { r: 4, className: "wxm-atlas-node-dot" })
+            e("circle", { r: radius, className: "wxm-atlas-node-dot" })
         );
     }
 
@@ -566,6 +566,12 @@
         })).filter(place => place.point);
         const caribbeanActiveCount = caribbeanNodes.filter(node => isLiveCaribbeanRecord(node.record)).length;
         const caribbeanGroups = countByGroup(CARIBBEAN_NODES);
+        const inverseZoomScale = 1 / Math.max(1, zoomScale || 1);
+        const isZoomedInspection = zoomScale > 1.35;
+        const routePulseRadius = Math.max(0.16, 1.65 * inverseZoomScale);
+        const destinationMarkerRadius = Math.max(0.16, 1.85 * inverseZoomScale);
+        const originCoreRadius = Math.max(0.16, 2.15 * inverseZoomScale);
+        const originHaloRadius = Math.max(0.2, 5.8 * inverseZoomScale);
         const applyZoom = action => {
             if (!svgRef.current || !zoomBehaviorRef.current || !d3) return;
             const svg = d3.select(svgRef.current);
@@ -599,7 +605,8 @@
             className: [
                 "wxm-atlas-shell",
                 atlasMode === "caribbean" ? "is-caribbean-focus" : "",
-                compact ? "is-compact-atlas" : ""
+                compact ? "is-compact-atlas" : "",
+                isZoomedInspection ? "is-zoomed-atlas" : ""
             ].filter(Boolean).join(" "),
             ref: containerRef
         },
@@ -701,7 +708,7 @@
                                     className: "wxm-atlas-route",
                                     style: { animationDelay: `${index * 0.35}s` }
                                 }),
-                                e("circle", { r: "2.8", className: "wxm-atlas-route-pulse" },
+                                e("circle", { r: routePulseRadius, className: "wxm-atlas-route-pulse" },
                                     e("animateMotion", {
                                         dur: `${4.8 + index * 0.24}s`,
                                         repeatCount: "indefinite",
@@ -717,9 +724,10 @@
                             const selected = selectedId === `caribbean-${node.code}`;
                             const showLabel = selected;
                             const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
-                            const markerRadius = atlasMode === "caribbean"
-                                ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
-                                : (node.major ? 2.8 : 1.8);
+                            const markerScreenRadius = atlasMode === "caribbean"
+                                ? (selected ? 2.4 : node.major ? 1.85 : active ? 1.65 : 1.1)
+                                : (node.major ? 1.85 : 1.15);
+                            const markerRadius = Math.max(0.14, markerScreenRadius * inverseZoomScale);
                             const className = [
                                 "wxm-atlas-caribbean-node",
                                 active ? "is-active" : "is-idle",
@@ -773,13 +781,14 @@
                     e("g", { className: "wxm-atlas-nodes" },
                         originPoint && atlasMode === "world"
                             ? e("g", { className: "wxm-atlas-origin", transform: `translate(${originPoint[0]}, ${originPoint[1]})` },
-                                e("circle", { r: 13, className: "wxm-atlas-origin-halo" }),
-                                e("circle", { r: 5.5, className: "wxm-atlas-origin-core" })
+                                !isZoomedInspection ? e("circle", { r: originHaloRadius, className: "wxm-atlas-origin-halo" }) : null,
+                                e("circle", { r: originCoreRadius, className: "wxm-atlas-origin-core" })
                             )
                             : null,
                         !compact && atlasMode === "world" ? topRoutes.map(route => e(NodeLabel, {
                             key: `${route.id}-label`,
                             point: route.point,
+                            radius: destinationMarkerRadius,
                             label: route.label,
                             country: route.country
                         })) : null

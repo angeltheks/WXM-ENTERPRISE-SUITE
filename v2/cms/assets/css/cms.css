@@ -1756,8 +1756,8 @@ body.analytics-focus .preview-panel {
 }
 
 .wxm-atlas-origin-halo {
-    fill: rgba(255,0,122,0.10);
-    stroke: rgba(255,255,255,0.58);
+    fill: rgba(255,0,122,0.055);
+    stroke: rgba(255,255,255,0.42);
     stroke-width: 1;
     filter: url(#wxmAtlasMagentaGlow);
     animation: wxmAtlasPulse 2.2s ease-in-out infinite;
@@ -1798,6 +1798,30 @@ body.analytics-focus .preview-panel {
     fill: #ff007a;
     stroke: rgba(255,255,255,0.78);
     filter: url(#wxmAtlasMagentaGlow);
+}
+
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-origin-halo {
+    display: none;
+    opacity: 0;
+    animation: none;
+}
+
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-origin-core,
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-route-pulse,
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-node-dot,
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-caribbean-node.is-active circle,
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-caribbean-node.is-selected circle {
+    filter: none;
+}
+
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-route {
+    opacity: 0.34;
+    stroke-width: 0.72;
+}
+
+.wxm-atlas-shell.is-zoomed-atlas .wxm-atlas-caribbean-node.is-active circle {
+    fill: #ff2d95;
+    stroke: rgba(255,255,255,0.62);
 }
 
 .wxm-atlas-caribbean-node.is-idle circle {

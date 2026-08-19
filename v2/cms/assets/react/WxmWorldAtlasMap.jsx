@@ -434,6 +434,12 @@ export default function WxmWorldAtlasMap({
   })).filter(place => place.point);
   const caribbeanActiveCount = caribbeanNodes.filter(node => isLiveCaribbeanRecord(node.record)).length;
   const caribbeanGroups = countByGroup(CARIBBEAN_NODES);
+  const inverseZoomScale = 1 / Math.max(1, zoomScale || 1);
+  const isZoomedInspection = zoomScale > 1.35;
+  const routePulseRadius = Math.max(0.16, 1.65 * inverseZoomScale);
+  const destinationMarkerRadius = Math.max(0.16, 1.85 * inverseZoomScale);
+  const originCoreRadius = Math.max(0.16, 2.15 * inverseZoomScale);
+  const originHaloRadius = Math.max(0.2, 5.8 * inverseZoomScale);
   const applyZoom = action => {
     if (!svgRef.current || !zoomBehaviorRef.current) return;
     const svg = d3.select(svgRef.current);
@@ -467,7 +473,8 @@ export default function WxmWorldAtlasMap({
     <div className={[
       "wxm-atlas-shell",
       atlasMode === "caribbean" ? "is-caribbean-focus" : "",
-      compact ? "is-compact-atlas" : ""
+      compact ? "is-compact-atlas" : "",
+      isZoomedInspection ? "is-zoomed-atlas" : ""
     ].filter(Boolean).join(" ")} ref={containerRef}>
       <div className="wxm-atlas-hud">
         <div>
@@ -555,7 +562,7 @@ export default function WxmWorldAtlasMap({
               {routes.map((route, index) => route.path && (
                 <g key={route.id} className="wxm-atlas-route-group">
                   <path id={`wxm-route-${route.id}`} d={route.path} className="wxm-atlas-route" style={{ animationDelay: `${index * 0.35}s` }} />
-                  <circle r="2.8" className="wxm-atlas-route-pulse">
+                  <circle r={routePulseRadius} className="wxm-atlas-route-pulse">
                     <animateMotion dur={`${4.8 + index * 0.24}s`} repeatCount="indefinite" path={route.path} />
                   </circle>
                 </g>
@@ -576,9 +583,10 @@ export default function WxmWorldAtlasMap({
               ].filter(Boolean).join(" ");
               const showLabel = selected;
               const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
-              const markerRadius = atlasMode === "caribbean"
-                ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
-                : (node.major ? 2.8 : 1.8);
+              const markerScreenRadius = atlasMode === "caribbean"
+                ? (selected ? 2.4 : node.major ? 1.85 : active ? 1.65 : 1.1)
+                : (node.major ? 1.85 : 1.15);
+              const markerRadius = Math.max(0.14, markerScreenRadius * inverseZoomScale);
               const nodeClassName = [
                 className,
                 showLabel ? "has-label" : ""
@@ -636,13 +644,13 @@ export default function WxmWorldAtlasMap({
           <g className="wxm-atlas-nodes">
             {originPoint && atlasMode === "world" && (
               <g className="wxm-atlas-origin" transform={`translate(${originPoint[0]}, ${originPoint[1]})`}>
-                <circle r="13" className="wxm-atlas-origin-halo" />
-                <circle r="5.5" className="wxm-atlas-origin-core" />
+                {!isZoomedInspection && <circle r={originHaloRadius} className="wxm-atlas-origin-halo" />}
+                <circle r={originCoreRadius} className="wxm-atlas-origin-core" />
               </g>
             )}
             {!compact && atlasMode === "world" && routes.map(route => route.point && (
               <g key={`${route.id}-label`} className="wxm-atlas-node-label is-marker-only" transform={`translate(${route.point[0]}, ${route.point[1]})`}>
-                <circle r="4" className="wxm-atlas-node-dot" />
+                <circle r={destinationMarkerRadius} className="wxm-atlas-node-dot" />
               </g>
             ))}
           </g>

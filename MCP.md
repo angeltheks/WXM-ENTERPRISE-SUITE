@@ -1085,6 +1085,25 @@ Regla:
 - El modo `Mundo` puede tener rutas animadas discretas; el modo `Caribe` debe priorizar siluetas, fronteras e islas pequenas.
 - Ninguna tarjeta interna del Atlas debe tapar controles de zoom, boton `Caribe`, boton `Mundo`, paises pequenos o zonas de inspeccion.
 
+## Fase CMS Analytics 2.6.6 - World Atlas Zoom-Safe Markers - 2026-08-19
+
+Objetivo:
+
+- Corregir la regresion donde el halo/punto magenta del origen y los marcadores de rutas crecian con el zoom y tapaban Republica Dominicana, Haiti, Puerto Rico y Antillas.
+
+Implementado:
+
+- Los marcadores operativos del Atlas usan radio compensado por `zoomScale`, por lo que mantienen tamano visual estable al acercar el mapa.
+- El halo grande de origen se oculta automaticamente cuando el mapa esta en modo inspeccion/zoom.
+- Los pulsos de rutas y marcadores de destino reducen radio y glow en zoom para no cubrir paises pequenos.
+- Se agrega clase `is-zoomed-atlas` para CSS de inspeccion: menos glow, rutas mas discretas y nodos activos mas contenidos.
+- El `cache-buster` del CMS cambia a `20260819-atlas-zoom-safe`.
+
+Regla:
+
+- Ningun marcador SVG dentro de la capa con zoom puede crecer proporcionalmente con el zoom si puede tapar geografia. Todo punto operativo debe ser screen-space o compensado por escala.
+- En Caribe, la lectura de siluetas, fronteras e islas tiene prioridad sobre efectos neon, halos, pulsos y decoracion de transmision.
+
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 
 Objetivo:

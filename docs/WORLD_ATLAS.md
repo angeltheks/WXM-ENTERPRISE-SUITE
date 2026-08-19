@@ -98,6 +98,13 @@ As of World Atlas Polish 1.4, the Atlas uses an unobstructed dashboard layout:
 - global route animation, pulse dots and Dominican origin halo are visually restrained so the Caribbean is not covered in `Mundo`;
 - active country fill is less opaque, preserving borders, coastlines and small-island silhouettes.
 
+As of World Atlas Polish 1.5, the Atlas uses zoom-safe operational markers:
+
+- route pulse dots, destination markers, Caribbean nodes and the Dominican origin core compensate their radius by the current D3 zoom scale;
+- the Dominican origin halo is not rendered while the map is in a zoomed inspection state;
+- zoomed Atlas styling disables heavy SVG glow on markers and pulse dots so small islands remain readable;
+- global routes stay available in `Mundo`, but their visual weight is reduced during inspection zoom.
+
 The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as the active source.
 
 ## Rules
@@ -115,6 +122,7 @@ The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as
 - Do not render permanent geographic labels in default map state. Names belong in hover tooltips, selected-country panels, side lists or drilldown sheets.
 - Do not render fixed operational panels inside the map when the Atlas is embedded in Analytics. The external dashboard panel owns live connection lists and ranking context.
 - Zoom/focus controls must never be covered by route summaries, selected-country cards, live lists or decorative effects.
+- SVG markers inside the zoom layer must be scale-compensated or hidden at inspection zoom. They must not grow large enough to cover Caribbean geography.
 - City, town and locality layers must be progressive: country first, then region/province, then city/locality only after user zoom or selection.
 - City/locality analytics must be aggregated and privacy-safe. Do not show personal-level location or exact listener coordinates.
 
