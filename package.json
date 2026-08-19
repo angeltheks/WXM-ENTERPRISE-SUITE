@@ -5,6 +5,8 @@
   "description": "WXM ONE RADIO player packaged for web, Android and iOS with Capacitor.",
   "scripts": {
     "serve": "python3 -m http.server 8080 --directory v2",
+    "smoke": "scripts/smoke-check.sh",
+    "smoke:interface": "node scripts/interface-smoke.mjs",
     "check:js": "node --check v2/assets/js/config.js && node --check v2/assets/js/metadata-service.js && node --check v2/assets/js/audio-engine.js && node --check v2/assets/js/ui-controller.js && node --check v2/assets/js/modules/playlist/playlist-engine.js && node --check v2/assets/js/modules/playlist/playlist-storage.js && node --check v2/assets/js/modules/playlist/playlist-ui.js",
     "cap:sync": "npx cap sync",
     "cap:add:android": "npx cap add android",

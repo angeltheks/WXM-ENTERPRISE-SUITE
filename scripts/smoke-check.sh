@@ -89,6 +89,9 @@ info "Checking CMS and remote admin JavaScript"
 "$NODE_BIN" --check v2/cms/assets/react/WxmWorldAtlasMap.runtime.js
 "$NODE_BIN" --check cms-remote-starter/server.js
 
+info "Checking interface contracts"
+"$NODE_BIN" scripts/interface-smoke.mjs
+
 if [ "${WXM_SMOKE_BUILD_ANDROID:-0}" = "1" ]; then
   info "Building Android debug APK"
   pushd android-webview >/dev/null

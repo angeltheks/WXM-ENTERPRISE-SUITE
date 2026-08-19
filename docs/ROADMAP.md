@@ -67,3 +67,12 @@
 - Backups and rollback.
 - Release automation.
 
+## Immediate Stabilization Track
+
+Before expanding CRM, advertising or AI services:
+
+- Keep the World Atlas stable and readable.
+- Run interface smoke checks on every UI change.
+- Consolidate active CMS vs legacy mirror discipline.
+- Connect analytics to persistent backend data.
+- Harden Remote Admin auth, uploads, CSRF and audit trail.

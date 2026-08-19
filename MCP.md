@@ -94,6 +94,45 @@ Siguiente recomendacion:
 
 - Fase 0.7: smoke visual automatizado y consolidacion de copias CMS antes de expandir CRM, news manager o publicidad.
 
+## Fase 0.7 - Smoke De Interfaz Y Disciplina CMS - 2026-08-20
+
+Objetivo:
+
+- Cerrar la brecha de validacion visual/semantica antes de abrir mas fases funcionales.
+- Evitar regresiones en app mobile, CMS, Analytics, Sistema y World Atlas.
+- Mantener una sola fuente activa del CMS aunque exista un espejo legacy de continuidad.
+
+Implementado:
+
+- `scripts/interface-smoke.mjs` valida contratos criticos de interfaz sin dependencias externas:
+  - vistas principales de la app;
+  - mini player;
+  - controles play/stop/sync;
+  - historial semanal;
+  - tabs y paneles de Analytics;
+  - tabs y paneles de Sistema;
+  - inputs de imagen;
+  - World Atlas y sus guardas anti-regresion para Caribe/zoom;
+  - paridad entre CMS activo y espejo legacy en archivos criticos.
+- `scripts/smoke-check.sh` ejecuta ahora el smoke de interfaz dentro del smoke general.
+- `package.json` agrega:
+  - `npm run smoke`
+  - `npm run smoke:interface`
+- Nueva documentacion: `docs/INTERFACE_QA.md`.
+- `docs/ROADMAP.md` agrega un track inmediato de estabilizacion antes de CRM, publicidad o IA.
+
+Reglas:
+
+- El CMS activo es `v2/cms/index.html` y `v2/cms/assets/`.
+- `v2/cms/cms/` queda como espejo legacy, no como fuente de desarrollo.
+- Cualquier cambio visual importante debe pasar por `npm run smoke`.
+
+Pendiente recomendado:
+
+- Agregar Playwright real con screenshots desktop/mobile cuando se instalen dependencias de test.
+- Conectar Analytics a backend persistente real.
+- Endurecer CMS Remote Admin antes de exponerlo en hosting publico.
+
 ## Fase actual
 
 Estado al 2026-06-02: Fase 1 y Fase 1.5 estabilizadas, Fase 2 avanzada con CMC local, CMS UI local, modulos editoriales/media renderizados en la app y Analytics/CMS local organizada en vistas operativas. Backend remoto de recoleccion pendiente.

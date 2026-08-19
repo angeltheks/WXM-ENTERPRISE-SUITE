@@ -73,6 +73,7 @@ docs/DATABASE.md
 docs/SECURITY.md
 docs/DEPLOYMENT.md
 docs/WORLD_ATLAS.md
+docs/INTERFACE_QA.md
 ```
 
 ## Flujo Git
