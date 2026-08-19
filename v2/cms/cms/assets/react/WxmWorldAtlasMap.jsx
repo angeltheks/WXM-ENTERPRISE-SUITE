@@ -574,9 +574,7 @@ export default function WxmWorldAtlasMap({
                 node.territory ? "is-territory" : "",
                 selected ? "is-selected" : ""
               ].filter(Boolean).join(" ");
-              const showLabel = atlasMode === "caribbean"
-                ? selected || CARIBBEAN_LABEL_PRIORITY.has(node.code)
-                : node.major && !compact;
+              const showLabel = selected;
               const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
               const markerRadius = atlasMode === "caribbean"
                 ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
@@ -620,7 +618,7 @@ export default function WxmWorldAtlasMap({
           {atlasMode === "caribbean" && (
             <g className="wxm-atlas-caribbean-places" aria-label="Ciudades principales del Caribe">
               {caribbeanPlaces.map(place => {
-                const showPlaceLabel = zoomScale >= 8 && CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
+                const showPlaceLabel = false;
                 return (
                 <g
                   key={`${place.code}-${place.label}`}
@@ -640,15 +638,11 @@ export default function WxmWorldAtlasMap({
               <g className="wxm-atlas-origin" transform={`translate(${originPoint[0]}, ${originPoint[1]})`}>
                 <circle r="22" className="wxm-atlas-origin-halo" />
                 <circle r="9" className="wxm-atlas-origin-core" />
-                <text x="-26" y="34">REPUBLICA</text>
-                <text x="-26" y="49">DOMINICANA</text>
               </g>
             )}
             {!compact && atlasMode === "world" && routes.map(route => route.point && (
-              <g key={`${route.id}-label`} className="wxm-atlas-node-label" transform={`translate(${route.point[0]}, ${route.point[1]})`}>
+              <g key={`${route.id}-label`} className="wxm-atlas-node-label is-marker-only" transform={`translate(${route.point[0]}, ${route.point[1]})`}>
                 <circle r="4" className="wxm-atlas-node-dot" />
-                <text x="10" y="-8">{route.label}</text>
-                <text x="10" y="8" className="is-muted">{route.country}</text>
               </g>
             ))}
           </g>

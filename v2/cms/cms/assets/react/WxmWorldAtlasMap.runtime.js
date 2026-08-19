@@ -419,15 +419,13 @@
         return `M ${start[0].toFixed(2)} ${start[1].toFixed(2)} Q ${cx.toFixed(2)} ${cy.toFixed(2)} ${end[0].toFixed(2)} ${end[1].toFixed(2)}`;
     }
 
-    function NodeLabel({ point, label, country }) {
+    function NodeLabel({ point }) {
         if (!point) return null;
         return e("g", {
-            className: "wxm-atlas-node-label",
+            className: "wxm-atlas-node-label is-marker-only",
             transform: `translate(${point[0]}, ${point[1]})`
         },
-            e("circle", { r: 4, className: "wxm-atlas-node-dot" }),
-            e("text", { x: 10, y: -8 }, label),
-            country ? e("text", { x: 10, y: 8, className: "is-muted" }, country) : null
+            e("circle", { r: 4, className: "wxm-atlas-node-dot" })
         );
     }
 
@@ -717,9 +715,7 @@
                         caribbeanNodes.map(node => {
                             const active = isLiveCaribbeanRecord(node.record);
                             const selected = selectedId === `caribbean-${node.code}`;
-                            const showLabel = atlasMode === "caribbean"
-                                ? selected || CARIBBEAN_LABEL_PRIORITY.has(node.code)
-                                : node.major && !compact;
+                            const showLabel = selected;
                             const labelOffset = CARIBBEAN_LABEL_OFFSETS[node.code] || { x: 2.6, y: -2.8, anchor: "start" };
                             const markerRadius = atlasMode === "caribbean"
                                 ? (selected ? 1.32 : node.major ? 1.12 : active ? 0.98 : 0.62)
@@ -763,7 +759,7 @@
                     ),
                     atlasMode === "caribbean" ? e("g", { className: "wxm-atlas-caribbean-places", "aria-label": "Ciudades principales del Caribe" },
                         caribbeanPlaces.map(place => {
-                            const showPlaceLabel = zoomScale >= 8 && CARIBBEAN_PLACE_LABEL_PRIORITY.has(place.label);
+                            const showPlaceLabel = false;
                             return e("g", {
                                 key: `${place.code}-${place.label}`,
                                 className: `wxm-atlas-place-node is-tier-${place.tier} ${showPlaceLabel ? "has-label" : "is-dot-only"}`,
@@ -778,9 +774,7 @@
                         originPoint && atlasMode === "world"
                             ? e("g", { className: "wxm-atlas-origin", transform: `translate(${originPoint[0]}, ${originPoint[1]})` },
                                 e("circle", { r: 22, className: "wxm-atlas-origin-halo" }),
-                                e("circle", { r: 9, className: "wxm-atlas-origin-core" }),
-                                e("text", { x: -26, y: 34 }, "REPUBLICA"),
-                                e("text", { x: -26, y: 49 }, "DOMINICANA")
+                                e("circle", { r: 9, className: "wxm-atlas-origin-core" })
                             )
                             : null,
                         !compact && atlasMode === "world" ? topRoutes.map(route => e(NodeLabel, {

@@ -66,7 +66,7 @@ As of World Atlas Polish 1.1, Caribbean focus mode is treated as an inspection m
 
 - animated transmission routes are hidden while the Caribbean is focused, so they do not cover islands, labels or connection nodes;
 - the internal side panel is hidden in Caribbean focus, because the dashboard already has a Live Connections panel outside the map;
-- city/place labels are rendered for key Caribbean and Caribbean-coast locations such as Santo Domingo, Santiago, Punta Cana, San Juan, La Habana, Kingston, Nassau, Willemstad, Cartagena and Panama City;
+- city/place nodes are rendered for key Caribbean and Caribbean-coast locations such as Santo Domingo, Santiago, Punta Cana, San Juan, La Habana, Kingston, Nassau, Willemstad, Cartagena and Panama City;
 - the zoom ceiling is increased to support closer inspection of small islands and territories;
 - compact Atlas styling is driven by component width, not only browser viewport width, because the CMS analytics grid can place the map inside a narrower card on desktop.
 
@@ -82,6 +82,14 @@ As of World Atlas Polish 1.2, Caribbean focus mode is visually restrained:
 - global transmission routes and moving pulse dots are not rendered in Caribbean focus; route animation is reserved for the `Mundo` broadcast view;
 - CSS also keeps a defensive hide rule for older runtime copies, but the source of truth is the React mode condition.
 
+As of World Atlas Polish 1.3, the Atlas uses clean-label behavior:
+
+- no country, route, city or locality name is rendered permanently on top of the map;
+- global route destinations remain as small markers, but their labels are not visible until an interaction pattern is added;
+- country/island names are exposed through hover tooltip and click/selected context instead of fixed text;
+- Caribbean city/place nodes are visual dots only by default, with future tooltip/drilldown interaction planned;
+- the Dominican Republic origin halo remains available in `Mundo`, but its text label is no longer rendered permanently.
+
 The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as the active source.
 
 ## Rules
@@ -96,6 +104,20 @@ The duplicate folder `v2/cms/cms/` is legacy backup only and must not be used as
 - In Caribbean focus, do not display route animations over the islands. Routes belong to global broadcast mode, not inspection mode.
 - In Caribbean focus, do not use large white nodes or full label dumps. The visual priority is country shape, border readability and a small set of high-value labels.
 - In Caribbean focus, do not render the global origin halo/core over Dominican Republic. Use the Caribbean node/place layers instead.
+- Do not render permanent geographic labels in default map state. Names belong in hover tooltips, selected-country panels, side lists or drilldown sheets.
+- City, town and locality layers must be progressive: country first, then region/province, then city/locality only after user zoom or selection.
+- City/locality analytics must be aggregated and privacy-safe. Do not show personal-level location or exact listener coordinates.
+
+## Drilldown Layer Strategy
+
+Recommended hierarchy for future analytics:
+
+1. Country layer: active/inactive country fill, aggregated listener count and listening time.
+2. Region/province layer: shown only after selecting a country or zooming beyond the country threshold.
+3. City layer: clustered markers, hover tooltip and selected city panel; no permanent label dumps.
+4. Locality/town layer: optional future layer for admin-only analytics, gated by privacy thresholds and disabled for public dashboards.
+
+Minimum privacy rule: only display region/city/locality metrics when the aggregated sample is large enough to avoid identifying individual listeners.
 
 ## Next Cartography Upgrade
 

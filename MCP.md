@@ -1042,6 +1042,29 @@ Regla:
 
 - Antes de abrir nuevas fases visuales del CMS, la interfaz debe conservar semantica navegable: ningun input sin etiqueta, ningun boton sin nombre, tabs con `aria-controls`, paneles ocultos con `hidden/aria-hidden` y sin overflow horizontal.
 
+## Fase CMS Analytics 2.6.4 - World Atlas Clean Labels - 2026-08-19
+
+Objetivo:
+
+- Corregir la regresion visual del World Atlas donde nombres de paises, ciudades y rutas volvian a renderizarse de forma permanente sobre el mapa, saturando Caribe y rutas globales.
+
+Implementado:
+
+- `v2/cms/assets/react/WxmWorldAtlasMap.jsx` y runtime:
+  - eliminan etiquetas fijas de destinos globales como Miami, New York, Mexico City, Barcelona y Dubai;
+  - mantienen los destinos como marcadores discretos sin texto permanente;
+  - eliminan el texto fijo `REPUBLICA DOMINICANA` del origen global para que el mapa no arranque contaminado visualmente;
+  - en modo Caribe, las islas/paises solo muestran nombre cuando estan seleccionados;
+  - las ciudades/localidades del Caribe quedan como puntos discretos sin nombre fijo para evitar montajes sobre Republica Dominicana, Haiti, Puerto Rico, Cuba y Antillas Menores.
+- Se sincroniza la ruta principal `v2/cms/` y la copia `v2/cms/cms/` para evitar diferencias al servir `/cms/`.
+
+Regla:
+
+- El mapa debe cargar limpio. Los nombres geograficos pertenecen a tooltip, clic/seleccion, panel lateral o hoja de detalle, no a texto permanente encima del SVG.
+- La expansion a ciudades, pueblos y localidades debe ser por capas progresivas: pais -> region/provincia -> ciudad -> localidad.
+- Las capas de ciudad/localidad deben ser agregadas y privadas: no mostrar ubicacion exacta ni datos con muestra pequena.
+- La prioridad visual del Atlas es lectura geografica y decision operativa; los efectos neon y marcadores no deben tapar paises ni islas.
+
 ## Git Baseline Y Flujo Post-Git - 2026-06-10
 
 Objetivo:
