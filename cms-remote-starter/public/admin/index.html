@@ -338,6 +338,8 @@
         <div id="adminActions" class="actions hidden">
           <button type="button" id="refreshCms">Refrescar CMS</button>
           <button type="button" id="refreshAnalytics">Analytics</button>
+          <button type="button" id="refreshServer">Estado servidor</button>
+          <button type="button" id="refreshAudit">Auditoria</button>
           <a class="link-button secondary" href="/wxm-cms.json" target="_blank" rel="noreferrer">JSON publico</a>
           <a class="link-button secondary" href="/health" target="_blank" rel="noreferrer">Health</a>
           <button type="button" id="logout" class="secondary wide">Cerrar sesion</button>
@@ -373,6 +375,23 @@
           <label for="jsonPreview">Vista segura del contrato CMS</label>
           <textarea id="jsonPreview" readonly spellcheck="false" placeholder="Inicia sesion para cargar /api/cms/current"></textarea>
         </section>
+
+        <section class="card" style="margin-top:18px">
+          <div class="panel-head">
+            <h2>Seguridad y auditoria</h2>
+            <span class="eyebrow">Fase 5.1</span>
+          </div>
+          <div class="split">
+            <div>
+              <label>Hardening del servidor</label>
+              <ul id="hardeningList" class="mini-list"></ul>
+            </div>
+            <div>
+              <label>Auditoria reciente</label>
+              <ul id="auditList" class="mini-list"></ul>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -386,6 +405,8 @@
       message: document.getElementById("message"),
       refreshCms: document.getElementById("refreshCms"),
       refreshAnalytics: document.getElementById("refreshAnalytics"),
+      refreshServer: document.getElementById("refreshServer"),
+      refreshAudit: document.getElementById("refreshAudit"),
       logout: document.getElementById("logout"),
       metricStatus: document.getElementById("metricStatus"),
       metricSource: document.getElementById("metricSource"),
@@ -397,11 +418,13 @@
       metricApp: document.getElementById("metricApp"),
       countriesList: document.getElementById("countriesList"),
       playersList: document.getElementById("playersList"),
+      hardeningList: document.getElementById("hardeningList"),
+      auditList: document.getElementById("auditList"),
       updatedAt: document.getElementById("updatedAt"),
       jsonPreview: document.getElementById("jsonPreview")
     };
 
-    const state = { authed: false };
+    const state = { authed: false, csrfToken: "" };
 
     function setMessage(text, type = "") {
       els.message.textContent = text || "";
@@ -419,9 +442,13 @@
     }
 
     async function api(path, options = {}) {
+      const headers = options.body ? { "Content-Type": "application/json" } : {};
+      if (state.csrfToken && options.method && options.method !== "GET" && !path.includes("/api/auth/login")) {
+        headers["X-WXM-CSRF"] = state.csrfToken;
+      }
       const response = await fetch(path, {
         credentials: "include",
-        headers: options.body ? { "Content-Type": "application/json" } : undefined,
+        headers: Object.keys(headers).length ? headers : undefined,
         ...options
       });
       const contentType = response.headers.get("content-type") || "";
@@ -477,6 +504,39 @@
       els.updatedAt.textContent = `Analytics ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
     }
 
+    function renderHardening(payload) {
+      const hardening = payload?.hardening || {};
+      const rows = [
+        { name: "CSRF", count: hardening.csrf ? "Activo" : "Pendiente" },
+        { name: "CSP", count: hardening.csp ? "Activo" : "Pendiente" },
+        { name: "Cookie segura", count: hardening.secureCookie ? "Produccion" : "Local/dev" },
+        { name: "Password hash", count: hardening.passwordHashConfigured ? "Configurado" : "Fallback" },
+        { name: "Password plano", count: hardening.plainPasswordFallback ? "Evitar produccion" : "No activo" },
+        { name: "Origins", count: Array.isArray(hardening.allowedOrigins) ? hardening.allowedOrigins.join(", ") : "--" }
+      ];
+      renderList(els.hardeningList, rows, "Sin estado de seguridad");
+    }
+
+    function renderAudit(payload) {
+      els.auditList.replaceChildren();
+      const rows = Array.isArray(payload?.entries) ? payload.entries.slice(0, 8) : [];
+      if (!rows.length) {
+        const li = document.createElement("li");
+        li.textContent = "Sin eventos de auditoria";
+        els.auditList.append(li);
+        return;
+      }
+      rows.forEach(row => {
+        const li = document.createElement("li");
+        const label = document.createElement("strong");
+        const value = document.createElement("span");
+        label.textContent = row.action || "evento";
+        value.textContent = row.ts ? new Date(row.ts).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" }) : "--";
+        li.append(label, value);
+        els.auditList.append(li);
+      });
+    }
+
     async function loadCms() {
       try {
         setMessage("Cargando contrato CMS protegido...");
@@ -500,13 +560,32 @@
       }
     }
 
+    async function loadServerStatus() {
+      try {
+        const payload = await api("/api/admin/status");
+        renderHardening(payload);
+      } catch (error) {
+        renderList(els.hardeningList, [], "Estado no disponible");
+      }
+    }
+
+    async function loadAudit() {
+      try {
+        const payload = await api("/api/admin/audit?limit=20");
+        renderAudit(payload);
+      } catch (error) {
+        renderAudit({ entries: [] });
+      }
+    }
+
     async function checkStatus() {
       try {
         const payload = await api("/api/auth/status");
+        state.csrfToken = payload.csrfToken || "";
         setAuthed(Boolean(payload.authenticated));
         if (payload.authenticated) {
           setMessage("Sesion recuperada.", "ok");
-          await Promise.allSettled([loadCms(), loadAnalytics()]);
+          await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit()]);
         } else {
           setMessage("Inicia sesion para administrar el CMS remoto.");
         }
@@ -523,11 +602,13 @@
         await api("/api/auth/login", {
           method: "POST",
           body: JSON.stringify({ password: els.password.value })
+        }).then(payload => {
+          state.csrfToken = payload.csrfToken || "";
         });
         els.password.value = "";
         setAuthed(true);
         setMessage("Sesion iniciada.", "ok");
-        await Promise.allSettled([loadCms(), loadAnalytics()]);
+        await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit()]);
       } catch (error) {
         setAuthed(false);
         setMessage(`Login fallido: ${error.message}`, "error");
@@ -536,8 +617,11 @@
 
     els.refreshCms.addEventListener("click", loadCms);
     els.refreshAnalytics.addEventListener("click", loadAnalytics);
+    els.refreshServer.addEventListener("click", loadServerStatus);
+    els.refreshAudit.addEventListener("click", loadAudit);
     els.logout.addEventListener("click", async () => {
       try { await api("/api/auth/logout", { method: "POST" }); } catch (_) {}
+      state.csrfToken = "";
       setAuthed(false);
       setMessage("Sesion cerrada.");
     });

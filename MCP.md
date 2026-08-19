@@ -133,6 +133,60 @@ Pendiente recomendado:
 - Conectar Analytics a backend persistente real.
 - Endurecer CMS Remote Admin antes de exponerlo en hosting publico.
 
+## Fase 5.1 - CMS Remote Admin Hardening Base - 2026-08-20
+
+Objetivo:
+
+- Convertir el `cms-remote-starter` en una base remota mas seria antes de hosting publico.
+- Proteger mutaciones admin contra CSRF.
+- Agregar trazabilidad basica sin guardar IP cruda.
+- Dejar el panel remoto mostrando estado de seguridad y auditoria.
+
+Implementado:
+
+- Token CSRF por sesion:
+  - `POST /api/auth/login` devuelve `csrfToken`.
+  - `GET /api/auth/status` devuelve `csrfToken` si la sesion es valida.
+  - Mutaciones admin requieren header `X-WXM-CSRF`.
+- Mutaciones protegidas:
+  - `POST /api/auth/logout`
+  - `POST /api/cms/publish`
+  - `POST /api/cms/rollback`
+  - `POST /api/assets/upload`
+- Rate limit basico para intentos de login mediante `WXM_CMS_LOGIN_MAX_ATTEMPTS`.
+- Auditoria admin pseudonima:
+  - archivo local `data/audit/admin.ndjson`;
+  - endpoint protegido `GET /api/admin/audit`;
+  - no muestra IP cruda, usa hash pseudonimo.
+- Endpoint protegido `GET /api/admin/status` con estado de hardening.
+- CSP base en respuestas del servidor remoto.
+- Admin remoto muestra:
+  - hardening del servidor;
+  - auditoria reciente;
+  - botones para refrescar estado y auditoria.
+- Smoke de interfaz valida ahora el contrato del Admin remoto.
+
+Validacion:
+
+- `node --check cms-remote-starter/server.js`: OK.
+- Flujo local temporal:
+  - login OK con `csrfToken`;
+  - status protegido OK;
+  - admin status OK;
+  - logout sin CSRF rechazado con `403 csrf_required`;
+  - audit protegido OK;
+  - logout con CSRF OK.
+- `scripts/smoke-check.sh`: OK.
+
+Pendiente para produccion:
+
+- Base de datos real.
+- RBAC/roles por usuario.
+- CSRF con cookies `Secure` obligatorias detras de HTTPS real.
+- Auditoria durable en base de datos.
+- Hash de password con KDF fuerte (`argon2`/`bcrypt`) cuando se permita dependencia externa.
+- Backups, rotacion de logs y alertas.
+
 ## Fase actual
 
 Estado al 2026-06-02: Fase 1 y Fase 1.5 estabilizadas, Fase 2 avanzada con CMC local, CMS UI local, modulos editoriales/media renderizados en la app y Analytics/CMS local organizada en vistas operativas. Backend remoto de recoleccion pendiente.

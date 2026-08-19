@@ -4,6 +4,9 @@ Servidor minimo para convertir el CMS local en una operacion remota segura:
 
 - Publica `GET /wxm-cms.json` para que la app Android/Web lea configuracion por HTTPS.
 - Protege escritura con login y cookie `HttpOnly`.
+- Protege mutaciones admin con token CSRF por sesion.
+- Limita intentos de login por ventana de tiempo.
+- Registra auditoria admin pseudonima en NDJSON.
 - Valida contrato antes de publicar.
 - Guarda revision historica y permite rollback.
 - Recibe analytics anonimos por `POST /api/analytics/ingest`.
@@ -29,6 +32,45 @@ Endpoints locales:
 
 La consola admin actual es intencionalmente ligera: sirve para verificar servidor, sesion, JSON publicado y resumen de analytics. El editor visual completo sigue viviendo en el CMS local hasta migrarlo a una app admin con roles, auditoria y base de datos.
 
+## Seguridad Admin
+
+El starter incluye una capa de hardening sin dependencias externas:
+
+- cookie `HttpOnly` firmada con HMAC;
+- `SameSite=Lax`;
+- `Secure` configurable en produccion;
+- token CSRF retornado por `POST /api/auth/login` y `GET /api/auth/status`;
+- mutaciones protegidas por header `X-WXM-CSRF`;
+- rate limit basico de login;
+- CSP base para el admin remoto;
+- auditoria admin sin IP cruda.
+
+Endpoints protegidos nuevos:
+
+```text
+GET /api/admin/status
+GET /api/admin/audit?limit=80
+```
+
+Mutaciones que requieren `X-WXM-CSRF`:
+
+```text
+POST /api/auth/logout
+POST /api/cms/publish
+POST /api/cms/rollback
+POST /api/assets/upload
+```
+
+Ejemplo:
+
+```bash
+curl -X POST https://tu-dominio.com/api/cms/publish \
+  -H 'Content-Type: application/json' \
+  -H 'Cookie: wxm_session=...' \
+  -H 'X-WXM-CSRF: token-devuelto-por-login' \
+  --data-binary @wxm-cms.json
+```
+
 ## Produccion
 
 1. Copia `.env.example` a `.env` en el servidor.
@@ -37,7 +79,8 @@ La consola admin actual es intencionalmente ligera: sirve para verificar servido
 4. Sirve siempre detras de HTTPS.
 5. Configura `WXM_CMS_ALLOWED_ORIGINS` con el dominio real de la app/web.
 6. Configura `WXM_CMS_PUBLIC_BASE_URL` con el dominio publico HTTPS del CMS.
-7. Publica el endpoint en la app: `https://tu-dominio.com/wxm-cms.json`.
+7. Ajusta `WXM_CMS_LOGIN_MAX_ATTEMPTS` si necesitas una politica distinta.
+8. Publica el endpoint en la app: `https://tu-dominio.com/wxm-cms.json`.
 
 Generar hash de password:
 

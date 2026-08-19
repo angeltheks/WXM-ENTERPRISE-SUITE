@@ -13,10 +13,14 @@ const UPLOAD_DIR = path.join(PUBLIC_DIR, "uploads");
 const CURRENT_FILE = path.join(DATA_DIR, "current", "wxm-cms.json");
 const REVISION_DIR = path.join(DATA_DIR, "revisions");
 const ANALYTICS_DIR = path.join(DATA_DIR, "analytics");
+const AUDIT_DIR = path.join(DATA_DIR, "audit");
+const AUDIT_FILE = path.join(AUDIT_DIR, "admin.ndjson");
 const MAX_JSON_BYTES = 220 * 1024;
 const MAX_ASSET_JSON_BYTES = 2 * 1024 * 1024;
 const MAX_ASSET_BYTES = 900 * 1024;
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+const LOGIN_WINDOW_MS = 10 * 60 * 1000;
+const LOGIN_MAX_ATTEMPTS = Number.parseInt(process.env.WXM_CMS_LOGIN_MAX_ATTEMPTS || "8", 10);
 const ALLOWED_ORIGINS = (process.env.WXM_CMS_ALLOWED_ORIGINS || "*")
     .split(",")
     .map(value => value.trim())
@@ -53,14 +57,17 @@ const COUNTRY_CODES = {
 };
 
 const analyticsRate = new Map();
+const loginRate = new Map();
 
 fs.mkdirSync(path.dirname(CURRENT_FILE), { recursive: true });
 fs.mkdirSync(REVISION_DIR, { recursive: true });
 fs.mkdirSync(ANALYTICS_DIR, { recursive: true });
+fs.mkdirSync(AUDIT_DIR, { recursive: true });
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 function securityHeaders(extra = {}) {
     return {
+        "Content-Security-Policy": "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
         "Referrer-Policy": "no-referrer",
@@ -77,7 +84,7 @@ function corsHeaders(req) {
         ? {
             "Access-Control-Allow-Origin": allowAll ? (origin || "*") : origin,
             "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Headers": "Content-Type, X-WXM-CSRF",
             "Access-Control-Allow-Credentials": "true",
             "Vary": "Origin"
         }
@@ -125,7 +132,11 @@ function readBody(req, maxBytes = MAX_JSON_BYTES) {
 async function readJson(req, maxBytes = MAX_JSON_BYTES) {
     const raw = await readBody(req, maxBytes);
     if (!raw.trim()) return {};
-    return JSON.parse(raw);
+    try {
+        return JSON.parse(raw);
+    } catch {
+        throw Object.assign(new Error("invalid_json"), { status: 400 });
+    }
 }
 
 function parseCookies(req) {
@@ -152,8 +163,13 @@ function createSessionCookie() {
     return `wxm_session=${encodeURIComponent(signed)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}${secure}`;
 }
 
+function clearSessionCookie() {
+    const secure = SECURE_COOKIE ? "; Secure" : "";
+    return `wxm_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${secure}`;
+}
+
 function hasValidSession(req) {
-    const token = parseCookies(req).wxm_session;
+    const token = getSessionToken(req);
     if (!token) return false;
     const parts = token.split(".");
     if (parts.length !== 3) return false;
@@ -165,9 +181,36 @@ function hasValidSession(req) {
     return ok && Number(parts[0]) > Date.now();
 }
 
+function getSessionToken(req) {
+    return parseCookies(req).wxm_session || "";
+}
+
+function createCsrfToken(req) {
+    const token = getSessionToken(req);
+    if (!token || !hasValidSession(req)) return "";
+    const parts = token.split(".");
+    const value = `${parts[0]}.${parts[1]}`;
+    return `${value}.${hmac(`csrf.${value}`)}`;
+}
+
+function csrfMatches(req) {
+    const provided = String(req.headers["x-wxm-csrf"] || "");
+    if (!provided) return false;
+    const expected = createCsrfToken(req);
+    if (!expected || provided.length !== expected.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+}
+
 function requireAuth(req, res) {
     if (hasValidSession(req)) return true;
     sendJson(req, res, 401, { ok: false, error: "auth_required" });
+    return false;
+}
+
+function requireCsrf(req, res) {
+    if (csrfMatches(req)) return true;
+    writeAudit("csrf_rejected", req, { path: new URL(req.url, `http://${req.headers.host || "localhost"}`).pathname });
+    sendJson(req, res, 403, { ok: false, error: "csrf_required" });
     return false;
 }
 
@@ -289,6 +332,63 @@ function validateContract(contract) {
 
 function sha256(value) {
     return crypto.createHash("sha256").update(value).digest("hex");
+}
+
+function clientKey(req) {
+    return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim();
+}
+
+function maskedClient(req) {
+    return sha256(`${clientKey(req)}:${SESSION_SECRET}`).slice(0, 16);
+}
+
+function checkLoginRate(req) {
+    const key = clientKey(req);
+    const now = Date.now();
+    const bucket = loginRate.get(key) || { resetAt: now + LOGIN_WINDOW_MS, count: 0 };
+    if (bucket.resetAt < now) {
+        bucket.resetAt = now + LOGIN_WINDOW_MS;
+        bucket.count = 0;
+    }
+    bucket.count += 1;
+    loginRate.set(key, bucket);
+    return {
+        ok: bucket.count <= LOGIN_MAX_ATTEMPTS,
+        retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000))
+    };
+}
+
+function resetLoginRate(req) {
+    loginRate.delete(clientKey(req));
+}
+
+function auditDetails(details = {}) {
+    return Object.fromEntries(Object.entries(details)
+        .filter(([, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => [text(key, 40), typeof value === "number" ? value : text(value, 220)]));
+}
+
+function writeAudit(action, req, details = {}) {
+    const entry = {
+        ts: new Date().toISOString(),
+        action: text(action, 80),
+        client: maskedClient(req),
+        userAgent: text(req.headers["user-agent"], 180),
+        details: auditDetails(details)
+    };
+    fs.appendFileSync(AUDIT_FILE, JSON.stringify(entry) + "\n", { mode: 0o640 });
+}
+
+function recentAudit(limit = 80) {
+    if (!fs.existsSync(AUDIT_FILE)) return [];
+    const lines = fs.readFileSync(AUDIT_FILE, "utf8").split("\n").filter(Boolean);
+    return lines.slice(-Math.max(1, Math.min(limit, 200))).reverse().map(line => {
+        try {
+            return JSON.parse(line);
+        } catch {
+            return { ts: "", action: "corrupted_audit_line", client: "", details: {} };
+        }
+    });
 }
 
 function writeAtomic(file, content) {
@@ -635,17 +735,70 @@ async function route(req, res) {
 
     if (req.method === "POST" && pathname === "/api/auth/login") {
         if (!PASSWORD_HASH && !PASSWORD_PLAIN) return sendJson(req, res, 503, { ok: false, error: "admin_password_not_configured" });
+        const rate = checkLoginRate(req);
+        if (!rate.ok) {
+            writeAudit("login_rate_limited", req);
+            return sendJson(req, res, 429, { ok: false, error: "rate_limited", retryAfterSeconds: rate.retryAfterSeconds }, { "Retry-After": String(rate.retryAfterSeconds) });
+        }
         const body = await readJson(req);
-        if (!passwordMatches(body.password)) return sendJson(req, res, 401, { ok: false, error: "invalid_credentials" });
-        return sendJson(req, res, 200, { ok: true }, { "Set-Cookie": createSessionCookie() });
+        if (!passwordMatches(body.password)) {
+            writeAudit("login_failed", req);
+            return sendJson(req, res, 401, { ok: false, error: "invalid_credentials" });
+        }
+        resetLoginRate(req);
+        const cookie = createSessionCookie();
+        const sessionReq = { ...req, headers: { ...req.headers, cookie } };
+        writeAudit("login_success", req);
+        return sendJson(req, res, 200, { ok: true, csrfToken: createCsrfToken(sessionReq) }, { "Set-Cookie": cookie });
     }
 
     if (req.method === "POST" && pathname === "/api/auth/logout") {
-        return sendJson(req, res, 200, { ok: true }, { "Set-Cookie": "wxm_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0" });
+        if (hasValidSession(req) && !requireCsrf(req, res)) return;
+        writeAudit("logout", req);
+        return sendJson(req, res, 200, { ok: true }, { "Set-Cookie": clearSessionCookie() });
     }
 
     if (req.method === "GET" && pathname === "/api/auth/status") {
-        return sendJson(req, res, 200, { ok: true, authenticated: hasValidSession(req) });
+        const authenticated = hasValidSession(req);
+        return sendJson(req, res, 200, {
+            ok: true,
+            authenticated,
+            csrfToken: authenticated ? createCsrfToken(req) : "",
+            hardening: {
+                secureCookie: SECURE_COOKIE,
+                allowedOrigins: ALLOWED_ORIGINS,
+                publicBaseConfigured: Boolean(PUBLIC_BASE_URL),
+                passwordHashConfigured: Boolean(PASSWORD_HASH),
+                loginMaxAttempts: LOGIN_MAX_ATTEMPTS
+            }
+        });
+    }
+
+    if (req.method === "GET" && pathname === "/api/admin/status") {
+        if (!requireAuth(req, res)) return;
+        return sendJson(req, res, 200, {
+            ok: true,
+            service: "wxm-cms-remote",
+            hasPublishedCms: fs.existsSync(CURRENT_FILE),
+            revisions: listRevisions().length,
+            uploadsEnabled: true,
+            analyticsFiles: fs.existsSync(ANALYTICS_DIR) ? fs.readdirSync(ANALYTICS_DIR).filter(name => name.endsWith(".ndjson")).length : 0,
+            auditEntries: recentAudit(1).length ? "available" : "empty",
+            hardening: {
+                csrf: true,
+                csp: true,
+                secureCookie: SECURE_COOKIE,
+                passwordHashConfigured: Boolean(PASSWORD_HASH),
+                plainPasswordFallback: Boolean(PASSWORD_PLAIN && !PASSWORD_HASH),
+                allowedOrigins: ALLOWED_ORIGINS
+            }
+        });
+    }
+
+    if (req.method === "GET" && pathname === "/api/admin/audit") {
+        if (!requireAuth(req, res)) return;
+        const limit = Number.parseInt(url.searchParams.get("limit") || "80", 10);
+        return sendJson(req, res, 200, { ok: true, entries: recentAudit(limit) });
     }
 
     if (req.method === "GET" && pathname === "/api/cms/current") {
@@ -656,6 +809,7 @@ async function route(req, res) {
 
     if (req.method === "POST" && pathname === "/api/cms/publish") {
         if (!requireAuth(req, res)) return;
+        if (!requireCsrf(req, res)) return;
         const contract = await readJson(req);
         const validation = validateContract(contract);
         if (!validation.ok) return sendJson(req, res, 422, { ok: false, ...validation });
@@ -665,6 +819,7 @@ async function route(req, res) {
         const revisionFile = `wxm-cms-${stamp}-${hash.slice(0, 12)}.json`;
         fs.writeFileSync(path.join(REVISION_DIR, revisionFile), payload, { mode: 0o640 });
         writeAtomic(CURRENT_FILE, payload);
+        writeAudit("cms_publish", req, { revisionFile, sha256: hash.slice(0, 16), warnings: validation.warnings.length });
         return sendJson(req, res, 200, { ok: true, revisionFile, sha256: hash, warnings: validation.warnings });
     }
 
@@ -675,16 +830,19 @@ async function route(req, res) {
 
     if (req.method === "POST" && pathname === "/api/cms/rollback") {
         if (!requireAuth(req, res)) return;
+        if (!requireCsrf(req, res)) return;
         const body = await readJson(req);
         const file = path.basename(String(body.file || ""));
         if (!listRevisions().includes(file)) return sendJson(req, res, 404, { ok: false, error: "revision_not_found" });
         const payload = fs.readFileSync(path.join(REVISION_DIR, file), "utf8");
         writeAtomic(CURRENT_FILE, payload);
+        writeAudit("cms_rollback", req, { restored: file });
         return sendJson(req, res, 200, { ok: true, restored: file });
     }
 
     if (req.method === "POST" && pathname === "/api/assets/upload") {
         if (!requireAuth(req, res)) return;
+        if (!requireCsrf(req, res)) return;
         const body = await readJson(req, MAX_ASSET_JSON_BYTES);
         const image = decodeDataImage(body.image);
         if (!image) return sendJson(req, res, 422, { ok: false, error: "invalid_or_too_large_image" });
@@ -697,6 +855,7 @@ async function route(req, res) {
         if (!file.startsWith(UPLOAD_DIR)) return sendJson(req, res, 403, { ok: false, error: "invalid_asset_path" });
         writeAtomic(file, image.buffer);
         const publicPath = `/uploads/${month}/${filename}`;
+        writeAudit("asset_upload", req, { path: publicPath, bytes: image.buffer.length, mime: image.mime });
         return sendJson(req, res, 201, {
             ok: true,
             path: publicPath,

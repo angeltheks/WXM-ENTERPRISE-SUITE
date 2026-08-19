@@ -34,6 +34,7 @@ const appHtml = read("v2/index.html");
 const cmsHtml = read("v2/cms/index.html");
 const cmsCss = read("v2/cms/assets/css/cms.css");
 const atlasRuntime = read("v2/cms/assets/react/WxmWorldAtlasMap.runtime.js");
+const remoteAdminHtml = read("cms-remote-starter/public/admin/index.html");
 
 ok("Checking mobile app interface contract");
 requiredIds(appHtml, "v2/index.html", [
@@ -117,5 +118,26 @@ ok("Checking active CMS and legacy mirror parity");
   ["v2/cms/assets/css/cms.css", "v2/cms/cms/assets/css/cms.css"],
   ["v2/cms/assets/react/WxmWorldAtlasMap.runtime.js", "v2/cms/cms/assets/react/WxmWorldAtlasMap.runtime.js"],
 ].forEach(([left, right]) => assertSameFile(left, right));
+
+ok("Checking CMS Remote Admin contract");
+requiredIds(remoteAdminHtml, "cms-remote-starter/public/admin/index.html", [
+  "loginForm",
+  "adminActions",
+  "refreshCms",
+  "refreshAnalytics",
+  "refreshServer",
+  "refreshAudit",
+  "hardeningList",
+  "auditList",
+  "jsonPreview",
+]);
+[
+  "X-WXM-CSRF",
+  "/api/auth/login",
+  "/api/auth/status",
+  "/api/admin/status",
+  "/api/admin/audit",
+  "/api/auth/logout",
+].forEach((token) => assert(remoteAdminHtml.includes(token), `Remote Admin is missing contract token: ${token}`));
 
 ok("OK");

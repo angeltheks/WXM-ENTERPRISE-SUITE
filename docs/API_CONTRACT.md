@@ -39,12 +39,31 @@ Current starter endpoints:
 POST /api/auth/login
 POST /api/auth/logout
 GET  /api/auth/status
+GET  /api/admin/status
+GET  /api/admin/audit
 GET  /api/cms/current
 POST /api/cms/publish
+GET  /api/cms/revisions
+POST /api/cms/rollback
+POST /api/assets/upload
+GET  /api/assets/list
 GET  /api/analytics/summary
 POST /api/analytics/ingest
 GET  /wxm-cms.json
 GET  /health
+```
+
+Admin mutations must send the session CSRF token:
+
+```text
+X-WXM-CSRF: <csrfToken>
+```
+
+The token is returned by:
+
+```text
+POST /api/auth/login
+GET  /api/auth/status
 ```
 
 ## Analytics Events
@@ -83,4 +102,3 @@ getNews()
 getAds()
 getUsers()
 ```
-
