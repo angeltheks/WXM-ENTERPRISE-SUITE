@@ -6,6 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { WxmFileStore } = require("./lib/storage");
+const { WxmShoutcastConnector } = require("./lib/shoutcast");
 
 const PORT = Number.parseInt(process.env.PORT || "8787", 10);
 const DATA_DIR = path.resolve(process.env.WXM_CMS_DATA_DIR || path.join(__dirname, "data"));
@@ -33,6 +34,7 @@ const SECURE_COOKIE = process.env.WXM_CMS_SECURE_COOKIE === "1";
 const PUBLIC_BASE_URL = process.env.WXM_CMS_PUBLIC_BASE_URL || "";
 const ANALYTICS_LOOKBACK_DAYS = 30;
 const LIVE_CONNECTION_WINDOW_MS = 5 * 60 * 1000;
+const shoutcastConnector = new WxmShoutcastConnector(process.env);
 const COUNTRY_CODES = {
     "Argentina": "AR",
     "Brazil": "BR",
@@ -662,6 +664,29 @@ function storageStatusPayload() {
     };
 }
 
+async function streamProviderStatusPayload() {
+    if (!shoutcastConnector.configured) {
+        return {
+            ok: false,
+            configured: false,
+            provider: "shoutcast-dnas",
+            error: "shoutcast_not_configured",
+            config: shoutcastConnector.safeConfig()
+        };
+    }
+    try {
+        return await shoutcastConnector.summary();
+    } catch (error) {
+        return {
+            ok: false,
+            configured: true,
+            provider: "shoutcast-dnas",
+            error: error.message,
+            config: shoutcastConnector.safeConfig()
+        };
+    }
+}
+
 function serveStatic(req, res, pathname) {
     const requested = pathname === "/admin" || pathname === "/admin/" ? "/admin/index.html" : pathname;
     const file = path.resolve(PUBLIC_DIR, `.${requested}`);
@@ -800,6 +825,10 @@ async function route(req, res) {
                 passwordHashConfigured: Boolean(PASSWORD_HASH),
                 plainPasswordFallback: Boolean(PASSWORD_PLAIN && !PASSWORD_HASH),
                 allowedOrigins: ALLOWED_ORIGINS
+            },
+            streamProvider: {
+                provider: "shoutcast-dnas",
+                ...shoutcastConnector.safeConfig()
             }
         });
     }
@@ -813,6 +842,11 @@ async function route(req, res) {
     if (req.method === "GET" && pathname === "/api/admin/storage") {
         if (!requireAuth(req, res)) return;
         return sendJson(req, res, 200, { ok: true, ...storageStatusPayload() });
+    }
+
+    if (req.method === "GET" && pathname === "/api/stream/shoutcast/summary") {
+        if (!requireAuth(req, res)) return;
+        return sendJson(req, res, 200, await streamProviderStatusPayload());
     }
 
     if (req.method === "POST" && pathname === "/api/admin/snapshot") {

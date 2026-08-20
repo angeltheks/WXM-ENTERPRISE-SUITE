@@ -12,6 +12,7 @@ Servidor minimo para convertir el CMS local en una operacion remota segura:
 - Guarda revision historica y permite rollback.
 - Recibe analytics anonimos por `POST /api/analytics/ingest`.
 - Expone resumen privado por `GET /api/analytics/summary`.
+- Expone resumen privado del proveedor SHOUTcast por `GET /api/stream/shoutcast/summary`.
 - Incluye consola admin minima en `GET /admin/` para login, estado, CMS publicado y analytics.
 
 No reemplaza un CMS final con base de datos, roles y subida de imagenes, pero deja una base real para hosting.
@@ -53,6 +54,7 @@ GET /api/admin/status
 GET /api/admin/audit?limit=80
 GET /api/admin/storage
 POST /api/admin/snapshot
+GET /api/stream/shoutcast/summary
 ```
 
 Mutaciones que requieren `X-WXM-CSRF`:
@@ -244,6 +246,53 @@ curl -X POST https://tu-dominio.com/api/admin/snapshot \
 ```
 
 Esto no reemplaza una base SQL final, pero deja el servidor preparado para migrar a SQLite/Postgres con un adaptador equivalente.
+
+## SHOUTcast DNAS
+
+La fase 5.2.1 agrega un conector protegido para leer el servidor SHOUTcast/DNAS desde el backend remoto. Esta integracion complementa analytics de la app con datos reales del servidor de streaming:
+
+- oyentes actuales del servidor;
+- peak y oyentes unicos;
+- streams activos;
+- SID principal/secundario;
+- path del stream;
+- codec, bitrate y sample rate;
+- metadata actual;
+- estado de listado publico;
+- uptime y hits del stream.
+
+Variables recomendadas:
+
+```bash
+WXM_SHOUTCAST_BASE_URL=http://jm8n.net:8024
+WXM_SHOUTCAST_SIDS=1,5
+WXM_SHOUTCAST_PRIMARY_SID=1
+WXM_SHOUTCAST_ADMIN_USER=admin
+WXM_SHOUTCAST_ADMIN_PASSWORD=tu-password-dnas
+WXM_SHOUTCAST_TIMEOUT_MS=6500
+WXM_SHOUTCAST_CACHE_TTL_MS=20000
+```
+
+Endpoint protegido:
+
+```text
+GET /api/stream/shoutcast/summary
+```
+
+Requiere cookie admin. El endpoint consulta:
+
+```text
+/statistics?json=1
+/admin.cgi?sid=<primarySid>&mode=viewjson&page=6
+```
+
+El segundo endpoint solo se llama cuando existen credenciales admin. Los authhashes se devuelven redactados (`abcd...1234`) y solo como indicador `hasAuthhash`; nunca se deben guardar completos en Git, en la app Android, en el JSON publico ni en logs.
+
+El Authhash sirve para identidad/listado SHOUTcast. No reemplaza analytics. Para el dashboard profesional se deben fusionar:
+
+- SHOUTcast/DNAS: listeners reales del servidor y metadata del stream.
+- WXM app analytics: sesiones, reproduccion, errores, app/web, referrers y retencion.
+- Futuro warehouse: paises, ciudades y cohortes agregadas sin IP visible.
 
 ## Rollback
 

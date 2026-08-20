@@ -22,6 +22,9 @@
 - Protect storage snapshots with authentication and CSRF.
 - Keep storage manifests sanitized; never expose absolute server paths or secrets.
 - Treat snapshots as sensitive operational backups.
+- Treat SHOUTcast/DNAS admin passwords and full authhash values as server-side secrets.
+- Never expose DNAS admin URLs, Basic Auth credentials or full authhashes in `/wxm-cms.json`, Android assets, WebView bridge payloads, logs or public dashboards.
+- Remote admin views may display only redacted authhash indicators and aggregate stream metrics.
 
 ## Android
 

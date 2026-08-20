@@ -1291,3 +1291,46 @@ Pendiente recomendado:
 - Agregar release workflow firmado cuando exista keystore de produccion.
 - Definir issues/milestones por fase para CMS remoto completo, analytics persistente y migracion futura a Jetpack Compose.
 - Depurar en una fase futura las copias legacy como `v2/cms/cms/`, sin hacerlo mientras sirvan como respaldo de continuidad.
+
+## Fase CMS Remoto 5.2.1 - SHOUTcast DNAS Connector - 2026-08-20
+
+Objetivo:
+
+- Integrar el servidor SHOUTcast/DNAS como fuente real de estadisticas de streaming, sin reemplazar la analitica propia de WXM App.
+- Separar claramente:
+  - SHOUTcast/DNAS: oyentes reales del servidor, peak, streams activos, metadata, codec, uptime y estado listado.
+  - WXM App analytics: sesiones de app/web, eventos de playback, errores, players, referrers y retencion.
+  - Authhash: identidad/listado SHOUTcast, no motor de analytics.
+
+Implementado:
+
+- Nuevo conector `cms-remote-starter/lib/shoutcast.js`.
+- Nuevo endpoint admin protegido:
+  - `GET /api/stream/shoutcast/summary`
+- Configuracion server-side por variables de entorno:
+  - `WXM_SHOUTCAST_BASE_URL`
+  - `WXM_SHOUTCAST_SIDS`
+  - `WXM_SHOUTCAST_PRIMARY_SID`
+  - `WXM_SHOUTCAST_ADMIN_USER`
+  - `WXM_SHOUTCAST_ADMIN_PASSWORD`
+  - `WXM_SHOUTCAST_TIMEOUT_MS`
+  - `WXM_SHOUTCAST_CACHE_TTL_MS`
+- Remote Admin agrega tarjeta `Proveedor de stream` y boton `SHOUTcast`.
+- El endpoint consulta:
+  - `/statistics?json=1`
+  - `/admin.cgi?sid=<primarySid>&mode=viewjson&page=6` si hay credenciales admin.
+- Los authhashes completos nunca se devuelven: solo `hasAuthhash` y version redactada.
+- Documentacion actualizada en README, API contract y seguridad.
+
+Regla de seguridad:
+
+- El Authhash y la clave admin DNAS son secretos operativos. No deben aparecer completos en Git, Android, WebView, JSON publico, logs ni dashboard publico.
+- Si el Authhash fue compartido en capturas o mensajes externos, conviene rotarlo desde SHOUTcast/DNAS.
+- El DNAS puede estar en HTTP si el proveedor no ofrece HTTPS, pero el CMS remoto de produccion debe estar detras de HTTPS y actuar como proxy seguro.
+
+Pendiente:
+
+- Configurar `.env` real en hosting.
+- Probar con los SIDs reales `1` y `5`.
+- Fusionar de forma controlada `streamProvider.totals.currentListeners` con el dashboard de Analytics sin ocultar la fuente del dato.
+- Agregar health badge para `streamlisted`, `streamstatus`, `backupstatus` y metadata stale.

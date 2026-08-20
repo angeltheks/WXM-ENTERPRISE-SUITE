@@ -51,6 +51,7 @@ POST /api/assets/upload
 GET  /api/assets/list
 GET  /api/analytics/summary
 POST /api/analytics/ingest
+GET  /api/stream/shoutcast/summary
 GET  /wxm-cms.json
 GET  /health
 ```
@@ -117,6 +118,55 @@ Payload:
 ```
 
 This endpoint requires authentication and `X-WXM-CSRF`.
+
+## Stream Provider APIs
+
+The remote backend can read streaming-provider telemetry server-side. These APIs are private admin endpoints and must never be exposed in the public CMS JSON consumed by the Android/Web app.
+
+```text
+GET /api/stream/shoutcast/summary
+```
+
+Response shape:
+
+```json
+{
+  "ok": true,
+  "provider": "shoutcast-dnas",
+  "source": {
+    "baseUrl": "http://jm8n.net:8024",
+    "authMode": "basic",
+    "primarySid": "1",
+    "sids": ["1", "5"]
+  },
+  "totals": {
+    "totalStreams": 2,
+    "activeStreams": 2,
+    "currentListeners": 9,
+    "peakListeners": 62,
+    "uniqueListeners": 8
+  },
+  "streams": [
+    {
+      "id": "1",
+      "role": "primary",
+      "path": "/stream",
+      "content": "audio/aacp",
+      "currentListeners": 9,
+      "peakListeners": 47,
+      "songTitle": "Artist - Title",
+      "hasAuthhash": true,
+      "authhash": "abcd...1234"
+    }
+  ]
+}
+```
+
+Security rules:
+
+- `WXM_SHOUTCAST_ADMIN_PASSWORD` and any full authhash values are server secrets.
+- The Android app, public website and `/wxm-cms.json` must never receive DNAS admin URLs, Basic Auth credentials or full authhashes.
+- The endpoint may use HTTP internally only if the DNAS provider is HTTP-only; the CMS Remote Admin itself must be served over HTTPS in production.
 
 ## Analytics Events
 

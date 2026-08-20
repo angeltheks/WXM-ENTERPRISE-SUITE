@@ -338,6 +338,7 @@
         <div id="adminActions" class="actions hidden">
           <button type="button" id="refreshCms">Refrescar CMS</button>
           <button type="button" id="refreshAnalytics">Analytics</button>
+          <button type="button" id="refreshStream">SHOUTcast</button>
           <button type="button" id="refreshServer">Estado servidor</button>
           <button type="button" id="refreshAudit">Auditoria</button>
           <button type="button" id="refreshStorage">Persistencia</button>
@@ -376,6 +377,23 @@
 
           <label for="jsonPreview">Vista segura del contrato CMS</label>
           <textarea id="jsonPreview" readonly spellcheck="false" placeholder="Inicia sesion para cargar /api/cms/current"></textarea>
+        </section>
+
+        <section class="card" style="margin-top:18px">
+          <div class="panel-head">
+            <h2>Proveedor de stream</h2>
+            <span class="eyebrow">SHOUTcast DNAS</span>
+          </div>
+          <div class="split">
+            <div>
+              <label>Estado del servidor</label>
+              <ul id="streamProviderList" class="mini-list"></ul>
+            </div>
+            <div>
+              <label>Streams detectados</label>
+              <ul id="streamList" class="mini-list"></ul>
+            </div>
+          </div>
         </section>
 
         <section class="card" style="margin-top:18px">
@@ -424,6 +442,7 @@
       message: document.getElementById("message"),
       refreshCms: document.getElementById("refreshCms"),
       refreshAnalytics: document.getElementById("refreshAnalytics"),
+      refreshStream: document.getElementById("refreshStream"),
       refreshServer: document.getElementById("refreshServer"),
       refreshAudit: document.getElementById("refreshAudit"),
       refreshStorage: document.getElementById("refreshStorage"),
@@ -439,6 +458,8 @@
       metricApp: document.getElementById("metricApp"),
       countriesList: document.getElementById("countriesList"),
       playersList: document.getElementById("playersList"),
+      streamProviderList: document.getElementById("streamProviderList"),
+      streamList: document.getElementById("streamList"),
       hardeningList: document.getElementById("hardeningList"),
       auditList: document.getElementById("auditList"),
       storageList: document.getElementById("storageList"),
@@ -525,6 +546,36 @@
       renderList(els.countriesList, analytics.countries, "Sin paises agregados");
       renderList(els.playersList, analytics.players || analytics.referrers, "Sin players agregados");
       els.updatedAt.textContent = `Analytics ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function renderStreamProvider(payload) {
+      const totals = payload?.totals || {};
+      const source = payload?.source || payload?.config || {};
+      const providerRows = payload?.ok ? [
+        { name: "Estado", count: "Conectado" },
+        { name: "Oyentes servidor", count: Number(totals.currentListeners || 0).toLocaleString("es-ES") },
+        { name: "Peak servidor", count: Number(totals.peakListeners || 0).toLocaleString("es-ES") },
+        { name: "Unicos servidor", count: Number(totals.uniqueListeners || 0).toLocaleString("es-ES") },
+        { name: "Streams activos", count: `${totals.activeStreams || 0}/${totals.totalStreams || 0}` },
+        { name: "Version", count: totals.version || "--" },
+        { name: "Auth", count: source.authMode || "public" }
+      ] : [
+        { name: "Estado", count: payload?.configured ? "Error" : "Sin configurar" },
+        { name: "Detalle", count: payload?.error || "Configura WXM_SHOUTCAST_BASE_URL" }
+      ];
+      renderList(els.streamProviderList, providerRows, "Sin estado SHOUTcast");
+
+      const streams = Array.isArray(payload?.streams) ? payload.streams : [];
+      renderList(els.streamList, streams.map(stream => ({
+        name: `SID ${stream.id} · ${stream.role || "stream"} · ${stream.path || "--"}`,
+        count: `${stream.currentListeners || 0} live · peak ${stream.peakListeners || 0} · ${stream.content || "--"}`
+      })), "Sin streams detectados");
+
+      if (payload?.ok) {
+        els.metricLive.textContent = Number(totals.currentListeners || 0).toLocaleString("es-ES");
+        els.metricPeak.textContent = `SHOUTcast peak ${Number(totals.peakListeners || 0).toLocaleString("es-ES")}`;
+      }
+      els.updatedAt.textContent = `SHOUTcast ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
     }
 
     function renderHardening(payload) {
@@ -618,6 +669,18 @@
       }
     }
 
+    async function loadStreamProvider() {
+      try {
+        setMessage("Consultando SHOUTcast DNAS...");
+        const payload = await api("/api/stream/shoutcast/summary");
+        renderStreamProvider(payload);
+        setMessage(payload.ok ? "SHOUTcast cargado." : `SHOUTcast: ${payload.error}`, payload.ok ? "ok" : "error");
+      } catch (error) {
+        renderStreamProvider({ ok: false, error: error.message });
+        setMessage(`SHOUTcast no disponible: ${error.message}`, "error");
+      }
+    }
+
     async function loadServerStatus() {
       try {
         const payload = await api("/api/admin/status");
@@ -675,7 +738,7 @@
         setAuthed(Boolean(payload.authenticated));
         if (payload.authenticated) {
           setMessage("Sesion recuperada.", "ok");
-          await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit(), loadStorage()]);
+          await Promise.allSettled([loadCms(), loadAnalytics(), loadStreamProvider(), loadServerStatus(), loadAudit(), loadStorage()]);
         } else {
           setMessage("Inicia sesion para administrar el CMS remoto.");
         }
@@ -698,7 +761,7 @@
         els.password.value = "";
         setAuthed(true);
         setMessage("Sesion iniciada.", "ok");
-        await Promise.allSettled([loadCms(), loadAnalytics(), loadServerStatus(), loadAudit(), loadStorage()]);
+        await Promise.allSettled([loadCms(), loadAnalytics(), loadStreamProvider(), loadServerStatus(), loadAudit(), loadStorage()]);
       } catch (error) {
         setAuthed(false);
         setMessage(`Login fallido: ${error.message}`, "error");
@@ -707,6 +770,7 @@
 
     els.refreshCms.addEventListener("click", loadCms);
     els.refreshAnalytics.addEventListener("click", loadAnalytics);
+    els.refreshStream.addEventListener("click", loadStreamProvider);
     els.refreshServer.addEventListener("click", loadServerStatus);
     els.refreshAudit.addEventListener("click", loadAudit);
     els.refreshStorage.addEventListener("click", loadStorage);
