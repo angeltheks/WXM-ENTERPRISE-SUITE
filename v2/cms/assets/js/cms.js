@@ -465,6 +465,7 @@ const SYSTEM_TAB_ALIASES = {
     visual: "app",
     audio: "app",
     analytics: "advanced",
+    shoutcast: "advanced",
     assets: "advanced",
     faq: "advanced"
 };
@@ -2939,6 +2940,12 @@ function bindActions() {
         button.addEventListener("click", () => {
             showPanel(button.dataset.jump);
             if (button.dataset.systemTabJump) showSystemTab(button.dataset.systemTabJump);
+            if (button.dataset.scrollTarget) {
+                window.requestAnimationFrame(() => {
+                    const target = document.getElementById(button.dataset.scrollTarget);
+                    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+            }
         });
     });
     dom.togglePreviewBtn?.addEventListener("click", () => {

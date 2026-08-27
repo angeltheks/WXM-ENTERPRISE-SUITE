@@ -53,12 +53,19 @@ The project must stay modular, secure, and ready for future MCP-compatible servi
 
 ## Current Operational State
 
-As of 2026-06-15, phase `0.6 - Auditoria Operativa De Continuidad` is complete.
+As of 2026-08-27, the active closure track is CMS Remote + CMS Local + Android App integration.
 
-- `scripts/smoke-check.sh` validates entry points, Git hygiene, secret guard, JSON contracts and JavaScript syntax.
-- CI runs the smoke check before Android debug build.
-- Android APK build is validated with the Gradle Wrapper.
-- CMS Remote Starter responds to `HEAD` and `GET` on critical public routes.
-- Current audit report lives in `docs/CURRENT_STATE_AUDIT.md`.
+- `scripts/smoke-check.sh` validates entry points, Git hygiene, secret guard, JSON contracts, JavaScript syntax and interface contracts.
+- `scripts/interface-smoke.mjs` guards app UI, CMS UI, World Atlas and CMS Remote Admin contracts.
+- `scripts/start-remote-cms.sh` starts the Remote Admin with global Node or the bundled Codex Node runtime.
+- CMS local has visible SHOUTcast navigation and keeps private SHOUTcast work behind Remote Admin.
+- CMS Remote Starter includes login, CSRF, audit, snapshots, rollback, asset upload, anonymous analytics and SHOUTcast summary endpoint.
+- Android app remains the production mobile target and must consume remote CMS with local fallback/cache.
 
-Next recommended phase: `0.7 - Smoke Visual Y Consolidacion De Copias CMS`.
+Current plan:
+
+```text
+docs/CMS_REMOTE_LOCAL_APP_COMPLETION_PLAN.md
+```
+
+Next recommended phase: finish Phase A/B operational polish, then connect real SHOUTcast + app analytics before expanding CRM, advertising or AI services.

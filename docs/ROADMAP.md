@@ -78,3 +78,19 @@ Before expanding CRM, advertising or AI services:
 - Consolidate active CMS vs legacy mirror discipline.
 - Keep analytics flowing through the remote storage adapter.
 - Harden Remote Admin auth, uploads, CSRF, audit trail and snapshots.
+
+## Current Closure Track - 2026-08-27
+
+Primary plan:
+
+```text
+docs/CMS_REMOTE_LOCAL_APP_COMPLETION_PLAN.md
+```
+
+Priority order:
+
+- Finish local/remote CMS operation first.
+- Keep SHOUTcast credentials only in Remote Admin environment variables.
+- Connect real SHOUTcast and anonymous app analytics into one dashboard.
+- Make the Android app consume remote CMS with local cache fallback.
+- Run smoke, visual QA, Android build and release report before tagging.

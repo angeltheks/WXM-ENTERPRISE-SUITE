@@ -20,10 +20,9 @@ No reemplaza un CMS final con base de datos, roles y subida de imagenes, pero de
 ## Desarrollo Local
 
 ```bash
-cd cms-remote-starter
+cd /Users/mac/AndroidProjects/Reprov2_NEXTGEN
 export WXM_CMS_ADMIN_PASSWORD='elige-un-password-local'
-export WXM_CMS_SESSION_SECRET="$(node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\")"
-npm run dev
+sh scripts/start-remote-cms.sh
 ```
 
 Endpoints locales:
@@ -33,6 +32,8 @@ Endpoints locales:
 - `http://127.0.0.1:8787/admin`
 
 La consola admin actual es intencionalmente ligera: sirve para verificar servidor, sesion, JSON publicado y resumen de analytics. El editor visual completo sigue viviendo en el CMS local hasta migrarlo a una app admin con roles, auditoria y base de datos.
+
+Si el sistema responde `zsh: command not found: node`, usa `scripts/start-remote-cms.sh` desde la raiz del proyecto. El script detecta Node global o el runtime embebido de Codex mediante `NODE_BIN`.
 
 ## Seguridad Admin
 

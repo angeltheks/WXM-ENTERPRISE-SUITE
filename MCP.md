@@ -16,6 +16,25 @@ WXM ONE RADIO debe evolucionar de reproductor web a una app de radio completa: e
 - El proxy Spotify vive en servidor HTTPS; la app movil no ejecuta PHP.
 - La reproduccion Android debe vivir en servicio nativo para segundo plano, pantalla bloqueada y controles de sistema.
 
+## Plan De Cierre CMS Local, Remote Admin Y App - 2026-08-27
+
+Objetivo: terminar la base operativa antes de abrir nuevas fases grandes. El proyecto debe poder editar contenido, publicar contrato CMS, consultar SHOUTcast de forma privada, alimentar analytics y compilar la app Android desde una sola fuente oficial.
+
+Orden de implementacion:
+
+1. Operacion y arranque: scripts que funcionen aunque macOS no tenga `node/npm` global, smoke test unico y comandos documentados.
+2. CMS local: panel ordenado por rol, entrada visible de SHOUTcast, configuracion tecnica escondida en Avanzado, FAQ operativo y validacion antes de publicar.
+3. CMS Remote Admin: login seguro, CSRF, auditoria, snapshots, rollback, assets, analytics, conector SHOUTcast y futuro panel CRUD completo.
+4. App Android: consumir contrato publicado, mantener WebView/Media3 estable, background playback, lockscreen, cache local y bridge sin romper interfaz.
+5. Cierre QA: smoke visual, smoke tecnico, build APK, reporte de pendientes y push a `dev`.
+
+Reglas:
+
+- SHOUTcast authhash, admin password y endpoints privados nunca van dentro del frontend publico ni dentro de la APK.
+- El CMS local puede mostrar estado y documentacion, pero las llamadas privadas deben pasar por `cms-remote-starter`.
+- Si el Remote Admin no esta disponible, la app debe seguir usando CMC local/cache sin romper la experiencia.
+- Las funciones futuras se activan por CMC/CMS para que WXM pueda operar solo musica hoy y ampliar contenido despues.
+
 ## Gobernanza Oficial Del Proyecto
 
 Desde 2026-06-10 existe una sola fuente de verdad:

@@ -64,6 +64,7 @@
             </div>
             <div class="header-actions">
                 <button class="ghost-btn" id="togglePreviewBtn" aria-pressed="false">Ocultar preview</button>
+                <button class="ghost-btn" data-jump="system" data-system-tab-jump="advanced" data-scroll-target="shoutcastConnector">SHOUTcast</button>
                 <button class="ghost-btn" id="reloadBtn">Recargar CMC</button>
                 <button class="primary-btn" id="saveDraftBtn">Guardar borrador</button>
             </div>
@@ -114,6 +115,12 @@
                             <strong>Stream y endpoints</strong>
                             <p>Gestiona senal principal, metadata, fallbacks y emergencia.</p>
                             <button class="small-btn" data-jump="system" data-system-tab-jump="operations">Configurar operacion</button>
+                        </article>
+                        <article class="control-card">
+                            <span>Proveedor stream</span>
+                            <strong>SHOUTcast DNAS</strong>
+                            <p>Consulta oyentes, streams, metadata y salud del servidor desde el backend remoto.</p>
+                            <button class="small-btn" data-jump="system" data-system-tab-jump="advanced" data-scroll-target="shoutcastConnector">Abrir SHOUTcast</button>
                         </article>
                         <article class="control-card">
                             <span>Contenido</span>
@@ -586,6 +593,28 @@
                                 <p>Lo que un operador necesita para mantener la senal al aire: stream, metadata, fallbacks y modo emergencia.</p>
                             </div>
                             <div class="system-stack">
+                                <article class="system-card" id="shoutcastConnector">
+                                    <div class="system-card-head">
+                                        <div>
+                                            <span class="eyebrow">Proveedor stream</span>
+                                            <h3>SHOUTcast DNAS</h3>
+                                        </div>
+                                        <small>Proxy seguro requerido</small>
+                                    </div>
+                                    <div class="operator-card compact">
+                                        <div>
+                                            <h3>Lectura protegida de estadisticas</h3>
+                                            <p>El CMS local no debe llamar directo al admin de SHOUTcast ni guardar claves. El Remote Admin actua como proxy seguro para consultar `statistics?json=1`, configuracion de streams y resumen de oyentes sin exponer password, authhash ni endpoints privados en la app.</p>
+                                        </div>
+                                        <button class="secondary-btn" data-jump="analytics">Ver analytics</button>
+                                    </div>
+                                    <div class="validation-list compact">
+                                        <p>Datos esperados: listeners actuales, oyentes unicos, peak, cancion actual, bitrate, formato, stream activo, uptime y lista de mount points.</p>
+                                        <p>Configurar en hosting: `WXM_SHOUTCAST_BASE_URL`, `WXM_SHOUTCAST_SIDS`, `WXM_SHOUTCAST_PRIMARY_SID`, `WXM_SHOUTCAST_ADMIN_USER`, `WXM_SHOUTCAST_ADMIN_PASSWORD`.</p>
+                                        <p>Endpoint privado del Remote Admin: `/api/stream/shoutcast/summary`. Requiere login admin y no se publica dentro del JSON de la app.</p>
+                                    </div>
+                                </article>
+
                                 <article class="system-card">
                                     <div class="system-card-head">
                                         <div>
@@ -909,6 +938,16 @@
                                         <li>Activa `Backend remoto` solo cuando exista API HTTPS.</li>
                                         <li>Configura ingesta y dashboard en el submenu Analytics.</li>
                                         <li>No envies datos personales; usa agregados y IDs anonimos.</li>
+                                    </ol>
+                                </details>
+                                <details class="manual-card">
+                                    <summary>SHOUTcast DNAS</summary>
+                                    <p><strong>Que es:</strong> conector privado para leer estadisticas reales del servidor SHOUTcast: oyentes, streams, metadata, peaks y estado de la senal.</p>
+                                    <p><strong>Resultado:</strong> el dashboard puede alimentar Analytics y Live Connections con datos reales sin exponer credenciales a la app publica.</p>
+                                    <ol>
+                                        <li>Configura las variables `WXM_SHOUTCAST_*` solo en el hosting o entorno local del Remote Admin.</li>
+                                        <li>Comprueba `/api/stream/shoutcast/summary` despues de iniciar sesion como admin.</li>
+                                        <li>No pegues password, authhash ni URLs admin dentro del CMC publico.</li>
                                     </ol>
                                 </details>
                                 <details class="manual-card">

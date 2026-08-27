@@ -36,6 +36,8 @@ if [ -n "${NODE_BIN:-}" ]; then
   [ -x "$NODE_BIN" ] || fail "NODE_BIN is set but not executable: $NODE_BIN"
 elif command -v node >/dev/null 2>&1; then
   NODE_BIN="$(command -v node)"
+elif [ -x "$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node" ]; then
+  NODE_BIN="$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
 elif [ -x "/Applications/Codex.app/Contents/Resources/cua_node/bin/node" ]; then
   NODE_BIN="/Applications/Codex.app/Contents/Resources/cua_node/bin/node"
 else

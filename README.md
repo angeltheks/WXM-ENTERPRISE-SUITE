@@ -119,6 +119,30 @@ Abrir:
 http://127.0.0.1:8091/index.html?dev=0
 ```
 
+## Levantar suite local completa
+
+Este comando inicia app web y CMS local. Si `WXM_CMS_ADMIN_PASSWORD` existe, tambien inicia el CMS Remote Admin:
+
+```bash
+cd /Users/mac/AndroidProjects/Reprov2_NEXTGEN
+export WXM_CMS_ADMIN_PASSWORD='pon-aqui-tu-clave-local'
+sh scripts/start-local-suite.sh
+```
+
+Puertos por defecto:
+
+```text
+8091 app web
+8098 CMS local
+8787 CMS Remote Admin
+```
+
+Detener servidores locales:
+
+```bash
+sh scripts/stop-local-suite.sh
+```
+
 ## Ver CMS local
 
 ```bash
@@ -134,16 +158,21 @@ http://127.0.0.1:8098/cms/index.html
 ## Levantar CMS Remote Admin local
 
 ```bash
-cd cms-remote-starter
+cd /Users/mac/AndroidProjects/Reprov2_NEXTGEN
 export WXM_CMS_ADMIN_PASSWORD='elige-un-password-local'
-export WXM_CMS_SESSION_SECRET="$(node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\")"
-npm run dev
+sh scripts/start-remote-cms.sh
 ```
 
 Abrir:
 
 ```text
 http://127.0.0.1:8787/admin/
+```
+
+Si no tienes `node` o `npm` global en macOS, el script intenta usar el Node embebido de Codex. Tambien puedes forzarlo con:
+
+```bash
+NODE_BIN=/ruta/a/node sh scripts/start-remote-cms.sh
 ```
 
 El Remote Admin incluye login protegido, CSRF, auditoria pseudonima, resumen de analytics, manifiesto de almacenamiento y snapshots operativos. Los endpoints de persistencia protegidos son:
